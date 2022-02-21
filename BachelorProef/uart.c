@@ -1,4 +1,10 @@
 /*
+ * uart.c
+ *
+ * Created: 21/02/2022 16:03:28
+ *  Author: Gebruiker
+ */ 
+/*
  * GccApplication1.c
  *
  * Created: 21/02/2022 13:47:48
@@ -9,6 +15,7 @@
 // en functies voor het in en uitlezen van de Rx en Tx poorten
 
 #include <avr/io.h>
+#include "HeaderMatrix.h"
 
 #define NAME3(a,b,c)         NAME3_HIDDEN(a,b,c)
 #define NAME3_HIDDEN(a,b,c)  a ## b ## c
@@ -62,13 +69,4 @@ int sendData(uint8_t hexgetal){   // returnt een 0 als het kan verzonden zorden 
 
 
 
-int main(void)
-{
-	
-	
-    /* Replace with your application code */
-    while (1) 
-    {
-    }
-}
 
