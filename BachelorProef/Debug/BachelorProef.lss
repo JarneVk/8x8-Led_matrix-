@@ -11,21 +11,21 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   3 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  0000017c  2**2
                   CONTENTS, READONLY
-  4 .debug_aranges 00000048  00000000  00000000  000001bc  2**0
+  4 .debug_aranges 00000050  00000000  00000000  000001bc  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   000025dc  00000000  00000000  00000204  2**0
+  5 .debug_info   00002625  00000000  00000000  0000020c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 00002376  00000000  00000000  000027e0  2**0
+  6 .debug_abbrev 000023c6  00000000  00000000  00002831  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000002c5  00000000  00000000  00004b56  2**0
+  7 .debug_line   00000312  00000000  00000000  00004bf7  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000058  00000000  00000000  00004e1c  2**2
+  8 .debug_frame  00000068  00000000  00000000  00004f0c  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    00001102  00000000  00000000  00004e74  2**0
+  9 .debug_str    00001122  00000000  00000000  00004f74  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    00000039  00000000  00000000  00005f76  2**0
+ 10 .debug_loc    00000039  00000000  00000000  00006096  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000028  00000000  00000000  00005faf  2**0
+ 11 .debug_ranges 00000030  00000000  00000000  000060cf  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -97,7 +97,7 @@ int main(void)
 
 000000be <uartsetup>:
 NAME3(USART,ARG,_BAUDH) = 0x02;\
-NAME3(USART,ARG,_CTRLC) = 0xA3;\
+NAME3(USART,ARG,_CTRLC) = 0x3A;  //00111010 -> 8bit verzending
 
 
 void uartsetup(){
@@ -106,7 +106,7 @@ void uartsetup(){
   c0:	40 93 08 08 	sts	0x0808, r20	; 0x800808 <__TEXT_REGION_LENGTH__+0x7f4808>
   c4:	32 e0       	ldi	r19, 0x02	; 2
   c6:	30 93 09 08 	sts	0x0809, r19	; 0x800809 <__TEXT_REGION_LENGTH__+0x7f4809>
-  ca:	23 ea       	ldi	r18, 0xA3	; 163
+  ca:	2a e3       	ldi	r18, 0x3A	; 58
   cc:	20 93 07 08 	sts	0x0807, r18	; 0x800807 <__TEXT_REGION_LENGTH__+0x7f4807>
 	PORTA_DIRSET = 0x01;
   d0:	91 e0       	ldi	r25, 0x01	; 1
