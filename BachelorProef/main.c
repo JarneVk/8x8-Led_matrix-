@@ -12,10 +12,15 @@
 
 int main(void)
 {
+	#ifdef SLAVE
 	uartsetup();
+	
+	readRegister_usart0();
+	#endif
     /* Replace with your application code */
     while (1) 
     {
+		
     }
 }
 

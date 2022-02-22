@@ -13,8 +13,6 @@ Discarded input sections
  .text          0x00000000        0x0 uart.o
  .data          0x00000000        0x0 uart.o
  .bss           0x00000000        0x0 uart.o
- .text.uartsetup
-                0x00000000       0x34 uart.o
  .text.sendData_usart0
                 0x00000000       0x22 uart.o
  .text          0x00000000        0x0 d:/lucas_data/microchip studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_exit.o)
@@ -163,7 +161,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0x142
+.text           0x00000000      0x16c
  *(.vectors)
  .vectors       0x00000000       0xa0 D:/Lucas_data/Microchip Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/gcc/dev/atmega4809/avrxmega3/crtatmega4809.o
                 0x00000000                __vector_default
@@ -214,68 +212,71 @@ END GROUP
  *(.init8)
  *(.init8)
  *(.init9)
- .init9         0x000000ac        0x8 D:/Lucas_data/Microchip Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/gcc/dev/atmega4809/avrxmega3/crtatmega4809.o
+ .init9         0x000000ac        0x4 D:/Lucas_data/Microchip Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/gcc/dev/atmega4809/avrxmega3/crtatmega4809.o
  *(.init9)
  *(.text)
- .text          0x000000b4        0x4 D:/Lucas_data/Microchip Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/gcc/dev/atmega4809/avrxmega3/crtatmega4809.o
-                0x000000b4                __vector_38
-                0x000000b4                __vector_22
-                0x000000b4                __vector_28
-                0x000000b4                __vector_1
-                0x000000b4                __vector_32
-                0x000000b4                __vector_34
-                0x000000b4                __vector_24
-                0x000000b4                __vector_12
-                0x000000b4                __bad_interrupt
-                0x000000b4                __vector_6
-                0x000000b4                __vector_31
-                0x000000b4                __vector_35
-                0x000000b4                __vector_39
-                0x000000b4                __vector_3
-                0x000000b4                __vector_23
-                0x000000b4                __vector_30
-                0x000000b4                __vector_25
-                0x000000b4                __vector_11
-                0x000000b4                __vector_13
-                0x000000b4                __vector_17
-                0x000000b4                __vector_19
-                0x000000b4                __vector_7
-                0x000000b4                __vector_27
-                0x000000b4                __vector_5
-                0x000000b4                __vector_33
-                0x000000b4                __vector_37
-                0x000000b4                __vector_4
-                0x000000b4                __vector_9
-                0x000000b4                __vector_2
-                0x000000b4                __vector_21
-                0x000000b4                __vector_15
-                0x000000b4                __vector_36
-                0x000000b4                __vector_29
-                0x000000b4                __vector_8
-                0x000000b4                __vector_26
-                0x000000b4                __vector_14
-                0x000000b4                __vector_10
-                0x000000b4                __vector_16
-                0x000000b4                __vector_18
-                0x000000b4                __vector_20
-                0x000000b8                . = ALIGN (0x2)
+ .text          0x000000b0        0x2 D:/Lucas_data/Microchip Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/gcc/dev/atmega4809/avrxmega3/crtatmega4809.o
+                0x000000b0                __vector_38
+                0x000000b0                __vector_22
+                0x000000b0                __vector_28
+                0x000000b0                __vector_1
+                0x000000b0                __vector_32
+                0x000000b0                __vector_34
+                0x000000b0                __vector_24
+                0x000000b0                __vector_12
+                0x000000b0                __bad_interrupt
+                0x000000b0                __vector_6
+                0x000000b0                __vector_31
+                0x000000b0                __vector_35
+                0x000000b0                __vector_39
+                0x000000b0                __vector_3
+                0x000000b0                __vector_23
+                0x000000b0                __vector_30
+                0x000000b0                __vector_25
+                0x000000b0                __vector_11
+                0x000000b0                __vector_13
+                0x000000b0                __vector_17
+                0x000000b0                __vector_19
+                0x000000b0                __vector_7
+                0x000000b0                __vector_27
+                0x000000b0                __vector_5
+                0x000000b0                __vector_33
+                0x000000b0                __vector_37
+                0x000000b0                __vector_4
+                0x000000b0                __vector_9
+                0x000000b0                __vector_2
+                0x000000b0                __vector_21
+                0x000000b0                __vector_15
+                0x000000b0                __vector_36
+                0x000000b0                __vector_29
+                0x000000b0                __vector_8
+                0x000000b0                __vector_26
+                0x000000b0                __vector_14
+                0x000000b0                __vector_10
+                0x000000b0                __vector_16
+                0x000000b0                __vector_18
+                0x000000b0                __vector_20
+                0x000000b2                . = ALIGN (0x2)
  *(.text.*)
- .text.main     0x000000b8        0x6 main.o
-                0x000000b8                main
+ .text.main     0x000000b2        0x6 main.o
+                0x000000b2                main
+ .text.uartsetup
+                0x000000b8       0x34 uart.o
+                0x000000b8                uartsetup
  .text.sendACK_usart0
-                0x000000be       0x22 uart.o
-                0x000000be                sendACK_usart0
+                0x000000ec       0x22 uart.o
+                0x000000ec                sendACK_usart0
  .text.sendNACK_usart0
-                0x000000e0       0x24 uart.o
-                0x000000e0                sendNACK_usart0
+                0x0000010e       0x24 uart.o
+                0x0000010e                sendNACK_usart0
  .text.readRegister_usart0
-                0x00000104       0x3a uart.o
-                0x00000104                readRegister_usart0
-                0x0000013e                . = ALIGN (0x2)
+                0x00000132       0x36 uart.o
+                0x00000132                readRegister_usart0
+                0x00000168                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x0000013e        0x0 d:/lucas_data/microchip studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_exit.o)
-                0x0000013e                _exit
-                0x0000013e                exit
+ .fini9         0x00000168        0x0 d:/lucas_data/microchip studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_exit.o)
+                0x00000168                _exit
+                0x00000168                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -294,16 +295,16 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x0000013e        0x4 d:/lucas_data/microchip studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_exit.o)
+ .fini0         0x00000168        0x4 d:/lucas_data/microchip studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_exit.o)
  *(.fini0)
-                0x00000142                _etext = .
+                0x0000016c                _etext = .
 
 .rodata
  *(.rodata)
  *(.rodata*)
  *(.gnu.linkonce.r*)
 
-.data           0x00802800        0x0 load address 0x00000142
+.data           0x00802800        0x0 load address 0x0000016c
                 [!provide]                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -318,8 +319,8 @@ END GROUP
  *(.bss*)
  *(COMMON)
                 [!provide]                PROVIDE (__bss_end, .)
-                0x00000142                __data_load_start = LOADADDR (.data)
-                0x00000142                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x0000016c                __data_load_start = LOADADDR (.data)
+                0x0000016c                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x00802800        0x0
                 [!provide]                PROVIDE (__noinit_start, .)
@@ -401,11 +402,11 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x2659
+.debug_info     0x00000000     0x266f
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000     0x248a D:/Lucas_data/Microchip Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/gcc/dev/atmega4809/avrxmega3/crtatmega4809.o
- .debug_info    0x0000248a       0x9f main.o
- .debug_info    0x00002529      0x130 uart.o
+ .debug_info    0x0000248a       0xb5 main.o
+ .debug_info    0x0000253f      0x130 uart.o
 
 .debug_abbrev   0x00000000     0x23d2
  *(.debug_abbrev)
@@ -413,24 +414,24 @@ END GROUP
  .debug_abbrev  0x00002296       0x68 main.o
  .debug_abbrev  0x000022fe       0xd4 uart.o
 
-.debug_line     0x00000000      0x388
+.debug_line     0x00000000      0x38e
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x187 D:/Lucas_data/Microchip Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/gcc/dev/atmega4809/avrxmega3/crtatmega4809.o
- .debug_line    0x00000187       0x51 main.o
- .debug_line    0x000001d8      0x1b0 uart.o
+ .debug_line    0x00000187       0x57 main.o
+ .debug_line    0x000001de      0x1b0 uart.o
 
 .debug_frame    0x00000000       0x94
  *(.debug_frame)
  .debug_frame   0x00000000       0x24 main.o
  .debug_frame   0x00000024       0x70 uart.o
 
-.debug_str      0x00000000     0x1151
+.debug_str      0x00000000     0x1160
  *(.debug_str)
  .debug_str     0x00000000      0xf85 D:/Lucas_data/Microchip Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/gcc/dev/atmega4809/avrxmega3/crtatmega4809.o
- .debug_str     0x00000f85      0x171 main.o
-                                0x1a5 (size before relaxing)
- .debug_str     0x000010f6       0x5b uart.o
-                                0x1ef (size before relaxing)
+ .debug_str     0x00000f85      0x18a main.o
+                                0x1be (size before relaxing)
+ .debug_str     0x0000110f       0x51 uart.o
+                                0x1fe (size before relaxing)
 
 .debug_loc      0x00000000       0x73
  *(.debug_loc)

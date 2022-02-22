@@ -8,13 +8,25 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|AVR = Debug|AVR
+		Master(Debug)|AVR = Master(Debug)|AVR
+		Master|AVR = Master|AVR
 		Release|AVR = Release|AVR
+		Slave(Debug)|AVR = Slave(Debug)|AVR
+		Slave|AVR = Slave|AVR
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Debug|AVR.ActiveCfg = Debug|AVR
 		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Debug|AVR.Build.0 = Debug|AVR
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Master(Debug)|AVR.ActiveCfg = Master(Debug)|AVR
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Master(Debug)|AVR.Build.0 = Master(Debug)|AVR
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Master|AVR.ActiveCfg = Master|AVR
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Master|AVR.Build.0 = Master|AVR
 		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Release|AVR.ActiveCfg = Release|AVR
 		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Release|AVR.Build.0 = Release|AVR
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Slave(Debug)|AVR.ActiveCfg = Slave(Debug)|AVR
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Slave(Debug)|AVR.Build.0 = Slave(Debug)|AVR
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Slave|AVR.ActiveCfg = Slave|AVR
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Slave|AVR.Build.0 = Slave|AVR
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

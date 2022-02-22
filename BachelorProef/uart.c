@@ -14,6 +14,7 @@
 // In dit programma confirureren we de uart poorten voor communicatie
 // en functies voor het in en uitlezen van de Rx en Tx poorten
 
+
 #include <avr/io.h>
 #include "HeaderMatrix.h"
 
@@ -51,7 +52,7 @@ int sendData_usart0(int hexgetal){   // returnt een 0 als het kan verzonden zord
         return 0;
     }    
     else {
-        // register is nog niet geschift > even wachten
+        // register is nog niet geshift > even wachten
         return 1;
     }
 }
@@ -99,11 +100,7 @@ int readRegister_usart0(){      // geeft 8 bits terug + 1 bit als packetnummer
 		if(bits[0]&(1<<2) || bits[0]&(1<<1)){	// kijken of er geen frame of parity errors zijn
 			sendNACK_usart0();			// 0xAA voorlopig als NACK
 			return 1;
-		}
-		
-		//else if checken op NACK moet nog worden toegevoegd -> vraag hoe gaan we dit naar buiten brengen via de int?
-		
-		else{
+		}else{//else if checken op NACK moet nog worden toegevoegd -> vraag hoe gaan we dit naar buiten brengen via de int?
 			sendACK_usart0();
 			return bits[1];
 		}	
