@@ -145,6 +145,7 @@
 #   disasm: disassembles the code for debugging
 #   clean:  removes all .hex, .elf, and .o files in the source code and library directories
 
+SHELL=cmd
 # parameters (change this stuff accordingly)
 # project name1
 PRJ_SLAVE = Slave
@@ -173,6 +174,8 @@ OUTPUT_MASTER = ./Master_build/
 # e.g. EXT = ../../EyeToSee ../../YouSART
 EXT = ./
 
+#Voor windows foward slash (fuck you windows)
+BLANK :=
 
 #################################################################################################
 # \/ stuff nobody needs to worry about until such time that worrying about it is appropriate \/ #
@@ -198,7 +201,7 @@ EXTC         := $(foreach dir, $(EXT), $(wildcard $(dir)/*.c))
 #OBJ_SLAVE    := $(foreach dir, $(CFILES_SLAVE),$(OUTPUT_SLAVE)$(subst .c,.o,$(notdir $(dir)))) $(EXTC:.c=.o)
 OBJ_SLAVE    := $(CFILES_SLAVE:.c=.o) $(EXTC:.c=.o)
 OBJ_MASTER    = $(CFILES_MASTER:.c=.o) $(EXTC:.c=.o)
-$(info $(OBJ_SLAVE))
+
 # user targets
 # compile all files
 all: $(PRJ_SLAVE).hex $(PRJ_MASTER).hex
@@ -220,16 +223,29 @@ fuse:
 	$(AVRDUDE) -U lfuse:w:$(LFU):m -U hfuse:w:$(HFU):m -U efuse:w:$(EFU):m
 
 # generate disassembly files for debugging
-disasm: $(PRJ).elf
-	$(OBJDUMP) -d $(OUTPUT)$(PRJ).elf
+disasm_slave: $(PRJ_SLAVE).elf
+	$(OBJDUMP) -d $(OUTPUT_SLAVE)$(PRJ_SLAVE).elf > $(OUTPUT_SLAVE)$(PRJ_SLAVE).txt
+
+disasm_master: $(PRJ_MASTER).elf
+	$(OBJDUMP) -d $(OUTPUT_MASTER)$(PRJ_MASTER).elf > $(OUTPUT_MASTER)$(PRJ_MASTER).txt
 
 # remove compiled files
 clean:
+ifeq ($(OS),Windows_NT)
+	del /q $(subst /,\$(BLANK),$(OUTPUT_SLAVE))*.hex
+	del /q $(subst /,\$(BLANK),$(OUTPUT_SLAVE))*.elf
+	del /q $(subst /,\$(BLANK),$(OUTPUT_MASTER))*.hex
+	del /q $(subst /,\$(BLANK),$(OUTPUT_MASTER))*.elf
+	$(foreach dir, $(subst /,\,$(dir $(SRC))), del /q $(dir)*.o;)
+	$(foreach dir, $(subst /,\,$(dir $(SRC_SLAVE))), del /q $(dir)*.o;)
+	$(foreach dir, $(subst /,\,$(dir $(SRC_MASTER))), del /q $(dir)*.o;)
+else
 	rm -f $(OUTPUT_SLAVE)*.hex $(OUTPUT_SLAVE)*.elf
 	rm -f $(OUTPUT_MASTER)*.hex $(OUTPUT_MASTER)*.elf
 	$(foreach dir, $(SRC), rm -f $(dir $(dir))/*.o;)
 	$(foreach dir, $(SRC_SLAVE), rm -f $(dir $(dir))/*.o;)
 	$(foreach dir, $(SRC_MASTER), rm -f $(dir $(dir))/*.o;)
+endif
 
 # other targets
 # objects from c files
@@ -238,30 +254,42 @@ clean:
 
 
 $(OUTPUT_SLAVE):
+ifeq ($(OS),Windows_NT)
+	-mkdir $(subst /,\,$(subst ./,,$(OUTPUT_SLAVE)))
+else
 	mkdir -p $(OUTPUT_SLAVE)
-
+endif
 
 $(OUTPUT_MASTER):
+ifeq ($(OS),Windows_NT)
+	-mkdir $(subst /,\,$(subst ./,,$(OUTPUT_MASTER)))
+else
 	mkdir -p $(OUTPUT_MASTER)
-	
+endif
 
 # elf files
 $(PRJ_SLAVE).elf: $(OUTPUT_SLAVE) $(OBJ_SLAVE)
-	@echo $(OBJ_SLAVE)
 	$(CC) $(CFLAGS) -o $(OUTPUT_SLAVE)$(PRJ_SLAVE).elf $(OBJ_SLAVE)
 
 $(PRJ_MASTER).elf: $(OUTPUT_MASTER) $(OBJ_MASTER)
-	@echo $(OBJ_MASTER)
 	$(CC) $(CFLAGS) -o $(OUTPUT_MASTER)$(PRJ_MASTER).elf $(OBJ_MASTER)
 
 
 # hex files
 $(PRJ_SLAVE).hex: $(PRJ_SLAVE).elf
+ifeq ($(OS),Windows_NT)
+	del /q $(subst /,\,$(OUTPUT_SLAVE)\$(PRJ_SLAVE)).hex
+else
 	rm -f $(OUTPUT_SLAVE)$(PRJ_SLAVE).hex
+endif
 	$(OBJCOPY) -j .text -j .data -O ihex $(OUTPUT_SLAVE)$(PRJ_SLAVE).elf $(OUTPUT_SLAVE)$(PRJ_SLAVE).hex
 	$(SIZE) $(OUTPUT_SLAVE)$(PRJ_SLAVE).elf
 
 $(PRJ_MASTER).hex: $(PRJ_MASTER).elf
+ifeq ($(OS),Windows_NT)
+	del /q $(subst /,\,$(OUTPUT_MASTER)\$(PRJ_MASTER)).hex
+else
 	rm -f $(OUTPUT_MASTER)$(PRJ_MASTER).hex
+endif
 	$(OBJCOPY) -j .text -j .data -O ihex $(OUTPUT_MASTER)$(PRJ_MASTER).elf $(OUTPUT_MASTER)$(PRJ_MASTER).hex
 	$(SIZE) $(OUTPUT_MASTER)$(PRJ_MASTER).elf
