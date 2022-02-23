@@ -1,4 +1,8 @@
 .vscode/c_cpp_properties.json
-
+*.o
+*.elf
+*.hex
+Master.txt
+Slave.txt
 .vscode/settings.json
 lmakefile
