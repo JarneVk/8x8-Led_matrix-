@@ -79,16 +79,16 @@ int readRegister_usart0(){      // geeft 8 bits terug + 1 bit als packetnummer
 		
 		if(bits[0]&(1<<2) || bits[0]&(1<<1)){	// kijken of er geen frame of parity errors zijn
 			//NACK sturen 
-			sendData_usart0(8+(int)*huidigPacketje);
+			sendData_usart0(8+huidigPacketje);
 			return 1;
-		}else if(bits[0] != (int)*huidigPacketje){
+		}else if(bits[0] != huidigPacketje){
 			//NACK sturen 
-			sendData_usart0(8+(int)*huidigPacketje);
+			sendData_usart0(8+huidigPacketje);
 			return 1;
 		}else{
 			//ACK sturen
-			sendData_usart0(4+(int)*huidigPacketje);
-			*huidigPacketje = ~(*huidigPacketje);		// toggel bit 
+			sendData_usart0(4+huidigPacketje);
+			huidigPacketje = ~(huidigPacketje);		// toggel bit 
 			return bits[1];
 		}	
 	}
