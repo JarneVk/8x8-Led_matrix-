@@ -2,6 +2,7 @@
 *.o
 *.elf
 *.hex
+*.map
 Master.txt
 Slave.txt
 .vscode/settings.json
