@@ -32,7 +32,7 @@ PRG = pkobn_updi
 # program source files (not including external libraries)
 SRC_SLAVE = ./Slave/main.c
 SRC_MASTER = ./Master/main.c
-SRC = uart.c
+SRC = uart.c 
 OUTPUT_SLAVE = ./Slave_build/
 OUTPUT_MASTER = ./Master_build/
 # where to look for external libraries (consisting of .c/.cpp files and .h files)
