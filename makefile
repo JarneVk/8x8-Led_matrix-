@@ -37,7 +37,7 @@ OUTPUT_SLAVE = ./Slave_build/
 OUTPUT_MASTER = ./Master_build/
 # where to look for external libraries (consisting of .c/.cpp files and .h files)
 # e.g. EXT = ../../EyeToSee ../../YouSART
-EXT = ./
+EXT = ./include/
 
 #Voor windows foward slash (fuck you windows)
 BLANK :=
