@@ -30,7 +30,7 @@ void uartsetup(){
 	PORTC_DIRSET = 0x01;
 	USART1_CTRLB = 0xC0;
 	
-	huidigPacketje = 0;
+	huidigPacketje_Ontvanger_aurt0 = 0;
 }
 
 
@@ -79,16 +79,16 @@ int readRegister_usart0(){      // geeft 8 bits terug + 1 bit als packetnummer
 		
 		if(bits[0]&(1<<2) || bits[0]&(1<<1)){	// kijken of er geen frame of parity errors zijn
 			//NACK sturen 
-			sendData_usart0(8+huidigPacketje);
+			sendData_usart0(8+huidigPacketje_Ontvanger_aurt0);
 			return 1;
-		}else if(bits[0] != huidigPacketje){
+		}else if(bits[0] != huidigPacketje_Ontvanger_aurt0){
 			//NACK sturen 
-			sendData_usart0(8+huidigPacketje);
+			sendData_usart0(8+huidigPacketje_Ontvanger_aurt0);
 			return 1;
 		}else{
 			//ACK sturen
-			sendData_usart0(4+huidigPacketje);
-			huidigPacketje = ~(huidigPacketje);		// toggel bit 
+			sendData_usart0(4+huidigPacketje_Ontvanger_aurt0);
+			huidigPacketje_Ontvanger_aurt0 = ~(huidigPacketje_Ontvanger_aurt0);		// toggel bit 
 			return bits[1];
 		}	
 	}

@@ -30,6 +30,8 @@ void uartsetup_zender_uart0(){
 	initIrcomUsart(1);
 	PORTC_DIRSET = 0x01;
 	USART1_CTRLB = 0xC0;
+
+	huidigPacketje_Ontvanger_aurt0 = 0;
 		
 }
 
@@ -45,9 +47,16 @@ void uartsetup_zender_uart0(){
     je kan ENKEL in het register schrijven als DREIF (in usartn.status) bit op 1 staat
 */
 
-int sendData_zender_usart0(int hexgetal, int PacketNummer){   // returnt een 0 als het kan verzonden zorden anders een 1
+int sendData_zender_usart0(int hexgetal){   // returnt een 0 als het kan verzonden zorden anders een 1
+
+	if(huidigPacketje_Ontvanger_aurt0 == bevestigde_packet_zender){
+		//sliding window buffer vol 
+		return 1;
+	}
+
+
     if(USART0_STATUS&(1<<5)){  // get de DREIF bit
-		if(PacketNummer == 0){
+		if(huidigPacketje_Zender_uart0 == 0){
 			USART0_TXDATAH &= ~(1<<0);	// zet bit op 0
 		}
 		else{
@@ -81,15 +90,19 @@ int readRegister_zender_usart0(){      // geeft 8 bits terug + 1 bit als packetn
 		bits[1] = USART0_RXDATAL; 
 		
 		if(bits[0]&(1<<2) || bits[0]&(1<<1)){	// kijken of er geen frame of parity errors zijn
-			//NACK sturen 
+			//NACK sturen 		
+			//sendData_usart0(8);
 			return 1;
-		}else{//else if checken op NACK moet nog worden toegevoegd -> vraag hoe gaan we dit naar buiten brengen via de int?
-			// ACK sturen
-			return bits[1];
+		}else if(bits[1]&(1<<4)){	//als een NACK tokomt
+			sendData_usart0(zender_buffer_uart0[huidigPacketje_Zender_uart0]);
+			return 0;
+		}else if(bits[1]&(1<<3)){
+			bevestigde_packet_zender = bits[1]&(0<<3);
+			return 0;
 		}	
 	}
 	else{
-		return 1;	// nog geen data beschikbaar
+		return 0;	// nog geen data beschikbaar
 	}
 }
 
