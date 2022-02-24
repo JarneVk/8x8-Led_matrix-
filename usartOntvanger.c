@@ -5,8 +5,11 @@
  *  Author: Gebruiker
  */ 
 
-// In dit programma confirureren we de uart poorten voor communicatie
-// en functies voor het in en uitlezen van de Rx en Tx poorten
+/*
+usart onvanger zorgt voor de low level aansturing van de usart poorten die aan de IRED worden gekoppeld 
+
+het zal enkel ontvangen en kan hierop zelf antwoorden met NACK(packet) of ACK(packet)
+*/
 
 
 #include <avr/io.h>

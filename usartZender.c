@@ -6,8 +6,17 @@
  */ 
  
 
-// In dit programma confirureren we de uart poorten voor communicatie
-// en functies voor het in en uitlezen van de Rx en Tx poorten
+/*
+usartZender zorgt voor de low level aansturen van de usart poorten die aan de IRED trancievers worden gekoppeld
+
+de Zender zal werken volgens een sliding window met buffer 1, en werkt in 1 richting 
+het zal dus enkel een ACK(packet) of NACK(packet) kunnen ontvangen 
+
+het stuurt een packet_nummer + 8bit info
+
+bij binnenkomen van een NACK zal het het juiste packet herzenden 
+bij ACK zal het dit packet van de buffer terug vrijgeven
+*/
 
 
 #include <avr/io.h>
