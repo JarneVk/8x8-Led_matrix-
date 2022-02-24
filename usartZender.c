@@ -49,11 +49,11 @@ void uartsetup_zender_uart0(){
 
 int sendData_zender_usart0(int hexgetal){   // returnt een 0 als het kan verzonden zorden anders een 1
 
-	if(huidigPacketje_Ontvanger_aurt0 == bevestigde_packet_zender){
+	if(huidigPacketje_Zender_uart0 == te_bevestigde_packet_zender){
 		//sliding window buffer vol 
 		return 1;
 	}
-
+	zender_buffer_uart0[huidigPacketje_Zender_uart0] = hexgetal;
 
     if(USART0_STATUS&(1<<5)){  // get de DREIF bit
 		if(huidigPacketje_Zender_uart0 == 0){
@@ -97,7 +97,7 @@ int readRegister_zender_usart0(){      // geeft 8 bits terug + 1 bit als packetn
 			sendData_usart0(zender_buffer_uart0[huidigPacketje_Zender_uart0]);
 			return 0;
 		}else if(bits[1]&(1<<3)){
-			bevestigde_packet_zender = bits[1]&(0<<3);
+			te_bevestigde_packet_zender = ~(bits[1]&(0<<3));		// als 1 is volgende packetje een 0 en omgekeerd
 			return 0;
 		}	
 	}
