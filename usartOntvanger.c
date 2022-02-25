@@ -13,6 +13,8 @@ het zal enkel ontvangen en kan hierop zelf antwoorden met NACK(packet) of ACK(pa
 
 
 #include <avr/io.h>
+#include <util/delay.h>
+#include <avr/interrupt.h>
 #include "HeaderMatrix.h"
 
 #define NAME3(a,b,c)         NAME3_HIDDEN(a,b,c)
@@ -31,9 +33,22 @@ void uartsetup(){
 	
 	initIrcomUsart(1);
 	PORTC_DIRSET = 0x01;
-	USART1_CTRLB = 0xC0;
+	USART0_CTRLB = 0xC0;
 	
 	huidigPacketje_Ontvanger_aurt0 = 0;
+	ontvanger_buffer_uart0 = 0;
+}
+
+
+void timer_setup(){
+	//TCB0_CTRLA mag op default 0 blijven 
+	// CTRLB mag ook op 0 blijven
+	TCB0_CTRLB = 0x01;
+	TCB0_EVCTRL = 0x00; 	// op 0x01 om de timer te starten 
+	TCB0_INTCTRL = 0x01;	//enable inetrups
+	TCB0_CNT = 0x01;
+	TCB0_CCMPL = 0xFF;
+	TCB0_CCMPH = 0xFF;
 }
 
 
@@ -53,6 +68,7 @@ void uartsetup(){
 
 int sendData_usart0(int hexgetal){   // returnt een 0 als het kan verzonden zorden anders een 1
     if(USART0_STATUS&(1<<5)){		 // get de DREIF bit
+		ontvanger_buffer_uart0 = hexgetal;
         USART0_TXDATAL = hexgetal;
         return 0;
     }    
@@ -74,7 +90,7 @@ int sendData_usart0(int hexgetal){   // returnt een 0 als het kan verzonden zord
     - als alles correct is -> RXDATAL inlezen en register laten schiften
 */
 
-int readRegister_usart0(){      // geeft 8 bits terug + 1 bit als packetnummer 
+void readuart0_interupt(){      // geeft 8 bits terug + 1 bit als packetnummer 
 	int bits[2];
 	if(USART0_RXDATAH&(1<<7)){	// kijken naar 7de bit
 		bits[0] = USART0_RXDATAH;
@@ -82,24 +98,42 @@ int readRegister_usart0(){      // geeft 8 bits terug + 1 bit als packetnummer
 		
 		if(bits[0]&(1<<2) || bits[0]&(1<<1)){	// kijken of er geen frame of parity errors zijn
 			//NACK sturen 
-			sendData_usart0(8+huidigPacketje_Ontvanger_aurt0);
-			return 1;
+			while(sendData_usart0(8+huidigPacketje_Ontvanger_aurt0)){
+				_delay_ms(1);
+			}
 		}else if(bits[0] != huidigPacketje_Ontvanger_aurt0){
 			//NACK sturen 
-			sendData_usart0(8+huidigPacketje_Ontvanger_aurt0);
-			return 1;
+			while(sendData_usart0(8+huidigPacketje_Ontvanger_aurt0)){
+				_delay_ms(1);
+			}
 		}else{
 			//ACK sturen
-			sendData_usart0(4+huidigPacketje_Ontvanger_aurt0);
+			while(sendData_usart0(4+huidigPacketje_Ontvanger_aurt0)){
+				_delay_ms(1);
+			}
 			huidigPacketje_Ontvanger_aurt0 = ~(huidigPacketje_Ontvanger_aurt0);		// toggel bit 
-			return bits[1];
+			//return bits[1];
+			/*
+
+			HIER MOET EEN HOGERE FUNCTIE KOMEN DIE DE DATA VERWERKT
+
+
+			*/
 		}	
-	}
-	else{
-		return 1;	// nog geen data beschikbaar -> andere manier bedenken 
 	}
 }
 
+ISR(USART0_RXC_vect){
+	readuart0_interupt();
+}
+
+
+//timeout functie 
+ISR(TCB0_INT_vect){
+	while(sendData_usart0(ontvanger_buffer_uart0)){
+		_delay_ms(1);
+	}
+}
 
 
 
