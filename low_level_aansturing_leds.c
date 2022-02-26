@@ -24,8 +24,8 @@ int writeToLed(char bitArray[],int aantalAangestuurdeLeds){
         PORTB_OUT &= ~PIN5_bm;
     }
     for(int i=0; i<aantalAangestuurdeLeds;++i){             // led info doorsturen
-        for(int j=0; j<29;++j){
-            if(bitArray[(aantalAangestuurdeLeds*29)+j]){
+        for(int j=0; j<32;++j){
+            if(bitArray[(aantalAangestuurdeLeds*32)+j]){
                 PORTB_OUT |= PIN5_bm;
             }
             else{
