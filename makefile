@@ -32,7 +32,7 @@ PRG = pkobn_updi
 # program source files (not including external libraries)
 SRC_SLAVE = ./Slave/main.c
 SRC_MASTER = ./Master/main.c
-SRC = usartOntvanger.c usartZender.c
+SRC = usartOntvanger.c usartZender.c low_level_aansturing_leds.c
 OUTPUT_SLAVE = ./Slave_build/
 OUTPUT_MASTER = ./Master_build/
 # where to look for external libraries (consisting of .c/.cpp files and .h files)

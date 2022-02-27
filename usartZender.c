@@ -33,7 +33,7 @@ NAME3(USART,ARG,_BAUDH) = 0x02;\
 NAME3(USART,ARG,_CTRLC) = 0x3E;  //00111110 -> 9bit verzending
 
 
-void uartsetup_zender_uart0(){
+void uartsetup_zender_uart1(){
 	initIrcomUsart(1);
 	PORTA_DIRSET = 0x01;
 	USART1_CTRLB = 0xC0;
@@ -42,17 +42,16 @@ void uartsetup_zender_uart0(){
 	PORTC_DIRSET = 0x01;
 	USART1_CTRLB = 0xC0;
 
-	huidigPacketje_Ontvanger_aurt0 = 0;
-	zender_buffer_uart0[0]=0;
-	zender_buffer_uart0[1]=0;
-	te_bevestigde_packet_zender = 0;
+	zender_buffer_uart1 = 0;
+	zender_verbinding = 0;
 		
 }
 
 
 /* SendData : de ontvanger zal een ACK(frame) een NACK(frame) kunnen sturen naar de zender
-		ACK :   0 0000 01 + 2bit voor frame 	
-		NACK :	0 0000 10 + 2bit voor frame
+		ACK :   1 0000 0001
+		NACK :	1 0000 0010
+		verbinding request : 0 1010 1010 => 0xAA
 
  */
 
@@ -63,19 +62,8 @@ void uartsetup_zender_uart0(){
 
 int sendData_zender_usart1(int hexgetal){   // returnt een 0 als het kan verzonden zorden anders een 1
 
-	if(huidigPacketje_Zender_uart0 == te_bevestigde_packet_zender){
-		//sliding window buffer vol 
-		return 1;
-	}
-	zender_buffer_uart0[huidigPacketje_Zender_uart0] = hexgetal;
-
-    if(USART0_STATUS&(1<<5)){  // get de DREIF bit
-		if(huidigPacketje_Zender_uart0 == 0){
-			USART1_TXDATAH &= ~(1<<0);	// zet bit op 0
-		}
-		else{
-			USART1_TXDATAH |= (1<<0);	// zet bit op 1
-		}
+	zender_buffer_uart1 = hexgetal;
+    if(USART1_STATUS&(1<<5)){  // get de DREIF bit
         USART1_TXDATAL = hexgetal;
         return 0;
     }    
@@ -97,27 +85,45 @@ int sendData_zender_usart1(int hexgetal){   // returnt een 0 als het kan verzond
     - als alles correct is -> RXDATAL inlezen en register laten schiften
 */
 
-/*
-int readRegister_zender_usart1(){      // vroegere functie
-}*/
-
-
-ISR(USART1_RXC_vect){			//interupt register 
+void interup_ReadData(){
 	int bits[2];
-	if(USART0_RXDATAH&(1<<7)){	// kijken naar 7de bit
+	if(USART1_RXDATAH&(1<<7)){	// kijken naar 7de bit
 		bits[0] = USART1_RXDATAH;
 		bits[1] = USART1_RXDATAL; 
 		
 		if(bits[0]&(1<<2) || bits[0]&(1<<1)){	// kijken of er geen frame of parity errors zijn
 			//NACK sturen 		
 			//of negeer het en wat op de timeout van de Ontvanger
-		}else if(bits[1]&(1<<4)){	//als een NACK tokomt
-			while(sendData_usart0(zender_buffer_uart0[bits[1] &=0b11111110])){
+		}else if(bits[0]==1 && bits[1]&(1<<2)){	//als een NACK tokomt
+			while(sendData_zender_usart1(zender_buffer_uart1)){
 				_delay_ms(1);
 			}
-		}else if(bits[1]&(1<<3)){
-			te_bevestigde_packet_zender = ~(bits[1] &=0b11111011);		// als 1 is volgende packetje een 0 en omgekeerd
+		}else if(bits[0]==1 && bits[1]==1){		//ACK nieuw packetje sturen
+			while(sendData_zender_usart1(1)){		//1 vevangen door getNewData()
+				_delay_ms(1);
+			}	
+		}
+		else if(bits[1]== 0b10101010){		//new verbinding request
+			connectRequest();
 		}	
+	}
+}
+
+void connectRequest(){
+	sendData_zender_usart1(1);
+
+	// nieuwe matrix doorsturen 	
+	
+}
+
+
+
+ISR(USART1_RXC_vect){			//interupt register 
+	if(zender_verbinding == 1){
+		interup_ReadData();
+	}
+	else{
+		connectRequest();
 	}
 }
 

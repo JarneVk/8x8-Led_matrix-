@@ -3,8 +3,8 @@
 // usart 0 
 void uartsetup();
 
-int huidigPacketje_Ontvanger_aurt0;
-int huidigPacketje_Zender_uart0;
-int te_bevestigde_packet_zender;
-int zender_buffer_uart0[2];
+int zender_buffer_uart1;
 int ontvanger_buffer_uart0;
+int ontvanger_verbinding;   //contole of er al een verbinding is gemaakt 
+int zender_verbinding;
+int ontvanger_count_timeout;
