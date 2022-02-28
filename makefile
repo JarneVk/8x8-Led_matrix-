@@ -1,3 +1,8 @@
+# simple AVR Makefile
+#
+# written by michael cousins (http://github.com/mcous)
+# released to the public domain
+
 # Makefile
 #
 # targets:
@@ -16,6 +21,8 @@ endif
 PRJ_SLAVE = Slave
 # project name2
 PRJ_MASTER = Master
+#Test output name
+PRJ_TEST = Test
 # avr mcu
 MCU = atmega4809
 # mcu clock frequency (default atmega4809 clock = 3.3333 Mhz)
@@ -32,9 +39,11 @@ PRG = pkobn_updi
 # program source files (not including external libraries)
 SRC_SLAVE = ./Slave/main.c
 SRC_MASTER = ./Master/main.c
+SRC_TEST = ./Test/main.c
 SRC = usartOntvanger.c usartZender.c low_level_aansturing_leds.c
 OUTPUT_SLAVE = ./Slave_build/
 OUTPUT_MASTER = ./Master_build/
+OUTPUT_TEST = ./Test_build/
 # where to look for external libraries (consisting of .c/.cpp files and .h files)
 # e.g. EXT = ../../EyeToSee ../../YouSART
 EXT = ./include/
@@ -50,7 +59,7 @@ BLANK :=
 INCLUDE := $(foreach dir, $(EXT), -I$(dir))
 # c flags
 #CFLAGS    = -Wall -DF_CPU=$(CLK) -mmcu=$(MCU) $(INCLUDE) -B ./atmega4809
-CFLAGS    = -x c -funsigned-char -funsigned-bitfields -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -Wall -mmcu=atmega4809 -B ".\atmega4809" -c -std=gnu99 #-MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"
+CFLAGS    = -DF_CPU=$(CLK) -x c -funsigned-char -funsigned-bitfields -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -Wall -mmcu=atmega4809 -B ".\atmega4809" -c -std=gnu99 #-MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"
 LINKERFLAGS =  -Wl,--start-group -Wl,-lm  -Wl,--end-group -Wl,--gc-sections -mrelax -mmcu=atmega4809 -B ".\atmega4809"  
 
 # executables
@@ -63,26 +72,37 @@ CC      = avr-gcc
 # generate list of objects
 CFILES_SLAVE  = $(SRC) $(SRC_SLAVE)
 CFILES_MASTER = $(SRC) $(SRC_MASTER)
+CFILES_TEST = $(SRC) $(SRC_TEST)
 EXTC         := $(foreach dir, $(EXT), $(wildcard $(dir)/*.c))
 #OBJ_SLAVE    := $(foreach dir, $(CFILES_SLAVE),$(OUTPUT_SLAVE)$(subst .c,.o,$(notdir $(dir)))) $(EXTC:.c=.o)
 OBJ_SLAVE    := $(CFILES_SLAVE:.c=.o) $(EXTC:.c=.o)
 OBJ_MASTER    = $(CFILES_MASTER:.c=.o) $(EXTC:.c=.o)
+OBJ_TEST    = $(CFILES_TEST:.c=.o) $(EXTC:.c=.o)
+
 
 # user targets
 # compile all files
 all: $(PRJ_SLAVE).hex $(PRJ_MASTER).hex
-	
+
+build_test: $(PRJ_TEST).hex
+
 slave: $(PRJ_SLAVE).hex
 
 master: $(PRJ_MASTER).hex
 
 # test programmer connectivity
-test:
+test_programmer:
 	$(AVRDUDE) -v
 
 # flash program to mcu (nog niet af)
-flash: all
-	$(AVRDUDE) -U flash:w:$(PRJ).hex:i
+flash_slave: slave
+	$(AVRDUDE) -U flash:w:$(OUTPUT_SLAVE)$(PRJ_SLAVE).hex:i
+
+flash_master: master
+	$(AVRDUDE) -U flash:w:$(OUTPUT_MASTER)$(PRJ_MASTER).hex:i
+
+flash_test: build_test
+	$(AVRDUDE) -U flash:w:$(OUTPUT_TEST)$(PRJ_TEST).hex:i
 
 # write fuses to mcu (moet nog is bezien worden)
 # fuse:
@@ -95,22 +115,33 @@ disasm_slave: $(PRJ_SLAVE).elf
 disasm_master: $(PRJ_MASTER).elf
 	$(OBJDUMP) -d $(OUTPUT_MASTER)$(PRJ_MASTER).elf > $(OUTPUT_MASTER)$(PRJ_MASTER).txt
 
+disasm_test: $(PRJ_TEST).elf
+	$(OBJDUMP) -d $(OUTPUT_TEST)$(PRJ_TEST).elf > $(OUTPUT_TEST)$(PRJ_TEST).txt
+
 # remove compiled files
 clean:
 ifeq ($(OS),Windows_NT)
-	del /q $(subst /,\$(BLANK),$(OUTPUT_SLAVE))*.hex
-	del /q $(subst /,\$(BLANK),$(OUTPUT_SLAVE))*.elf
-	del /q $(subst /,\$(BLANK),$(OUTPUT_MASTER))*.hex
-	del /q $(subst /,\$(BLANK),$(OUTPUT_MASTER))*.elf
-	$(foreach dir, $(subst /,\,$(dir $(SRC))), del /q $(dir)*.o;)
-	$(foreach dir, $(subst /,\,$(dir $(SRC_SLAVE))), del /q $(dir)*.o;)
-	$(foreach dir, $(subst /,\,$(dir $(SRC_MASTER))), del /q $(dir)*.o;)
+	-del /q $(subst /,\$(BLANK),$(OUTPUT_SLAVE))*.hex
+	-del /q $(subst /,\$(BLANK),$(OUTPUT_SLAVE))*.elf
+	-del /q $(subst /,\$(BLANK),$(OUTPUT_SLAVE))*.map
+	-del /q $(subst /,\$(BLANK),$(OUTPUT_MASTER))*.hex
+	-del /q $(subst /,\$(BLANK),$(OUTPUT_MASTER))*.elf
+	-del /q $(subst /,\$(BLANK),$(OUTPUT_MASTER))*.map
+	-del /q $(subst /,\$(BLANK),$(OUTPUT_TEST))*.hex
+	-del /q $(subst /,\$(BLANK),$(OUTPUT_TEST))*.elf
+	-del /q $(subst /,\$(BLANK),$(OUTPUT_TEST))*.map
+	-$(foreach dir, $(subst /,\,$(dir $(SRC))), del /q $(dir)*.o;)
+	-$(foreach dir, $(subst /,\,$(dir $(SRC_SLAVE))), del /q $(dir)*.o;)
+	-$(foreach dir, $(subst /,\,$(dir $(SRC_MASTER))), del /q $(dir)*.o;)
+	-$(foreach dir, $(subst /,\,$(dir $(SRC_TEST))), del /q $(dir)*.o;)
 else
-	rm -f $(OUTPUT_SLAVE)*.hex $(OUTPUT_SLAVE)*.elf
-	rm -f $(OUTPUT_MASTER)*.hex $(OUTPUT_MASTER)*.elf
-	$(foreach dir, $(SRC), rm -f $(dir $(dir))/*.o;)
-	$(foreach dir, $(SRC_SLAVE), rm -f $(dir $(dir))/*.o;)
-	$(foreach dir, $(SRC_MASTER), rm -f $(dir $(dir))/*.o;)
+	-rm -f $(OUTPUT_SLAVE)*.hex $(OUTPUT_SLAVE)*.elf $(OUTPUT_SLAVE)*.map
+	-rm -f $(OUTPUT_MASTER)*.hex $(OUTPUT_MASTER)*.elf $(OUTPUT_MASTER)*.map
+	-rm -f $(OUTPUT_TEST)*.hex $(OUTPUT_TEST)*.elf $(OUTPUT_TEST)*.map
+	-$(foreach dir, $(SRC), rm -f $(dir $(dir))/*.o;)
+	-$(foreach dir, $(SRC_SLAVE), rm -f $(dir $(dir))/*.o;)
+	-$(foreach dir, $(SRC_MASTER), rm -f $(dir $(dir))/*.o;)
+	-$(foreach dir, $(SRC_TEST), rm -f $(dir $(dir))/*.o;)
 endif
 
 # other targets
@@ -118,7 +149,7 @@ endif
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-
+# Creating output directories
 $(OUTPUT_SLAVE):
 ifeq ($(OS),Windows_NT)
 	-mkdir $(subst /,\,$(subst ./,,$(OUTPUT_SLAVE)))
@@ -133,6 +164,13 @@ else
 	mkdir -p $(OUTPUT_MASTER)
 endif
 
+$(OUTPUT_TEST):
+ifeq ($(OS),Windows_NT)
+	-mkdir $(subst /,\,$(subst ./,,$(OUTPUT_TEST)))
+else
+	mkdir -p $(OUTPUT_TEST)
+endif
+
 # elf files
 $(PRJ_SLAVE).elf: $(OUTPUT_SLAVE) $(OBJ_SLAVE)
 	$(CC) -o $(OUTPUT_SLAVE)$(PRJ_SLAVE).elf $(OBJ_SLAVE) -Wl,-Map="$(OUTPUT_SLAVE)$(PRJ_SLAVE).map" $(LINKERFLAGS)
@@ -140,6 +178,8 @@ $(PRJ_SLAVE).elf: $(OUTPUT_SLAVE) $(OBJ_SLAVE)
 $(PRJ_MASTER).elf: $(OUTPUT_MASTER) $(OBJ_MASTER)
 	$(CC) -o $(OUTPUT_MASTER)$(PRJ_MASTER).elf $(OBJ_MASTER) -Wl,-Map="$(OUTPUT_MASTER)$(PRJ_MASTER).map" $(LINKERFLAGS)
 
+$(PRJ_TEST).elf: $(OUTPUT_TEST) $(OBJ_TEST)
+	$(CC) -o $(OUTPUT_TEST)$(PRJ_TEST).elf $(OBJ_TEST) -Wl,-Map="$(OUTPUT_TEST)$(PRJ_TEST).map" $(LINKERFLAGS)
 
 # hex files
 $(PRJ_SLAVE).hex: $(PRJ_SLAVE).elf
@@ -159,3 +199,12 @@ else
 endif
 	$(OBJCOPY) -j .text -j .data -O ihex $(OUTPUT_MASTER)$(PRJ_MASTER).elf $(OUTPUT_MASTER)$(PRJ_MASTER).hex
 	$(SIZE) $(OUTPUT_MASTER)$(PRJ_MASTER).elf
+
+$(PRJ_TEST).hex: $(PRJ_TEST).elf
+ifeq ($(OS),Windows_NT)
+	del /q $(subst /,\,$(OUTPUT_TEST)\$(PRJ_TEST)).hex
+else
+	rm -f $(OUTPUT_TEST)$(PRJ_TEST).hex
+endif
+	$(OBJCOPY) -j .text -j .data -O ihex $(OUTPUT_TEST)$(PRJ_TEST).elf $(OUTPUT_TEST)$(PRJ_TEST).hex
+	$(SIZE) $(OUTPUT_TEST)$(PRJ_TEST).elf

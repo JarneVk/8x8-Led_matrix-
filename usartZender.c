@@ -47,11 +47,21 @@ void uartsetup_zender_uart1(){
 		
 }
 
+void timer_setup(){
+	//TCB0_CTRLA mag op default 0 blijven 
+	TCB0_CTRLB = 0x01;		//timeout mode
+	TCB0_INTCTRL = 0x01;	//enable inetrups
+	TCB0_CNT = 0x00;		//zet timer op 0
+	TCB0_CCMPL = 0xFF;
+	TCB0_CCMPH = 0xFF;
+	TCB0_EVCTRL = 0x01; 	// op 0x01 om de timer te starten 
+}
+
 
 /* SendData : de ontvanger zal een ACK(frame) een NACK(frame) kunnen sturen naar de zender
 		ACK :   1 0000 0001
 		NACK :	1 0000 0010
-		verbinding request : 0 1010 1010 => 0xAA
+		verbinding request : 1 1010 1010 => 1 0xAA
 
  */
 
@@ -60,7 +70,7 @@ void uartsetup_zender_uart1(){
     je kan ENKEL in het register schrijven als DREIF (in usartn.status) bit op 1 staat
 */
 
-int sendData_zender_usart1(int hexgetal){   // returnt een 0 als het kan verzonden zorden anders een 1
+int sendData_zender_usart1(uint8_t hexgetal){   // returnt een 0 als het kan verzonden zorden anders een 1
 
 	zender_buffer_uart1 = hexgetal;
     if(USART1_STATUS&(1<<5)){  // get de DREIF bit
@@ -69,6 +79,20 @@ int sendData_zender_usart1(int hexgetal){   // returnt een 0 als het kan verzond
     }    
     else {
         // register is nog niet geshift > even wachten
+        return 1;
+    }
+}
+
+// 1 voor ACK, 2 voor NACK
+
+int sendSpecial(int dat){
+	if(USART0_STATUS&(1<<5)){		 // get de DREIF bit
+		USART0_TXDATAH = 1;
+		USART0_TXDATAL = dat;
+        return 0;
+    }    
+    else {
+        // register is nog niet geshift -> even wachten
         return 1;
     }
 }
@@ -85,48 +109,58 @@ int sendData_zender_usart1(int hexgetal){   // returnt een 0 als het kan verzond
     - als alles correct is -> RXDATAL inlezen en register laten schiften
 */
 
+void SendNewColum(){
+	zender_verbinding = 1;
+	zender_count_timeout = 0;
+	sendData_zender_usart1(1);	//getNextMatrixData());
+}
+
 void interup_ReadData(){
-	int bits[2];
+	uint8_t bits[2];
 	if(USART1_RXDATAH&(1<<7)){	// kijken naar 7de bit
 		bits[0] = USART1_RXDATAH;
 		bits[1] = USART1_RXDATAL; 
 		
 		if(bits[0]&(1<<2) || bits[0]&(1<<1)){	// kijken of er geen frame of parity errors zijn
 			//NACK sturen 		
-			//of negeer het en wat op de timeout van de Ontvanger
+			sendSpecial(2);
 		}else if(bits[0]==1 && bits[1]&(1<<2)){	//als een NACK tokomt
 			while(sendData_zender_usart1(zender_buffer_uart1)){
 				_delay_ms(1);
 			}
 		}else if(bits[0]==1 && bits[1]==1){		//ACK nieuw packetje sturen
-			while(sendData_zender_usart1(1)){		//1 vevangen door getNewData()
+			zender_count_timeout = 0;
+			while(sendData_zender_usart1(1)){							//getNextMatrixData()
 				_delay_ms(1);
 			}	
 		}
-		else if(bits[1]== 0b10101010){		//new verbinding request
-			connectRequest();
-		}	
 	}
-}
-
-void connectRequest(){
-	sendData_zender_usart1(1);
-
-	// nieuwe matrix doorsturen 	
-	
 }
 
 
 
 ISR(USART1_RXC_vect){			//interupt register 
-	if(zender_verbinding == 1){
+		TCB0_EVCTRL = 0x00; 	// timer stoppen en resetten 
+		TCB0_CNT = 0x00;
 		interup_ReadData();
-	}
-	else{
-		connectRequest();
-	}
+		TCB0_EVCTRL = 0x01;
 }
 
+
+//timeout functie 
+ISR(TCB0_INT_vect){
+	TCB0_EVCTRL = 0x00; 	// timer stoppen en resetten 
+	TCB0_CNT = 0x00;
+	zender_count_timeout += 1;
+	if(zender_count_timeout == 4){		//verbinding verbroken
+		zender_verbinding = 0;
+		zender_count_timeout = 0;
+	}
+	while(sendData_zender_usart1(ontvanger_buffer_uart0)){
+		_delay_ms(1);
+	}
+	TCB0_EVCTRL = 0x01;
+}
 
 
 

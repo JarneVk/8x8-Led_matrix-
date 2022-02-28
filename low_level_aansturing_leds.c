@@ -14,26 +14,30 @@ aansturing Leds : APA102
 void initLedPoorten(){
     //initialisatie van de gebruikte poorten (als output zetten)
     PORTB_DIR |= PIN5_bm;   // pin5_bm is een standaard bitmap functie van avr/io
-
+    PORTB_DIR |= PIN4_bm;   // clk signaal
 }
 
-
-int writeToLed(char bitArray[],int aantalAangestuurdeLeds){
+void writeToLed(uint32_t bits[]){
 
     for(int i=0; i<32; ++i){    //32x0
         PORTB_OUT &= ~PIN5_bm;
+        PORTB_OUT |= PIN4_bm;
+        PORTB_OUT &= ~PIN4_bm;
     }
-    for(int i=0; i<aantalAangestuurdeLeds;++i){             // led info doorsturen
+    for(int i=0; i<64;++i){             // led info doorsturen
         for(int j=0; j<32;++j){
-            if(bitArray[(aantalAangestuurdeLeds*32)+j]){
+            if(bits[i]&(1<<j)){
                 PORTB_OUT |= PIN5_bm;
+                PORTB_OUT |= PIN4_bm;
+                PORTB_OUT &= ~PIN4_bm;
             }
             else{
                 PORTB_OUT &= ~PIN5_bm;
+                PORTB_OUT |= PIN4_bm;
+                PORTB_OUT &= ~PIN4_bm;
             }
         }
     }
-
     for(int i=0; i<32; ++i){    //32x1
         PORTB_OUT |= PIN5_bm;
     }
