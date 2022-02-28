@@ -26,7 +26,7 @@ NAME3(USART,ARG,_BAUDH) = 0x02;\
 NAME3(USART,ARG,_CTRLC) = 0x3E;  //00111110 -> 9bit verzending
 
 
-void uartsetup(){
+void uartsetup_ontvanger_uart0(){
 	initIrcomUsart(0);
 	PORTA_DIRSET = 0x01;
 	USART0_CTRLB = 0xC0;

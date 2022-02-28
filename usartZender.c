@@ -12,10 +12,7 @@ usartZender zorgt voor de low level aansturen van de usart poorten die aan de IR
 de Zender zal werken volgens een sliding window met buffer 1, en werkt in 1 richting 
 het zal dus enkel een ACK(packet) of NACK(packet) kunnen ontvangen 
 
-het stuurt een packet_nummer + 8bit info
-
-bij binnenkomen van een NACK zal het het juiste packet herzenden 
-bij ACK zal het dit packet van de buffer terug vrijgeven
+voor een nieuwe kolom door te sturen : buffer klaar zetten en functie sendNewColum() oproepen
 */
 
 
@@ -109,10 +106,12 @@ int sendSpecial(int dat){
     - als alles correct is -> RXDATAL inlezen en register laten schiften
 */
 
-void SendNewColum(){
+void SendNewColumn(){  
 	zender_verbinding = 1;
 	zender_count_timeout = 0;
-	sendData_zender_usart1(1);	//getNextMatrixData());
+	columnIndex = 0;
+	part =0;
+	sendData_zender_usart1(1);	//getNextOutputData();
 }
 
 void interup_ReadData(){
@@ -130,7 +129,7 @@ void interup_ReadData(){
 			}
 		}else if(bits[0]==1 && bits[1]==1){		//ACK nieuw packetje sturen
 			zender_count_timeout = 0;
-			while(sendData_zender_usart1(1)){							//getNextMatrixData()
+			while(sendData_zender_usart1(1)){							//getNextOutputData()
 				_delay_ms(1);
 			}	
 		}

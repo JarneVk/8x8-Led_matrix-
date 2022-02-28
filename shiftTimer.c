@@ -15,6 +15,13 @@ void shiftTimer_setup(){
 	TCB1_EVCTRL = 0x01; 	// op 0x01 om de timer te starten 
 }
 
+void shiftTimer_reset(){
+	TCB1_EVCTRL = 0x00;
+	TCB1_CNT = 0x00;
+	TCB1_EVCTRL = 0x01;
+}
+
+
 ISR(TCB1_INT_vect){
 	// shift matrix
 }
