@@ -8,11 +8,16 @@
 
 /*
 usartZender zorgt voor de low level aansturen van de usart poorten die aan de IRED trancievers worden gekoppeld
-
 de Zender zal werken volgens een sliding window met buffer 1, en werkt in 1 richting 
 het zal dus enkel een ACK(packet) of NACK(packet) kunnen ontvangen 
 
-voor een nieuwe kolom door te sturen : buffer klaar zetten en functie sendNewColum() oproepen
+werking: 	- 	Er moet een externe functie 'uint8_t getNextOutputData()' worden die de 8 bits die verzonden moeten worden terug geeft.
+
+			- 	Om de zending te starten word 'SendNewColumn()' opgeroepen.
+				Als de ontvanger nog data verwacht zal deze antwoorden met ACK of NACK
+
+			-	Als de ontvanger 4x niet antwoord op een verzonden bericht zal dit geinterpreteerd worden als verbinding verborken.
+				Er zal geen nieuwe data gevraagd worden tot de 'SendNewColumn()' opnieuw wordt opgeroepen
 */
 
 
@@ -59,10 +64,7 @@ void timer_setup(){
 		ACK :   1 0000 0001
 		NACK :	1 0000 0010
 		verbinding request : 1 1010 1010 => 1 0xAA
-
- */
-
-/* send data : we kiezen voor 8 bit verzending -> CHSIZE in Control C moet op 8 bit staan
+	we kiezen voor 8 bit verzending -> CHSIZE in Control C moet op 8 bit staan
     als er data in TXDATAL word geschreven zal deze in de TX buffer komen en serieel worden doorgestuurd
     je kan ENKEL in het register schrijven als DREIF (in usartn.status) bit op 1 staat
 */
@@ -75,21 +77,21 @@ int sendData_zender_usart1(uint8_t hexgetal){   // returnt een 0 als het kan ver
         return 0;
     }    
     else {
-        // register is nog niet geshift > even wachten
+        // register is nog niet geshift
         return 1;
     }
 }
 
 // 1 voor ACK, 2 voor NACK
 
-int sendSpecial(int dat){
+int sendSpecial_zender(int dat){
 	if(USART0_STATUS&(1<<5)){		 // get de DREIF bit
 		USART0_TXDATAH = 1;
 		USART0_TXDATAL = dat;
         return 0;
     }    
     else {
-        // register is nog niet geshift -> even wachten
+        // register is nog niet geshift
         return 1;
     }
 }
@@ -97,13 +99,8 @@ int sendSpecial(int dat){
 /* get data : in RXDATAH, bit 7 zegt of er data in de buffer zit -> eerste hiernaar kijken 
     als RXDATAH of L worden gelezen zal de buffer doorschuiven (afhankelijk van de configuratie in Control C)
     => eerst het niet schiftende register uitlezen en dan het schiftende 
-    #optioneel FERR geef aan of de frame juist is toegekomen#
-    #PERR parity check, een foute controle op de data #
-
-    aanpak? 
-    - eerste RXDATAH inlezen en kijken of er nieuwe data aanwezig is 
-    - checken of de data goed is toegekomen met PERR/FERR
-    - als alles correct is -> RXDATAL inlezen en register laten schiften
+    FERR geef aan of de frame juist is toegekomen
+    PERR parity check, een foute controle op de data 
 */
 
 void SendNewColumn(){  
@@ -120,10 +117,10 @@ void interup_ReadData(){
 		bits[0] = USART1_RXDATAH;
 		bits[1] = USART1_RXDATAL; 
 		
-		if(bits[0]&(1<<2) || bits[0]&(1<<1)){	// kijken of er geen frame of parity errors zijn
+		if(bits[0]&(1<<2) || bits[0]&(1<<1)){	// frame of parity errors
 			//NACK sturen 		
-			sendSpecial(2);
-		}else if(bits[0]==1 && bits[1]&(1<<2)){	//als een NACK tokomt
+			sendSpecial_zender(2);
+		}else if(bits[0]==1 && bits[1]&(1<<2)){	// NACK 
 			while(sendData_zender_usart1(zender_buffer_uart1)){
 				_delay_ms(1);
 			}

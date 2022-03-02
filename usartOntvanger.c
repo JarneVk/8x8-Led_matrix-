@@ -7,8 +7,13 @@
 
 /*
 usart onvanger zorgt voor de low level aansturing van de usart poorten die aan de IRED worden gekoppeld 
-
 het zal enkel ontvangen en kan hierop zelf antwoorden met NACK(packet) of ACK(packet)
+
+werking :	- 	Er moet een externe functie 'int writeUartData(uint8_t data)' worden aangemaakt.
+				Deze functie geeft een 1 terug als ze nog data verwacht en een 0 als ze geen data meer verwacht (voor die verzending).
+
+			- 	Dit programma zal een interupt generen als het een packetje ontvangt. 
+				De errors worden automatisch afgehandeld
 */
 
 
@@ -39,13 +44,10 @@ void uartsetup_ontvanger_uart0(){
 }
 
 
-/* SendData : de ontvanger zal een ACK(frame) een NACK(frame) kunnen sturen naar de zender
+/* Send Data : de ontvanger zal een ACK(frame) een NACK(frame) kunnen sturen naar de zender
 		ACK :   1 0000 0001
 		NACK :	1 0000 0010	
-
- */
-
-/* send data : we kiezen voor 8 bit verzending -> CHSIZE in Control C moet op 8 bit staan
+	we kiezen voor 8 bit verzending -> CHSIZE in Control C moet op 8 bit staan
     als er data in TXDATAL word geschreven zal deze in de TX buffer komen en serieel worden doorgestuurd
     je kan ENKEL in het register schrijven als DREIF (in usartn.status) bit op 1 staat
 */
@@ -57,25 +59,25 @@ int sendData_usart0(uint8_t hexgetal){   // returnt een 0 als het kan verzonden 
         return 0;
     }    
     else {
-        // register is nog niet geshift -> even wachten
+        // register is nog niet geshift
         return 1;
     }
 }
 
 // 1 voor ACK, 2 voor NACK, 3 voor Connect
-/*
-int sendSpecial(int dat){
+
+int sendSpecial_ontvanger(int dat){
 	if(USART0_STATUS&(1<<5)){		 // get de DREIF bit
 		USART0_TXDATAH = 1;
 		USART0_TXDATAL = dat;
         return 0;
     }    
     else {
-        // register is nog niet geshift -> even wachten
+        // register is nog niet geshift
         return 1;
     }
 }
-*/
+
 
 /* get data : in RXDATAH, bit 7 zegt of er data in de buffer zit -> eerste hiernaar kijken 
     als RXDATAH of L worden gelezen zal de buffer doorschuiven (afhankelijk van de configuratie in Control C)
@@ -97,7 +99,7 @@ void readuart0_interupt(){      // geeft 8 bits terug
 		
 		if(bits[0]&(1<<2) || bits[0]&(1<<1)){	// kijken of er geen frame of parity errors zijn
 			//NACK sturen 
-			while(sendSpecial(2)){
+			while(sendSpecial_ontvanger(2)){
 				_delay_ms(1);
 			}
 		}else if(bits[0]==1 && bits[1]==2){	//NACK
@@ -105,15 +107,14 @@ void readuart0_interupt(){      // geeft 8 bits terug
 				_delay_ms(1);
 			}
 		} else{
-			//ACK sturen
-			while(sendSpecial(1)){
-				_delay_ms(1);
-			}
-			//return bits[1];
+			
 			/*
-
-			HIER MOET EEN HOGERE FUNCTIE KOMEN DIE DE DATA VERWERKT
-
+			if(***(bits[1]) == 0){ HIER MOET EEN HOGERE FUNCTIE KOMEN DIE DE DATA VERWERKT
+				//ACK sturen
+				while(sendSpecial_ontvanger(1)){
+				_delay_ms(1);
+				}
+			}
 
 			*/
 		}	
