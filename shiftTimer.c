@@ -1,3 +1,7 @@
+#include "HeaderMatrix.h"
+
+#include <avr/io.h>
+
 /*
 
 timer die interups geeft om de matrix te laten shiften
@@ -24,4 +28,5 @@ void shiftTimer_reset(){
 
 ISR(TCB1_INT_vect){
 	// shift matrix
+	shift_interupt_test();
 }

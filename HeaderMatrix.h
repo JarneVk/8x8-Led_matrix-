@@ -2,15 +2,17 @@
 #include <avr/io.h>
 
 //ontvanger
-void uartsetup_ontvanger_uart0();
+/*void uartsetup_ontvanger_uart0();
 int sendData_usart0(uint8_t hexgetal);
-sendSpecial_ontvanger(int dat);
+int sendSpecial_ontvanger(int dat);
 void readuart0_interupt();
 
 //zender
 int sendData_zender_usart1(uint8_t hexgetal)
 void timer_setup();
-//uint8_t getNextOutputData();
+*/
+uint8_t getNextOutputData();
+/*
 int sendSpecial_zender(int dat);
 void SendNewColumn();
 void interup_ReadData();
@@ -22,7 +24,7 @@ void writeToLed(uint32_t bits[]);
 //shiftTimer
 void shiftTimer_setup();
 void shiftTimer_reset();
-
+*/
 
 uint8_t zender_buffer_uart1;
 uint8_t ontvanger_buffer_uart0;

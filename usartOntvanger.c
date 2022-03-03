@@ -64,7 +64,7 @@ int sendData_usart0(uint8_t hexgetal){   // returnt een 0 als het kan verzonden 
     }
 }
 
-// 1 voor ACK, 2 voor NACK, 3 voor Connect
+// 1 voor ACK, 2 voor NACK, 3 voor EndOfMessage
 
 int sendSpecial_ontvanger(int dat){
 	if(USART0_STATUS&(1<<5)){		 // get de DREIF bit
@@ -108,15 +108,21 @@ void readuart0_interupt(){      // geeft 8 bits terug
 			}
 		} else{
 			
-			/*
-			if(***(bits[1]) == 0){ HIER MOET EEN HOGERE FUNCTIE KOMEN DIE DE DATA VERWERKT
+			
+			if(writeOntvangenData(bits[1]) == 0){ //HIER MOET EEN HOGERE FUNCTIE KOMEN DIE DE DATA VERWERKT
 				//ACK sturen
 				while(sendSpecial_ontvanger(1)){
 				_delay_ms(1);
 				}
 			}
+			else{
+				while(sendSpecial_ontvanger(3)){
+				_delay_ms(1);
+				}
+				ledsAansturenTest();
+			}
 
-			*/
+			
 		}	
 	}
 }

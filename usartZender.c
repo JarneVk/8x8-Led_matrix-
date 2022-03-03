@@ -26,6 +26,8 @@ werking: 	- 	Er moet een externe functie 'uint8_t getNextOutputData()' worden di
 #include <avr/delay.h>
 #include "HeaderMatrix.h"
 
+#include "./Test/uart_test.c"
+
 #define NAME3(a,b,c)         NAME3_HIDDEN(a,b,c)
 #define NAME3_HIDDEN(a,b,c)  a ## b ## c
 
@@ -108,7 +110,7 @@ void SendNewColumn(){
 	zender_count_timeout = 0;
 	columnIndex = 0;
 	part =0;
-	sendData_zender_usart1(1);	//getNextOutputData();
+	sendData_zender_usart1(getNextOutputData());
 }
 
 void interup_ReadData(){
@@ -124,9 +126,13 @@ void interup_ReadData(){
 			while(sendData_zender_usart1(zender_buffer_uart1)){
 				_delay_ms(1);
 			}
+		} else if(bits[0]==1 && bits[1]==3){	//END
+			TCB0_EVCTRL = 0x00; 	// timer stoppen en resetten 
+			TCB0_CNT = 0x00;
+
 		}else if(bits[0]==1 && bits[1]==1){		//ACK nieuw packetje sturen
 			zender_count_timeout = 0;
-			while(sendData_zender_usart1(1)){							//getNextOutputData()
+			while(sendData_zender_usart1(getNextOutputData())){							//
 				_delay_ms(1);
 			}	
 		}
