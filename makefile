@@ -40,7 +40,8 @@ PRG = pkobn_updi
 SRC_SLAVE = ./Slave/main.c
 SRC_MASTER = ./Master/main.c
 SRC_TEST = ./Test/main.c
-SRC = usartOntvanger.c usartZender.c low_level_aansturing_leds.c shiftTimer.c 
+SRC = ./low_level_code/usartOntvanger.c ./low_level_code/usartZender.c ./low_level_code/low_level_aansturing_leds.c ./low_level_code/shiftTimer.c \
+./Test/uart_test.c
 OUTPUT_SLAVE = ./Slave_build/
 OUTPUT_MASTER = ./Master_build/
 OUTPUT_TEST = ./Test_build/

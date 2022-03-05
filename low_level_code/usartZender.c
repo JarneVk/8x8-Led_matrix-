@@ -24,9 +24,9 @@ werking: 	- 	Er moet een externe functie 'uint8_t getNextOutputData()' worden di
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/delay.h>
-#include "HeaderMatrix.h"
+#include "../HeaderMatrix.h"
 
-#include "./Test/uart_test.c"
+#include "../Test/uart_test.c"
 
 #define NAME3(a,b,c)         NAME3_HIDDEN(a,b,c)
 #define NAME3_HIDDEN(a,b,c)  a ## b ## c
@@ -84,20 +84,6 @@ int sendData_zender_usart1(uint8_t hexgetal){   // returnt een 0 als het kan ver
     }
 }
 
-// 1 voor ACK, 2 voor NACK
-
-int sendSpecial_zender(int dat){
-	if(USART0_STATUS&(1<<5)){		 // get de DREIF bit
-		USART0_TXDATAH = 1;
-		USART0_TXDATAL = dat;
-        return 0;
-    }    
-    else {
-        // register is nog niet geshift
-        return 1;
-    }
-}
-
 /* get data : in RXDATAH, bit 7 zegt of er data in de buffer zit -> eerste hiernaar kijken 
     als RXDATAH of L worden gelezen zal de buffer doorschuiven (afhankelijk van de configuratie in Control C)
     => eerst het niet schiftende register uitlezen en dan het schiftende 
@@ -121,7 +107,7 @@ void interup_ReadData(){
 		
 		if(bits[0]&(1<<2) || bits[0]&(1<<1)){	// frame of parity errors
 			//NACK sturen 		
-			sendSpecial_zender(2);
+			sendSpecial(2);
 		}else if(bits[0]==1 && bits[1]&(1<<2)){	// NACK 
 			while(sendData_zender_usart1(zender_buffer_uart1)){
 				_delay_ms(1);

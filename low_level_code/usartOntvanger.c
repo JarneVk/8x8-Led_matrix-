@@ -20,7 +20,7 @@ werking :	- 	Er moet een externe functie 'int writeUartData(uint8_t data)' worde
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
-#include "HeaderMatrix.h"
+#include "../HeaderMatrix.h"
 
 #define NAME3(a,b,c)         NAME3_HIDDEN(a,b,c)
 #define NAME3_HIDDEN(a,b,c)  a ## b ## c
@@ -47,7 +47,7 @@ void uartsetup_ontvanger_uart0(){
 /* Send Data : de ontvanger zal een ACK(frame) een NACK(frame) kunnen sturen naar de zender
 		ACK :   1 0000 0001
 		NACK :	1 0000 0010	
-	we kiezen voor 8 bit verzending -> CHSIZE in Control C moet op 8 bit staan
+	we kiezen voor 9 bit verzending -> CHSIZE in Control C moet op 9 bit staan
     als er data in TXDATAL word geschreven zal deze in de TX buffer komen en serieel worden doorgestuurd
     je kan ENKEL in het register schrijven als DREIF (in usartn.status) bit op 1 staat
 */
@@ -64,31 +64,12 @@ int sendData_usart0(uint8_t hexgetal){   // returnt een 0 als het kan verzonden 
     }
 }
 
-// 1 voor ACK, 2 voor NACK, 3 voor EndOfMessage
-
-int sendSpecial_ontvanger(int dat){
-	if(USART0_STATUS&(1<<5)){		 // get de DREIF bit
-		USART0_TXDATAH = 1;
-		USART0_TXDATAL = dat;
-        return 0;
-    }    
-    else {
-        // register is nog niet geshift
-        return 1;
-    }
-}
-
 
 /* get data : in RXDATAH, bit 7 zegt of er data in de buffer zit -> eerste hiernaar kijken 
     als RXDATAH of L worden gelezen zal de buffer doorschuiven (afhankelijk van de configuratie in Control C)
     => eerst het niet schiftende register uitlezen en dan het schiftende 
-    #optioneel FERR geef aan of de frame juist is toegekomen#
-    #PERR parity check, een foute controle op de data #
-
-    aanpak? 
-    - eerste RXDATAH inlezen en kijken of er nieuwe data aanwezig is 
-    - checken of de data goed is toegekomen met PERR/FERR
-    - als alles correct is -> RXDATAL inlezen en register laten schiften
+    FERR geef aan of de frame juist is toegekomen
+	PERR parity check, een foute controle op de data 
 */
 
 void readuart0_interupt(){      // geeft 8 bits terug 
@@ -99,7 +80,7 @@ void readuart0_interupt(){      // geeft 8 bits terug
 		
 		if(bits[0]&(1<<2) || bits[0]&(1<<1)){	// kijken of er geen frame of parity errors zijn
 			//NACK sturen 
-			while(sendSpecial_ontvanger(2)){
+			while(sendSpecial(2)){
 				_delay_ms(1);
 			}
 		}else if(bits[0]==1 && bits[1]==2){	//NACK
@@ -111,12 +92,12 @@ void readuart0_interupt(){      // geeft 8 bits terug
 			
 			if(writeOntvangenData(bits[1]) == 0){ //HIER MOET EEN HOGERE FUNCTIE KOMEN DIE DE DATA VERWERKT
 				//ACK sturen
-				while(sendSpecial_ontvanger(1)){
+				while(sendSpecial(1)){
 				_delay_ms(1);
 				}
 			}
 			else{
-				while(sendSpecial_ontvanger(3)){
+				while(sendSpecial(3)){
 				_delay_ms(1);
 				}
 				ledsAansturenTest();

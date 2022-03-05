@@ -9,7 +9,7 @@ aansturing Leds : APA102
 */
 
 #include <avr/io.h>
-#include "HeaderMatrix.h"
+#include "../HeaderMatrix.h"
 
 void initLedPoorten(){
     //initialisatie van de gebruikte poorten (als output zetten)
