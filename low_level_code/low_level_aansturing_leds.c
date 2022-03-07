@@ -19,13 +19,13 @@ void initLedPoorten(){
 
 void writeToLed(uint32_t bits[]){
 
-    for(int i=0; i<32; ++i){    //32x0
+    for(int i=0; i<32; i++){    //32x0
         PORTB_OUT &= ~PIN5_bm;
         PORTB_OUT |= PIN4_bm;
         PORTB_OUT &= ~PIN4_bm;
     }
-    for(int i=0; i<64;++i){             // led info doorsturen
-        for(int j=0; j<32;++j){
+    for(int i=0; i<8;i++){             // led info doorsturen
+        for(int j=0; j<32;j++){
             if(bits[i]&(1<<j)){
                 PORTB_OUT |= PIN5_bm;
                 PORTB_OUT |= PIN4_bm;
@@ -38,8 +38,11 @@ void writeToLed(uint32_t bits[]){
             }
         }
     }
-    for(int i=0; i<32; ++i){    //32x1
+    
+    for(int i=0; i<32; i++){    //32x1
         PORTB_OUT |= PIN5_bm;
+        PORTB_OUT |= PIN4_bm;
+        PORTB_OUT &= ~PIN4_bm;
     }
 
 }

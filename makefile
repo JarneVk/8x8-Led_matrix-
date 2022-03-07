@@ -24,7 +24,7 @@ PRJ_MASTER = Master
 #Test output name
 PRJ_TEST = Test
 # avr mcu
-MCU = atmega4809
+MCU = m4809
 # mcu clock frequency (default atmega4809 clock = 3.3333 Mhz)
 CLK = 3333333
 # avr programmer (and port if necessary)
@@ -40,8 +40,9 @@ PRG = pkobn_updi
 SRC_SLAVE = ./Slave/main.c
 SRC_MASTER = ./Master/main.c
 SRC_TEST = ./Test/main.c
-SRC = ./low_level_code/usartOntvanger.c ./low_level_code/usartZender.c ./low_level_code/low_level_aansturing_leds.c ./low_level_code/shiftTimer.c \
-./Test/uart_test.c
+SRC = ./low_level_code/low_level_aansturing_leds.c ./low_level_code/shiftTimer.c \
+./Test/uart_test.c  
+#./low_level_code/usartOntvanger.c ./low_level_code/usartZender.c ./low_level_code/uartAlgemeen.c 
 OUTPUT_SLAVE = ./Slave_build/
 OUTPUT_MASTER = ./Master_build/
 OUTPUT_TEST = ./Test_build/
@@ -64,7 +65,7 @@ CFLAGS    = -DF_CPU=$(CLK) -x c -funsigned-char -funsigned-bitfields -Os -ffunct
 LINKERFLAGS =  -Wl,--start-group -Wl,-lm  -Wl,--end-group -Wl,--gc-sections -mrelax -mmcu=atmega4809 -B ".\atmega4809"  
 
 # executables
-AVRDUDE = avrdude -c $(PRG) -p $(MCU)
+AVRDUDE = "C:\Users\Gebruiker\Documents\3de jaar KUL\sem 2\bacholorProef\avrdude\avrdude.exe" -c $(PRG) -p $(MCU)
 OBJCOPY = avr-objcopy
 OBJDUMP = avr-objdump
 SIZE    = avr-size --format=avr --mcu=$(MCU)

@@ -90,7 +90,7 @@ void readuart0_interupt(){      // geeft 8 bits terug
 		} else{
 			
 			
-			if(writeOntvangenData(bits[1]) == 0){ //HIER MOET EEN HOGERE FUNCTIE KOMEN DIE DE DATA VERWERKT
+			if(writeOntvangenData_test(bits[1]) == 0){ //HIER MOET EEN HOGERE FUNCTIE KOMEN DIE DE DATA VERWERKT
 				//ACK sturen
 				while(sendSpecial(1)){
 				_delay_ms(1);
@@ -100,7 +100,7 @@ void readuart0_interupt(){      // geeft 8 bits terug
 				while(sendSpecial(3)){
 				_delay_ms(1);
 				}
-				ledsAansturenTest();
+				ledsAansturen_test();
 			}
 
 			

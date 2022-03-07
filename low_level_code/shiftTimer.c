@@ -28,5 +28,5 @@ void shiftTimer_reset(){
 
 ISR(TCB1_INT_vect){
 	// shift matrix
-	shift_interupt_test();
+	shift_matrix();
 }
