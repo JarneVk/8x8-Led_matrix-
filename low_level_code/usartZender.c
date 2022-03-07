@@ -41,10 +41,6 @@ void uartsetup_zender_uart1(){
 	initIrcomUsart(1);
 	PORTA_DIRSET = 0x01;
 	USART1_CTRLB = 0xC0;
-	
-	initIrcomUsart(1);
-	PORTC_DIRSET = 0x01;
-	USART1_CTRLB = 0xC0;
 
 	zender_buffer_uart1 = 0;
 	zender_verbinding = 0;
