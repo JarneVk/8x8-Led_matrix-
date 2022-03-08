@@ -3,26 +3,17 @@
 
 //ontvanger
 int sendSpecial(int dat);
-/*void uartsetup_ontvanger_uart0();
-int sendData_usart0(uint8_t hexgetal);
-int sendSpecial_ontvanger(int dat);
-void readuart0_interupt();
+void uartsetup_ontvanger_uart0();
 
 //zender
-int sendData_zender_usart1(uint8_t hexgetal)
+void uartsetup_zender_uart1();
 void timer_setup();
-*/
 uint8_t getNextOutputData();
-/*
-int sendSpecial_zender(int dat);
-*/
 void SendNewColumn();
-/*
-void interup_ReadData();
 
 //Led's
 void initLedPoorten();
-*/
+
 void writeToLed(uint32_t bits[]);
 
 //shiftTimer

@@ -43,7 +43,6 @@ void uartsetup_zender_uart1(){
 	USART1_CTRLB = 0xC0;
 
 	zender_buffer_uart1 = 0;
-	zender_verbinding = 0;
 		
 }
 
@@ -88,11 +87,11 @@ int sendData_zender_usart1(uint8_t hexgetal){   // returnt een 0 als het kan ver
 */
 
 void SendNewColumn(){  
-	zender_verbinding = 1;
 	zender_count_timeout = 0;
 	columnIndex = 0;
 	part =0;
 	sendData_zender_usart1(getNextOutputData());
+	TCB0_EVCTRL = 0x01;
 }
 
 void interup_ReadData(){
@@ -137,7 +136,6 @@ ISR(TCB0_INT_vect){
 	TCB0_CNT = 0x00;
 	zender_count_timeout += 1;
 	if(zender_count_timeout == 4){		//verbinding verbroken
-		zender_verbinding = 0;
 		zender_count_timeout = 0;
 	}
 	while(sendData_zender_usart1(ontvanger_buffer_uart0)){

@@ -24,7 +24,7 @@ void writeToLed(uint32_t bits[]){
         PORTB_OUT |= PIN4_bm;
         PORTB_OUT &= ~PIN4_bm;
     }
-    for(int i=0; i<8;i++){             // led info doorsturen
+    for(int i=0; i<64;i++){             // led info doorsturen
         for(int j=0; j<32;j++){
             if(bits[i]&(1<<j)){
                 PORTB_OUT |= PIN5_bm;

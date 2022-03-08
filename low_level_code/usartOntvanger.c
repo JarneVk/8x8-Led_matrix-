@@ -36,10 +36,6 @@ void uartsetup_ontvanger_uart0(){
 	PORTA_DIRSET = 0x01;
 	USART0_CTRLB = 0xC0;
 	
-	initIrcomUsart(1);
-	PORTC_DIRSET = 0x01;
-	USART0_CTRLB = 0xC0;
-	
 	ontvanger_buffer_uart0 = 0;
 }
 
@@ -90,7 +86,7 @@ void readuart0_interupt(){      // geeft 8 bits terug
 		} else{
 			
 			
-			if(writeOntvangenData_test(bits[1]) == 0){ //HIER MOET EEN HOGERE FUNCTIE KOMEN DIE DE DATA VERWERKT
+			if(writeOntvangenData(bits[1]) == 0){ //HIER MOET EEN HOGERE FUNCTIE KOMEN DIE DE DATA VERWERKT
 				//ACK sturen
 				while(sendSpecial(1)){
 				_delay_ms(1);
@@ -100,7 +96,7 @@ void readuart0_interupt(){      // geeft 8 bits terug
 				while(sendSpecial(3)){
 				_delay_ms(1);
 				}
-				ledsAansturen_test();
+				ledsAansturen();
 			}
 
 			
