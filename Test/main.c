@@ -30,6 +30,18 @@ int main(void)
     shiftTimer_setup();
 
     //uart ontvanger (hier niets voor doen)
+    while (1)
+    {
+        if (TCB1_CNTL >= 0xF0)
+        {
+            PORTC_OUT |= PIN5_bm;
+        }
+        else{
+            PORTC_OUT &= ~PIN5_bm;
+        }
+        
+        // laat de interups werken
+    }
     
 
 

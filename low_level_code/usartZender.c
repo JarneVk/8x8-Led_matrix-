@@ -26,7 +26,7 @@ werking: 	- 	Er moet een externe functie 'uint8_t getNextOutputData()' worden di
 #include <avr/delay.h>
 #include "../HeaderMatrix.h"
 
-#include "../Test/uart_test.c"
+//#include "../Test/uart_test.c"
 
 #define NAME3(a,b,c)         NAME3_HIDDEN(a,b,c)
 #define NAME3_HIDDEN(a,b,c)  a ## b ## c
@@ -34,15 +34,21 @@ werking: 	- 	Er moet een externe functie 'uint8_t getNextOutputData()' worden di
 #define initIrcomUsart(ARG) \
 NAME3(USART,ARG,_BAUDL) = 0xB6;\
 NAME3(USART,ARG,_BAUDH) = 0x02;\
-NAME3(USART,ARG,_CTRLC) = 0x3E;  //00111110 -> 9bit verzending
+NAME3(USART,ARG,_CTRLA) = 0b11000000;\ 
+NAME3(USART,ARG,_CTRLC) = 0b00111110;  //00111110 -> 9bit verzending
 
 
 void uartsetup_zender_uart1(){
 	initIrcomUsart(1);
-	PORTA_DIRSET = 0x01;
-	USART1_CTRLB = 0xC0;
+	PORTC_DIRSET = 0x01;
+	USART1_CTRLB = 0b11010000; //was 0xC0
+	USART1_EVCTRL = 0x01; //disable IrDA
 
 	zender_buffer_uart1 = 0;
+
+
+	//LED voor te testen 
+	PORTC_DIR |= PIN4_bm;
 		
 }
 
@@ -67,7 +73,7 @@ void timer_setup(){
 */
 
 int sendData_zender_usart1(uint8_t hexgetal){   // returnt een 0 als het kan verzonden zorden anders een 1
-
+	PORTC_OUT |= PIN4_bm;
 	zender_buffer_uart1 = hexgetal;
     if(USART1_STATUS&(1<<5)){  // get de DREIF bit
         USART1_TXDATAL = hexgetal;
@@ -77,6 +83,7 @@ int sendData_zender_usart1(uint8_t hexgetal){   // returnt een 0 als het kan ver
         // register is nog niet geshift
         return 1;
     }
+	PORTC_OUT &= ~PIN4_bm;
 }
 
 /* get data : in RXDATAH, bit 7 zegt of er data in de buffer zit -> eerste hiernaar kijken 

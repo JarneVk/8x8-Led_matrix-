@@ -26,12 +26,12 @@ uint8_t getNextOutputData(){
     return (uint8_t)var;
 }
 static int m_shift=0;
-void shift_matrix_test(){
+void shift_matrix(){
     part = 0;
     packetje=0;
     array[m_shift] = 0b11100111111111111111111111111111;
     if(m_shift<7){
-        shiftTimer_reset();
+        
         m_shift++;
     }
     else{
