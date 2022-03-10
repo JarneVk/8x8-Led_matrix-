@@ -46,20 +46,20 @@ void uartsetup_zender_uart1(){
 
 	zender_buffer_uart1 = 0;
 
+	zender_timer_setup();
 
 	//LED voor te testen 
 	PORTC_DIR |= PIN4_bm;
 		
 }
 
-void timer_setup(){
-	//TCB0_CTRLA mag op default 0 blijven 
-	TCB0_CTRLB = 0x01;		//timeout mode
-	TCB0_INTCTRL = 0x01;	//enable inetrups
-	TCB0_CNT = 0x00;		//zet timer op 0
-	TCB0_CCMPL = 0xFF;
-	TCB0_CCMPH = 0xFF;
-	TCB0_EVCTRL = 0x01; 	// op 0x01 om de timer te starten 
+void zender_timer_setup(){
+	TCB1_CCMPL = 0xFF;
+	TCB1_CCMPH = 0xFF;
+	TCB1_CTRLA = 0b00000011;
+	TCB1_CTRLB = 0x00;		//timeout mode
+	TCB1_INTCTRL = 0x01;	//enable inetrups
+
 }
 
 
@@ -77,13 +77,17 @@ int sendData_zender_usart1(uint8_t hexgetal){   // returnt een 0 als het kan ver
 	zender_buffer_uart1 = hexgetal;
     if(USART1_STATUS&(1<<5)){  // get de DREIF bit
         USART1_TXDATAL = hexgetal;
+		_delay_ms(500);
+		PORTC_OUT &= ~PIN4_bm;
         return 0;
     }    
     else {
         // register is nog niet geshift
+		PORTC_OUT &= ~PIN4_bm;
         return 1;
     }
 	PORTC_OUT &= ~PIN4_bm;
+	return 0;
 }
 
 /* get data : in RXDATAH, bit 7 zegt of er data in de buffer zit -> eerste hiernaar kijken 
@@ -98,7 +102,7 @@ void SendNewColumn(){
 	columnIndex = 0;
 	part =0;
 	sendData_zender_usart1(getNextOutputData());
-	TCB0_EVCTRL = 0x01;
+	TCB1_CTRLB = 0x00;
 }
 
 void interup_ReadData(){
@@ -115,8 +119,6 @@ void interup_ReadData(){
 				_delay_ms(1);
 			}
 		} else if(bits[0]==1 && bits[1]==3){	//END
-			TCB0_EVCTRL = 0x00; 	// timer stoppen en resetten 
-			TCB0_CNT = 0x00;
 
 		}else if(bits[0]==1 && bits[1]==1){		//ACK nieuw packetje sturen
 			zender_count_timeout = 0;
@@ -130,25 +132,24 @@ void interup_ReadData(){
 
 
 ISR(USART1_RXC_vect){			//interupt register 
-		TCB0_EVCTRL = 0x00; 	// timer stoppen en resetten 
-		TCB0_CNT = 0x00;
 		interup_ReadData();
-		TCB0_EVCTRL = 0x01;
 }
 
 
 //timeout functie 
-ISR(TCB0_INT_vect){
-	TCB0_EVCTRL = 0x00; 	// timer stoppen en resetten 
-	TCB0_CNT = 0x00;
+ISR(TCB1_INT_vect){
+	PORTC_OUT ^= PIN5_bm;
+	TCB1_INTFLAGS = 0x01;
 	zender_count_timeout += 1;
 	if(zender_count_timeout == 4){		//verbinding verbroken
 		zender_count_timeout = 0;
+		TCB1_CTRLB = 0x01;	
 	}
-	while(sendData_zender_usart1(ontvanger_buffer_uart0)){
+	else{
+		while(sendData_zender_usart1(ontvanger_buffer_uart0)){
 		_delay_ms(1);
 	}
-	TCB0_EVCTRL = 0x01;
+	}
 }
 
 

@@ -5,10 +5,8 @@
 
 int main(void)
 {
-    
     initLedPoorten();
-    uartsetup_zender_uart1();
-    uartsetup_ontvanger_uart0();
+    uarts_setup();
     //leds testing 
     /*
     while(1){
@@ -31,15 +29,7 @@ int main(void)
 
     //uart ontvanger (hier niets voor doen)
     while (1)
-    {
-        if (TCB1_CNTL >= 0xF0)
-        {
-            PORTC_OUT |= PIN5_bm;
-        }
-        else{
-            PORTC_OUT &= ~PIN5_bm;
-        }
-        
+    {       
         // laat de interups werken
     }
     

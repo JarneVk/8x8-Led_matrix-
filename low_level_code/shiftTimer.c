@@ -12,11 +12,12 @@ timer die interups geeft om de matrix te laten shiften
 
 
 void shiftTimer_setup(){
-	TCB1_CCMPL = 0xFF;
-	TCB1_CCMPH = 0xFF;
-	TCB1_CTRLA = 0x01; 
-	TCB1_CTRLB = 0x00;		//timeout mode
-	TCB1_INTCTRL = 0x01;	//enable inetrups
+	 	// clk/64
+	TCB0_CCMPL = 0x00;
+	TCB0_CCMPH = 0xF0;
+	TCB0_CTRLA = 0b00000101; 
+	TCB0_CTRLB = 0x00;		//periotic interupt
+	TCB0_INTCTRL = 0x01;	//enable inetrups
 	//TCB1_CNT = 0x00;		//zet timer op 0
 
 	//TCB1_EVCTRL |= PIN4_bm; 	// om de timer te starten 
@@ -28,9 +29,10 @@ void shiftTimer_setup(){
 }
 
 
-ISR(TCB1_INT_vect){
+ISR(TCB0_INT_vect){
 	// shift matrix
 	PORTC_OUT ^= PIN6_bm;
-	_delay_ms(1000);
-	//shift_matrix();
+	SendNewColumn();
+	TCB0_INTFLAGS = 0x01;  //interupt cleren zodat timer door kan
+
 }

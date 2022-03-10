@@ -41,7 +41,7 @@ void uartsetup_ontvanger_uart0(){
 	ontvanger_buffer_uart0 = 0;
 
 	//LED voor te testen 
-	PORTC_DIR |= PIN5_bm;
+	PORTC_DIR |= PIN7_bm;
 	
 }
 
@@ -75,7 +75,7 @@ int sendData_usart0(uint8_t hexgetal){   // returnt een 0 als het kan verzonden 
 */
 
 void readuart0_interupt(){      // geeft 8 bits terug 
-	PORTC_OUT |= PIN5_bm;
+
 	uint8_t bits[2];
 	if(USART0_RXDATAH&(1<<7)){	// kijken naar 7de bit
 		bits[0] = USART0_RXDATAH;
@@ -111,12 +111,15 @@ void readuart0_interupt(){      // geeft 8 bits terug
 			
 		}	
 	}
-	PORTC_OUT &= ~PIN5_bm;
+	
 }
 
 
 ISR(USART0_RXC_vect){
-	readuart0_interupt();	
+	PORTC_OUT |= PIN7_bm;
+	readuart0_interupt();
+	_delay_ms(1000);
+	PORTC_OUT &= ~PIN7_bm;	
 }
 
 

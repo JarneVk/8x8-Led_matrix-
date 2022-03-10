@@ -6,6 +6,7 @@ static uint32_t array[8] = {0,0,0,0,0,0,0,0};
 static int packetje=0; 
 
 uint8_t getNextOutputData(){
+    /*
     uint32_t var =0 ;
     if(part==0){
         var =  array[packetje]>>24;
@@ -24,14 +25,16 @@ uint8_t getNextOutputData(){
     }
     }
     return (uint8_t)var;
+    */
+   return 0b11111111;
 }
 static int m_shift=0;
 void shift_matrix(){
+    /*
     part = 0;
     packetje=0;
     array[m_shift] = 0b11100111111111111111111111111111;
     if(m_shift<7){
-        
         m_shift++;
     }
     else{
@@ -41,6 +44,7 @@ void shift_matrix(){
         m_shift=0;
     }
     SendNewColumn();
+    */
 }
 
 
