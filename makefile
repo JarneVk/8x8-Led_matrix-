@@ -66,10 +66,10 @@ LINKERFLAGS =  -Wl,--start-group -Wl,-lm  -Wl,--end-group -Wl,--gc-sections -mre
 
 # executables
 AVRDUDE = "C:\Users\Gebruiker\Documents\3de jaar KUL\sem 2\bacholorProef\avrdude\avrdude.exe" -c $(PRG) -p $(MCU)
-OBJCOPY = avr-objcopy
-OBJDUMP = avr-objdump
-SIZE    = avr-size --format=avr --mcu=$(MCU)
-CC      = avr-gcc
+OBJCOPY = "D:\Lucas_data\Microchip Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-objcopy"
+OBJDUMP = "D:\Lucas_data\Microchip Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-objdump"
+SIZE    = "D:\Lucas_data\Microchip Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-size" --format=avr --mcu=atmega4809
+CC      = "D:\Lucas_data\Microchip Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc"
 
 # generate list of objects
 CFILES_SLAVE  = $(SRC) $(SRC_SLAVE)

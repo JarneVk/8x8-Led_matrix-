@@ -2,8 +2,10 @@
 #include <avr/io.h>
 
 //ontvanger
+
 int sendSpecial(int dat);
 void uartsetup_ontvanger_uart0();
+
 
 //zender
 void uartsetup_zender_uart1();
@@ -19,6 +21,16 @@ void writeToLed(uint32_t bits[]);
 //shiftTimer
 void shiftTimer_setup();
 void shiftTimer_reset();
+
+
+//computer communication
+void USART3_Init();
+
+/*
+Define for easy string literal use
+*/
+#define printStringLiteral(ARG) PROG_printString(PSTR(ARG))
+void PROG_printString(const char data[]);
 
 
 uint8_t zender_buffer_uart1;
