@@ -4,11 +4,10 @@
 //ontvanger
 
 int sendSpecial(int dat);
-void uartsetup_ontvanger_uart0();
+void uarts_setup();
 
 
 //zender
-void uartsetup_zender_uart1();
 void timer_setup();
 uint8_t getNextOutputData();
 void SendNewColumn();

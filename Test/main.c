@@ -5,10 +5,8 @@
 
 int main(void)
 {
-    
     initLedPoorten();
-    uartsetup_zender_uart1();
-    uartsetup_ontvanger_uart0();
+    uarts_setup();
     //leds testing 
     /*
     while(1){
@@ -30,6 +28,10 @@ int main(void)
     shiftTimer_setup();
 
     //uart ontvanger (hier niets voor doen)
+    while (1)
+    {       
+        // laat de interups werken
+    }
     
 
 
