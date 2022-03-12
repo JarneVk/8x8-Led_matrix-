@@ -1,6 +1,12 @@
 
 #include <avr/io.h>
 
+//aanzetten van printf_p (1164 bytes aan program data printf_p doet ook mallocs)
+//ALLEEEN VOOR DEBUGGEEEN (stdio is +-1kb aan program memory)
+//vb van gebruik printf_P(PSTR("dit mag alleen een literal string zijn %d"),i)
+//  string in prog space^   ^ define voor string in program space te zetten
+#define PRINTFP
+
 //ontvanger
 
 int sendSpecial(int dat);
