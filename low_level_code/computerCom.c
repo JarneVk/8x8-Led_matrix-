@@ -2,14 +2,14 @@
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
+#include <stdlib.h>
 #ifdef PRINTFP
 #include <stdio.h>
 #endif
 
-static void USART3_sendChar(char data){
+void USART3_sendChar(char data){
     while(!(USART3_STATUS & USART_DREIF_bm));
     USART3_TXDATAL = data;
-
 }
 
 #ifdef PRINTFP
@@ -28,6 +28,13 @@ Prints string from program memory to UART3
 void PROG_printString(const char data[]){
     while(pgm_read_byte(&data) != '\0'){
         USART3_sendChar(pgm_read_byte(&data));
+        data++;
+    }
+}
+
+void SRAM_printString(char data[]){
+    while(*data != '\0'){
+        USART3_sendChar(*data);
         data++;
     }
 }
@@ -55,8 +62,24 @@ void USART3_Init(){
  
 }
 
-
 //test
-/*ISR(USART3_RXC_vect){
-    USART3_sendChar((char)USART3_RXDATAL);
-}*/
+char input[MLENGTH + 1]; //+ 1 voor string termination
+// char* inPointer = NULL;
+uint8_t lengthIn = 0;
+uint8_t index = 0;
+
+ISR(USART3_RXC_vect){
+     uint8_t inc = USART3_RXDATAL;
+    if(inc != 3){
+        if(index <= MLENGTH - 1){
+            input[index] = inc;
+            index++;
+        }
+    }else{
+        input[index] = '\0';
+        lengthIn = index;
+        index = 0;
+        SRAM_printString(input);
+        USART3_sendChar((char)0x03);
+    }
+}
