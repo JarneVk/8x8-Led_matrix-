@@ -28,21 +28,13 @@ werking: 	- 	Er moet een externe functie 'uint8_t getNextOutputData()' worden di
 
 //#include "../Test/uart_test.c"
 
-#define NAME3(a,b,c)         NAME3_HIDDEN(a,b,c)
-#define NAME3_HIDDEN(a,b,c)  a ## b ## c
-
-#define initIrcomUsart(ARG) \
-NAME3(USART,ARG,_BAUDL) = 0x25;\
-NAME3(USART,ARG,_BAUDH) = 0x80;\
-NAME3(USART,ARG,_CTRLA) = 0b11000000;\
-NAME3(USART,ARG,_CTRLC) = 0b00111110;  //00111110 -> 9bit verzending
-
-
 void uartsetup_zender_uart1(){
-	initIrcomUsart(1);
+	USART0_BAUD = 0x056D;
+	USART0_CTRLC = 0b00100110;
 	PORTC_DIRSET = 0x01;
-	USART1_CTRLB = 0b11000000; //was 0xC0
-	USART1_EVCTRL = 0x01; //disable IrDA
+	USART1_CTRLB = 0b11000000;
+	USART0_CTRLA = 0b10000000;
+	//USART1_EVCTRL = 0x01; //disable IrDA
 
 	zender_buffer_uart1 = 0;
 
@@ -74,35 +66,21 @@ void zender_timer_setup(){
 */
 
 int sendData_zender_usart1(uint8_t hexgetal){   // returnt een 0 als het kan verzonden zorden anders een 1
-	
 	zender_buffer_uart1 = hexgetal;
-    if(USART1_STATUS&(1<<5)){  // get de DREIF bit
+    while(!(USART1_STATUS & USART_DREIF_bm)){
 		PORTC_OUT |= PIN4_bm;
-        USART1_TXDATAL = hexgetal;
-		_delay_ms(1000);
-		PORTC_OUT &= ~PIN4_bm;
-        return 0;
-    }    
-    else {
-        // register is nog niet geshift
-		PORTC_OUT &= ~PIN4_bm;
-        return 1;
-    }
+		USART1_TXDATAL = hexgetal;	
+	}
+	_delay_ms(1000);
 	PORTC_OUT &= ~PIN4_bm;
-	return 0;
 }
 
 // 1 voor ACK, 2 voor NACK, 3 voor EndOfMessage
 int sendSpecial_zender(int dat){
-	if(USART1_STATUS&(1<<5)){		 // get de DREIF bit
+	while(!(USART1_STATUS & USART_DREIF_bm)){
 		USART1_TXDATAH = 1;
 		USART1_TXDATAL = dat;
-        return 0;
-    }    
-    else {
-        // register is nog niet geshift
-        return 1;
-    }
+	}
 }
 
 /* get data : in RXDATAH, bit 7 zegt of er data in de buffer zit -> eerste hiernaar kijken 
@@ -130,16 +108,12 @@ void interup_ReadData(){
 			//NACK sturen 		
 			sendSpecial_zender(2);
 		}else if(bits[0]==1 && bits[1]&(1<<2)){	// NACK 
-			while(sendData_zender_usart1(zender_buffer_uart1)){
-				_delay_ms(1);
-			}
+			sendData_zender_usart1(zender_buffer_uart1);
 		} else if(bits[0]==1 && bits[1]==3){	//END
 
 		}else if(bits[0]==1 && bits[1]==1){		//ACK nieuw packetje sturen
 			zender_count_timeout = 0;
-			while(sendData_zender_usart1(getNextOutputData())){							//
-				_delay_ms(1);
-			}	
+			sendData_zender_usart1(getNextOutputData());	
 		}
 	}
 }
@@ -161,9 +135,7 @@ ISR(TCB1_INT_vect){
 		TCB1_CTRLB = 0x01;	
 	}
 	else{
-		while(sendData_zender_usart1(ontvanger_buffer_uart0)){
-		_delay_ms(1);
-	}
+		sendData_zender_usart1(ontvanger_buffer_uart0);
 	}
 }
 
