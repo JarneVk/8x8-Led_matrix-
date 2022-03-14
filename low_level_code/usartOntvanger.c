@@ -48,7 +48,7 @@ void uartsetup_ontvanger_uart0(){
 
 void sendData_usart0(uint8_t hexgetal){   // returnt een 0 als het kan verzonden zorden anders een 1
     ontvanger_buffer_uart0 = hexgetal;
-	while(!(USART0_STATUS & USART_DREIF_bm)){
+	while((USART0_STATUS & USART_DREIF_bm)){
 		USART0_TXDATAL = hexgetal;
 	}
 		
@@ -58,7 +58,7 @@ void sendData_usart0(uint8_t hexgetal){   // returnt een 0 als het kan verzonden
 // 1 voor ACK, 2 voor NACK, 3 voor EndOfMessage
 void sendSpecial_ontvanger(int dat){
 	ontvanger_buffer_uart0 = dat;
-	while(!(USART0_STATUS & USART_DREIF_bm)){
+	while((USART0_STATUS & USART_DREIF_bm)){
 		USART0_TXDATAH = 1;
 		USART0_TXDATAL = dat;
 	}
@@ -92,8 +92,11 @@ void readuart0_interupt(){      // geeft 8 bits terug
 				sendSpecial_ontvanger(1);
 			}
 			else{
-				sendSpecial_ontvanger(3);
+				PORTC_OUT |= PIN5_bm;
+				sendSpecial_ontvanger(3); //END
 				ledsAansturen();
+				_delay_ms(1000);
+				PORTC_OUT &= ~PIN5_bm;
 			}
 
 			

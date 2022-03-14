@@ -67,7 +67,7 @@ void zender_timer_setup(){
 
 int sendData_zender_usart1(uint8_t hexgetal){   // returnt een 0 als het kan verzonden zorden anders een 1
 	zender_buffer_uart1 = hexgetal;
-    while(!(USART1_STATUS & USART_DREIF_bm)){
+    while((USART1_STATUS & USART_DREIF_bm)){
 		PORTC_OUT |= PIN4_bm;
 		USART1_TXDATAL = hexgetal;	
 	}
@@ -77,7 +77,7 @@ int sendData_zender_usart1(uint8_t hexgetal){   // returnt een 0 als het kan ver
 
 // 1 voor ACK, 2 voor NACK, 3 voor EndOfMessage
 int sendSpecial_zender(int dat){
-	while(!(USART1_STATUS & USART_DREIF_bm)){
+	while((USART1_STATUS & USART_DREIF_bm)){
 		USART1_TXDATAH = 1;
 		USART1_TXDATAL = dat;
 	}
@@ -127,7 +127,7 @@ ISR(USART1_RXC_vect){			//interupt register
 
 //timeout functie 
 ISR(TCB1_INT_vect){
-	PORTC_OUT ^= PIN5_bm;
+	
 	TCB1_INTFLAGS = 0x01;
 	zender_count_timeout += 1;
 	if(zender_count_timeout >= 4){		//verbinding verbroken
