@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #define AMOUNT 8
 #define LETTER_WIDTH 4
-#define MAX_STRING_LEN 50
+#define MAX_STRING_LEN 30
 //structure to represent a single led in led matrix
 typedef struct led{
     uint8_t brightness; // amount of brightness : value between 0-31
@@ -17,11 +18,11 @@ void fillLedMatrixWithValue(Led m[][AMOUNT], uint8_t brightness, uint8_t red, ui
 void enterLetterInMatrix(Led m[][LETTER_WIDTH], uint8_t letterMatrix[][LETTER_WIDTH], uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue);
 void printLedMatrixToTerminal(Led m[][AMOUNT]);
 void printMatrixToTerminal(uint8_t matrix[][LETTER_WIDTH]);
-void shiftMatrix(Led matrix[][AMOUNT], Led columnReceived[AMOUNT]);
-void masterShiftMatrix(Led matrix[][AMOUNT],Led letter[][LETTER_WIDTH]);
+void shiftMatrix(Led columnReceived[AMOUNT]);
+void masterShiftMatrix(Led letter[][LETTER_WIDTH]);
 void initLedMatrix1d(Led matrix[AMOUNT], uint8_t value);
 void charToLedLetter(char cha, Led letter[][LETTER_WIDTH], uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue);
-void masterShiftMatrixFullString(Led matrix[][AMOUNT], uint8_t brightness, uint8_t red[MAX_STRING_LEN], uint8_t green[MAX_STRING_LEN], uint8_t blue[MAX_STRING_LEN]);
+void masterShiftMatrixFullString();
 uint16_t ledToOutput(Led pixel);
 void inputToLed(Led pixel, uint8_t input1, uint8_t input2);
 uint8_t getNextOuputData();
@@ -30,12 +31,27 @@ void sendColumn();
 void getUserInput();
 
 
-//global variables:
+//*****global variables*****:
 
-uint8_t columnIndex; //for the function getNextOuputData
-uint8_t part; //for the function getNextOuputData
+//for the function getNextOutputData:
+uint8_t columnIndex=0; 
+uint8_t part=0;
 Led columnSend[AMOUNT]; //for the function shiftMatrix and getNextOuputData
+                        //the column to be send to the next board
+
+//for the function masterShiftMatrix
+uint8_t columnLetterToShiftIn=0; //the column of the letter to be shifted in 0-3
+
+//for the function masterShiftMatrixFullString
+uint8_t letterNr=0; //the counter of the letter in the string
+
+//general use global variables
 char string[MAX_STRING_LEN]="Something"; //the string to be displayed on screen
+uint8_t string_red[MAX_STRING_LEN]; //the amount of red for each letter of the string
+uint8_t string_green[MAX_STRING_LEN]; //the amount of green for each letter of the string
+uint8_t string_blue[MAX_STRING_LEN]; //the amount of blue for each letter of the string
+uint8_t string_brightness=10; //the brightness of the string to be displayed on the leds
+Led main_matrix[AMOUNT][AMOUNT]; //the matrix of this LED BOARD
 
 uint8_t matrix_a[AMOUNT][LETTER_WIDTH]= {{0,0,0,0},
                                        {0,1,1,0},
