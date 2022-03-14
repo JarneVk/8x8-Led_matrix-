@@ -10,12 +10,18 @@ public class CNMessageTransfer{
 	private byte[] data;
 	
 	public CNMessageTransfer(int i) throws IOException {
+		boolean win = false;
+		if(System.getProperty("os.name").toLowerCase().contains("windows"));
+			win = true;
 		SerialPort[] comPorts = SerialPort.getCommPorts();
 		ArrayList<SerialPort> curioVComs = new ArrayList<SerialPort>();
 		for(SerialPort sp : comPorts) {
 			//System.out.println(sp.getPortDescription());
-			if(sp.getPortDescription().equals("Curiosity Virtual COM Port"))
+			if(sp.getPortDescription().equals("Curiosity Virtual COM Port") && win)
 				curioVComs.add(sp);
+			else
+				if(sp.getPortDescription().equals("nEDBG CMSIS-DAP"))
+					curioVComs.add(sp);
 		}
 		try {
 			comPort = curioVComs.get(i);

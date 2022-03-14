@@ -1,12 +1,25 @@
 package message_transfer;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
+import javax.swing.filechooser.*;
+import com.fazecast.jSerialComm.SerialPort;
 
 
 public class Test {
 	
 	public static void main(String[] args) {
+//		FileSystemView fsv = FileSystemView.getFileSystemView();
+//		File[] roots = File.listRoots();
+//		
+//		for(File f : roots){
+//			System.out.println(f);
+//		}
+//		
+//		SerialPort[] comPorts = SerialPort.getCommPorts();
+//		for(SerialPort sp : comPorts)
+//			System.out.println(sp);
+		
 		CNMessageTransfer cn = null;
 		try {
 			cn = new CNMessageTransfer(0);
