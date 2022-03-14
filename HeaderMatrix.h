@@ -8,8 +8,6 @@
 #define PRINTFP
 
 //ontvanger
-
-int sendSpecial(int dat);
 void uarts_setup();
 
 

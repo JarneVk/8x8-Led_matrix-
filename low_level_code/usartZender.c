@@ -65,19 +65,20 @@ void zender_timer_setup(){
     je kan ENKEL in het register schrijven als DREIF (in usartn.status) bit op 1 staat
 */
 
-int sendData_zender_usart1(uint8_t hexgetal){   // returnt een 0 als het kan verzonden zorden anders een 1
+void sendData_zender_usart1(uint8_t hexgetal){   // returnt een 0 als het kan verzonden zorden anders een 1
 	zender_buffer_uart1 = hexgetal;
     while((USART1_STATUS & USART_DREIF_bm)){
 		PORTC_OUT |= PIN4_bm;
+		printf_P(PSTR("zender_send %d"),hexgetal);
 		USART1_TXDATAL = hexgetal;	
 	}
-	_delay_ms(1000);
 	PORTC_OUT &= ~PIN4_bm;
 }
 
 // 1 voor ACK, 2 voor NACK, 3 voor EndOfMessage
-int sendSpecial_zender(int dat){
+void sendSpecial_zender(int dat){
 	while((USART1_STATUS & USART_DREIF_bm)){
+		printf_P(PSTR("zender_special %d"),dat);
 		USART1_TXDATAH = 1;
 		USART1_TXDATAL = dat;
 	}
@@ -127,7 +128,7 @@ ISR(USART1_RXC_vect){			//interupt register
 
 //timeout functie 
 ISR(TCB1_INT_vect){
-	
+	printf_P(PSTR("zender_timer verstreken"));
 	TCB1_INTFLAGS = 0x01;
 	zender_count_timeout += 1;
 	if(zender_count_timeout >= 4){		//verbinding verbroken

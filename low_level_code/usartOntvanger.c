@@ -81,21 +81,24 @@ void readuart0_interupt(){      // geeft 8 bits terug
 		
 		if(bits[0]&(1<<2) || bits[0]&(1<<1)){	// kijken of er geen frame of parity errors zijn
 			//NACK sturen 
+			printf_P(PSTR("ontvanger_send NACK"));
 			sendSpecial_ontvanger(2);
 		}else if(bits[0]==1 && bits[1]==2){	//NACK
+			printf_P(PSTR("ontvanger_send buffer"));
 			sendData_usart0(ontvanger_buffer_uart0);
 		} else{
 			
 			
 			if(writeOntvangenData(bits[1]) == 0){ //HIER MOET EEN HOGERE FUNCTIE KOMEN DIE DE DATA VERWERKT
 				//ACK sturen
+				printf_P(PSTR("ontvanger schrijf bits weg"));
 				sendSpecial_ontvanger(1);
 			}
 			else{
 				PORTC_OUT |= PIN5_bm;
+				printf_P(PSTR("ontvanger_send einde"));
 				sendSpecial_ontvanger(3); //END
 				ledsAansturen();
-				_delay_ms(1000);
 				PORTC_OUT &= ~PIN5_bm;
 			}
 
@@ -107,8 +110,8 @@ void readuart0_interupt(){      // geeft 8 bits terug
 
 ISR(USART0_RXC_vect){
 	PORTC_OUT |= PIN7_bm;
+	printf_P(PSTR("ontvanger_data interupt"));
 	readuart0_interupt();	
-	_delay_ms(1000);
 	PORTC_OUT &= ~PIN7_bm;
 }
 
