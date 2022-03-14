@@ -22,22 +22,14 @@ werking :	- 	Er moet een externe functie 'int writeUartData(uint8_t data)' worde
 #include <avr/interrupt.h>
 #include "../HeaderMatrix.h"
 
-#define NAME3(a,b,c)         NAME3_HIDDEN(a,b,c)
-#define NAME3_HIDDEN(a,b,c)  a ## b ## c
-
-#define initIrcomUsart(ARG) \
-NAME3(USART,ARG,_BAUDL) = 0xB6;\
-NAME3(USART,ARG,_BAUDH) = 0x02;\
-NAME3(USART,ARG,_CTRLA) = 0b11000000;\ 
-NAME3(USART,ARG,_CTRLC) = 0x3E;  //00111110 -> 9bit verzending
-
-
 void uartsetup_ontvanger_uart0(){
-	initIrcomUsart(0);
+	USART0_BAUD = 0x056D;
+	USART0_CTRLC = 0b00100110;
 	PORTA_DIRSET = 0x01;
-	USART0_CTRLB = 0b11010000; //was 0xC0
-	USART0_EVCTRL = 0x01; //disable IrDA
-	
+	USART0_CTRLB = 0b11000000; 
+	USART0_CTRLA = 0b10000000;
+	//USART0_EVCTRL = 0x01; //disable IrDA
+
 	ontvanger_buffer_uart0 = 0;
 
 	//LED voor te testen 
@@ -54,16 +46,22 @@ void uartsetup_ontvanger_uart0(){
     je kan ENKEL in het register schrijven als DREIF (in usartn.status) bit op 1 staat
 */
 
-int sendData_usart0(uint8_t hexgetal){   // returnt een 0 als het kan verzonden zorden anders een 1
-    if(USART0_STATUS&(1<<5)){		 // get de DREIF bit
-		ontvanger_buffer_uart0 = hexgetal;
-        USART0_TXDATAL = hexgetal;
-        return 0;
-    }    
-    else {
-        // register is nog niet geshift
-        return 1;
-    }
+void sendData_usart0(uint8_t hexgetal){   // returnt een 0 als het kan verzonden zorden anders een 1
+    ontvanger_buffer_uart0 = hexgetal;
+	while((USART0_STATUS & USART_DREIF_bm)){
+		USART0_TXDATAL = hexgetal;
+	}
+		
+        
+}
+
+// 1 voor ACK, 2 voor NACK, 3 voor EndOfMessage
+void sendSpecial_ontvanger(int dat){
+	ontvanger_buffer_uart0 = dat;
+	while((USART0_STATUS & USART_DREIF_bm)){
+		USART0_TXDATAH = 1;
+		USART0_TXDATAL = dat;
+	}
 }
 
 
@@ -83,29 +81,22 @@ void readuart0_interupt(){      // geeft 8 bits terug
 		
 		if(bits[0]&(1<<2) || bits[0]&(1<<1)){	// kijken of er geen frame of parity errors zijn
 			//NACK sturen 
-			while(sendSpecial(2)){
-				_delay_ms(1);
-			}
+			sendSpecial_ontvanger(2);
 		}else if(bits[0]==1 && bits[1]==2){	//NACK
-			PORTC_OUT |= PIN5_bm;
-			while(sendData_usart0(ontvanger_buffer_uart0)){
-				_delay_ms(1);
-			}
+			sendData_usart0(ontvanger_buffer_uart0);
 		} else{
 			
 			
 			if(writeOntvangenData(bits[1]) == 0){ //HIER MOET EEN HOGERE FUNCTIE KOMEN DIE DE DATA VERWERKT
 				//ACK sturen
-				PORTC_OUT &= ~PIN5_bm;
-				while(sendSpecial(1)){
-				_delay_ms(1);
-				}
+				sendSpecial_ontvanger(1);
 			}
 			else{
-				while(sendSpecial(3)){
-				_delay_ms(1);
-				}
+				PORTC_OUT |= PIN5_bm;
+				sendSpecial_ontvanger(3); //END
 				ledsAansturen();
+				_delay_ms(1000);
+				PORTC_OUT &= ~PIN5_bm;
 			}
 
 			
@@ -114,12 +105,11 @@ void readuart0_interupt(){      // geeft 8 bits terug
 	
 }
 
-
 ISR(USART0_RXC_vect){
 	PORTC_OUT |= PIN7_bm;
-	readuart0_interupt();
+	readuart0_interupt();	
 	_delay_ms(1000);
-	PORTC_OUT &= ~PIN7_bm;	
+	PORTC_OUT &= ~PIN7_bm;
 }
 
 
