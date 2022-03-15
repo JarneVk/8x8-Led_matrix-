@@ -66,19 +66,19 @@ void USART3_Init(){
 char input[MLENGTH + 1]; //+ 1 voor string termination
 // char* inPointer = NULL;
 uint8_t lengthIn = 0;
-uint8_t index = 0;
+uint8_t indexIn = 0;
 
 ISR(USART3_RXC_vect){
      uint8_t inc = USART3_RXDATAL;
     if(inc != 3){
-        if(index <= MLENGTH - 1){
-            input[index] = inc;
-            index++;
+        if(indexIn <= MLENGTH - 1){
+            input[indexIn] = inc;
+            indexIn++;
         }
     }else{
-        input[index] = '\0';
-        lengthIn = index;
-        index = 0;
+        input[indexIn] = '\0';
+        lengthIn = indexIn;
+        indexIn = 0;
         SRAM_printString(input);
         USART3_sendChar((char)0x03);
     }

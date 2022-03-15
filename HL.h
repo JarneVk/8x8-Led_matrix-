@@ -34,16 +34,16 @@ void getUserInput();
 //*****global variables*****:
 
 //for the function getNextOutputData:
-uint8_t columnIndex=0; 
-uint8_t part=0;
+uint8_t columnIndex; 
+uint8_t part;
 Led columnSend[AMOUNT]; //for the function shiftMatrix and getNextOuputData
                         //the column to be send to the next board
 
 //for the function masterShiftMatrix
-uint8_t columnLetterToShiftIn=0; //the column of the letter to be shifted in 0-3
+uint8_t columnLetterToShiftIn; //the column of the letter to be shifted in 0-3
 
 //for the function masterShiftMatrixFullString
-uint8_t letterNr=0; //the counter of the letter in the string
+uint8_t letterNr; //the counter of the letter in the string
 
 //general use global variables
 char string[MAX_STRING_LEN]="Something"; //the string to be displayed on screen

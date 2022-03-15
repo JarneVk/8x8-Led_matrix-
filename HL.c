@@ -93,11 +93,13 @@ void inputToLed(Led pixel, uint8_t input1, uint8_t input2) {
     pixel.green = (input2>>4) & 0b00001111;
     pixel.red = input2 & 0b00001111;
 }
-
+const char userInput[MAX_STRING_LEN]="Test str";
 //method to get the input string from the user
 void getUserInput() {
-    char userInput[MAX_STRING_LEN]="Test str";
-    printf_P(PSTR("%s"),userInput);
+    //string niet declareren lokaal?
+    for(int i=0; i<MAX_STRING_LEN; i++ ){
+        printf_P(PSTR("%c,%x"),userInput[i],userInput[i]);
+    }
     printf_P(PSTR("\n\r\n\r"));
     int i;
     for(i=0; i<MAX_STRING_LEN; i++ ){
@@ -105,6 +107,7 @@ void getUserInput() {
             break; //end of user input
         }
         string[i]=userInput[i];
+        printf_P(PSTR("nieuwe c %d:%c  %x\n\r"),i,string[i],string[i]);
         string_red[i]=31;
         string_blue[i]=0;
         string_green[i]=0;
@@ -113,6 +116,7 @@ void getUserInput() {
         string[i]='\0'; //for the remaining lenght of the string , fill up with 0 chars
         i++;
     } 
+    printf_P(PSTR("nieuwe string:%s\n\r"),string);
     string_brightness=20;
 }
 
@@ -204,6 +208,7 @@ void masterShiftMatrixFullString() {
     Led letter[AMOUNT][LETTER_WIDTH];
     
     if (letterNr<MAX_STRING_LEN && string[letterNr]!='\0'){
+        printf_P(PSTR("string[letterNr] %d : %c\n\r"),letterNr,string[letterNr]);
         charToLedLetter(string[letterNr],letter, string_brightness, string_red[letterNr], string_green[letterNr], string_blue[letterNr]);
         masterShiftMatrix(letter);
         if(columnLetterToShiftIn ==0) {
@@ -227,7 +232,9 @@ void masterShiftMatrixFullString() {
 //@param green: the amount of red
 //@param blue: the amount of red
 void charToLedLetter(char cha, Led letter[][LETTER_WIDTH], uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue){
+    printf_P(PSTR("karakter: %c\n\r"),cha);
     cha = tolower(cha); //only lowercase letters
+    printf_P(PSTR("karakter: %c\n\r"),cha);
     switch (cha)
     {
         case 'a': enterLetterInMatrix(letter,matrix_a, brightness, red, green, blue);      break;
@@ -350,19 +357,20 @@ int main(int argc, char *argv[]) {
     USART3_Init();
     printf_P(PSTR("test\n\r\n\r\n\r"));
     printf_P(PSTR("%s\n\r"),string);
-    // fillLedMatrixWithValue(matrix0, 31, 31, 0, 0);
-    // printf_P(PSTR("Testing a matrix filled with 31 everywhere: \n\r"));
-    // printLedMatrixToTerminal(matrix0);
+    printf_P(PSTR("%c\n\r"),string[0]);
+    fillLedMatrixWithValue(matrix0, 31, 31, 0, 0);
+    printf_P(PSTR("Testing a matrix filled with 31 everywhere: \n\r"));
+    printLedMatrixToTerminal(matrix0);
 
-    // printf_P(PSTR("Testing letter matrix 'a': \n\r"));
-    // printMatrixToTerminal(matrix_a); //test to see if global variables are available here
+    printf_P(PSTR("Testing letter matrix 'a': \n\r"));
+    printMatrixToTerminal(matrix_a); //test to see if global variables are available here
 
-    // //testing master matrix shifting a full string  
-    // initGlobalVariables();
-    // getUserInput();
-    // printf_P(PSTR("Testing masterShiftMatrixFullString:\n\r\n\r"));
-    // for(int i=0; i<40; i++) {
-    //     masterShiftMatrixFullString();
-    // }
+    //testing master matrix shifting a full string  
+    initGlobalVariables();
+    getUserInput();
+    printf_P(PSTR("Testing masterShiftMatrixFullString:\n\r\n\r"));
+    for(int i=0; i<40; i++) {
+        masterShiftMatrixFullString();
+    }
 
 }
