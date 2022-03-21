@@ -2,7 +2,6 @@
 //HL= high level code
 #include "HL.h"
 #include "HeaderMatrix.h"
-#include <avr/pgmspace.h>
 
 
 
@@ -93,7 +92,9 @@ void inputToLed(Led pixel, uint8_t input1, uint8_t input2) {
     pixel.green = (input2>>4) & 0b00001111;
     pixel.red = input2 & 0b00001111;
 }
-const char userInput[MAX_STRING_LEN]="Test str";
+
+//const char wou hem ook niet raar genoeg
+char userInput[MAX_STRING_LEN]="Test str";
 //method to get the input string from the user
 void getUserInput() {
     //string niet declareren lokaal?
@@ -129,10 +130,10 @@ void getUserInput() {
 //@param red: the amount of red for the led
 //@param blue: the amount of blue for the led
 //@param green: the amount of green for the led
-void enterLetterInMatrix(Led m[][LETTER_WIDTH], uint8_t letterMatrix[][LETTER_WIDTH], uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue) {
+void enterLetterInMatrix(Led m[][LETTER_WIDTH], const uint8_t letterMatrix[][LETTER_WIDTH], uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue) {
     for(int row=0; row<AMOUNT; row++) {
         for(int col=0; col<LETTER_WIDTH; col++) {
-            if( letterMatrix[row][col] != 0) { //letterMatrix determines which leds are turned on with the specified brightness
+            if( pgm_read_byte(&letterMatrix[row][col]) != 0) { //letterMatrix determines which leds are turned on with the specified brightness
                 m[row][col].brightness=brightness;
             }
             else {
@@ -304,15 +305,17 @@ void printLedMatrixToTerminal(Led m[][AMOUNT]) {
 
 //function to print an 8x4 matrix to the terminal for testing purposes
 //@param matrix: the 8x4 matrix to be printed.
-void printMatrixToTerminal(uint8_t matrix[][LETTER_WIDTH]){
+void printMatrixToTerminal_P(const uint8_t matrix[][LETTER_WIDTH]){
     for(int i=0; i<AMOUNT; i++) {
         for(int j=0; j<LETTER_WIDTH; j++) {
-            printf_P(PSTR("%5d"),matrix[i][j]);
+            printf_P(PSTR("%5d"),pgm_read_byte(&matrix[i][j]));
         }
         printf_P(PSTR("\n\r"));
     }
     printf_P(PSTR("\n\r"));
 }
+
+
 
 //function to make a 1d matrix of Leds filled with a certain brightness value for testing purposes
 //@param matrix: the matrix to be initialized
@@ -363,7 +366,7 @@ int main(int argc, char *argv[]) {
     printLedMatrixToTerminal(matrix0);
 
     printf_P(PSTR("Testing letter matrix 'a': \n\r"));
-    printMatrixToTerminal(matrix_a); //test to see if global variables are available here
+    printMatrixToTerminal_P(matrix_a); //test to see if global variables are available here
 
     //testing master matrix shifting a full string  
     initGlobalVariables();

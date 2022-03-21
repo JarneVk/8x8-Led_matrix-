@@ -1,4 +1,4 @@
-.vscode/c_cpp_properties.json
+.vscode/*
 *.o
 *.elf
 *.hex
@@ -6,4 +6,4 @@
 Master.txt
 Slave.txt
 Test.txt
-.vscode/settings.json
+java/.metadata/*
