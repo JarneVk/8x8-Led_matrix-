@@ -15,21 +15,29 @@ typedef struct led{
 }Led;
 
 //function prototypes:
-void fillLedMatrixWithValue(Led m[][AMOUNT], uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue);
-void enterLetterInMatrix(Led m[][LETTER_WIDTH], const uint8_t letterMatrix[][LETTER_WIDTH], uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue);
-void printLedMatrixToTerminal(Led m[][AMOUNT]);
-void printMatrixToTerminal_P(const uint8_t matrix[][LETTER_WIDTH]);
-void shiftMatrix(Led columnReceived[AMOUNT]);
-void masterShiftMatrix(Led letter[][LETTER_WIDTH]);
-void initLedMatrix1d(Led matrix[AMOUNT], uint8_t value);
-void charToLedLetter(char cha, Led letter[][LETTER_WIDTH], uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue);
-void masterShiftMatrixFullString();
+//**********INIT MODULE**********
+void initGlobalVariables();
+
+//**********I/O MODULE**********
 uint16_t ledToOutput(Led pixel);
-void inputToLed(Led pixel, uint8_t input1, uint8_t input2);
 uint8_t getNextOuputData();
 uint32_t ledToHardwareDriver(Led pixel);
-void sendColumn();
+void inputToLed(Led pixel, uint8_t input1, uint8_t input2);
 void getUserInput();
+
+//**********DATA PROCESSING**********
+void enterLetterInMatrix(Led m[][LETTER_WIDTH], uint8_t letterMatrix[][LETTER_WIDTH], uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue);
+void shiftMatrix(Led columnReceived[AMOUNT]);
+void masterShiftMatrix(Led letter[][LETTER_WIDTH]);
+void masterShiftMatrixFullString();
+void charToLedLetter(char cha, Led letter[][LETTER_WIDTH], uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue);
+
+//**********TESTING FUNCTIONS**********
+void fillLedMatrixWithValue(Led m[][AMOUNT], uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue);
+void printLedMatrixToTerminal(Led m[][AMOUNT]);
+void printMatrixToTerminal(uint8_t matrix[][LETTER_WIDTH]);
+void initLedMatrix1d(Led matrix[AMOUNT], uint8_t value);
+void sendColumn();
 
 
 //*****global variables*****:
