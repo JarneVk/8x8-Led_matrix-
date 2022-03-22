@@ -7,3 +7,6 @@ Master.txt
 Slave.txt
 Test.txt
 .vscode/settings.json
+
+usartOntvanger_oud.c
+usartZender_oud.c

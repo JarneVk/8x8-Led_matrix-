@@ -26,7 +26,7 @@ uint8_t getNextOutputData(){
     }
     return (uint8_t)var;
     */
-   return 0b11111111;
+   return 0b11101010;
 }
 static int m_shift=0;
 void shift_matrix(){
@@ -50,18 +50,16 @@ void shift_matrix(){
 
 
 //uart ontvanger testing 
-static int ontvang_i=0;
+
 static uint8_t array_ont[32];
 int writeOntvangenData(uint8_t data){
-    array_ont[ontvang_i] = data;
-    if(ontvang_i>=32){
-        ontvang_i++;
+    if(ontvang_i>32){
         return 1;
-    }
-    else{
-        ontvang_i =0;
+    } else  {
+        array_ont[ontvang_i] = data;
+        ontvang_i ++;
         return 0;
-    }  
+    }
 }
 
 void ledsAansturen(){

@@ -22,7 +22,6 @@ void initLedPoorten();
 void writeToLed(uint32_t bits[]);
 
 //shiftTimer
-void shiftTimer_setup();
 void shiftTimer_reset();
 
 
@@ -43,3 +42,6 @@ uint8_t zender_count_timeout;
 
 uint8_t columnIndex;
 uint8_t part;
+
+
+int ontvang_i; //testing
