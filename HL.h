@@ -26,7 +26,7 @@ void inputToLed(Led pixel, uint8_t input1, uint8_t input2);
 void getUserInput();
 
 //**********DATA PROCESSING**********
-void enterLetterInMatrix(Led m[][LETTER_WIDTH], uint8_t letterMatrix[][LETTER_WIDTH], uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue);
+void enterLetterInMatrix(Led m[][LETTER_WIDTH],const uint8_t letterMatrix[][LETTER_WIDTH], uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue);
 void shiftMatrix(Led columnReceived[AMOUNT]);
 void masterShiftMatrix(Led letter[][LETTER_WIDTH]);
 void masterShiftMatrixFullString();
