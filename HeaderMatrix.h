@@ -6,6 +6,7 @@
 //vb van gebruik printf_P(PSTR("dit mag alleen een literal string zijn %d"),i)
 //  string in prog space^   ^ define voor string in program space te zetten
 #define PRINTFP
+#define MLENGTH 20
 
 //ontvanger
 void uarts_setup();
@@ -27,6 +28,7 @@ void shiftTimer_reset();
 
 //computer communication
 void USART3_Init();
+void USART3_sendChar(char data);
 
 /*
 Define for easy string literal use

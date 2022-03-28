@@ -1,4 +1,4 @@
-.vscode/c_cpp_properties.json
+.vscode/*
 *.o
 *.elf
 *.hex
@@ -10,3 +10,4 @@ Test.txt
 
 usartOntvanger_oud.c
 usartZender_oud.c
+java/.metadata/*
