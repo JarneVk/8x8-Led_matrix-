@@ -1,7 +1,7 @@
 //HL.c file made by Olivier & Jorn
 //HL= high level code
 #include "HL.h"
-#include "HeaderMatrix.h"
+
 
 
 
@@ -77,6 +77,44 @@ uint32_t ledToHardwareDriver(Led pixel) {
     red_driver = (uint32_t)pixel.red<<4;      //format 00000000 00000000 00000000 RRRR0000
     hardwareDriver = brightness_driver + blue_driver + green_driver + red_driver;//format 111BBBB0 BBBB0000 GGGG0000 RRRR0000
     return hardwareDriver;
+}
+
+//function to drive the led hardware with the main_matrix
+//we run through the matrix from the right bottem corner then up left down left up etc...
+//Global vars used here:
+//*main_matrix
+void driveLeds(){
+    uint32_t ledArray[AMOUNT*AMOUNT];
+    for(int col=AMOUNT-1; col>=0; col--) {
+        for(int row=AMOUNT-1; row>=0; row--) {
+            int row2;
+            if(col%2==0) {
+                row2=AMOUNT-1-row; //uneven rows in reverse order
+            }
+            else{
+                row2=row;
+            }
+            uint32_t hwDriver = ledToHardwareDriver(main_matrix[row2][col]);
+            int row_led=AMOUNT-1-row;
+            int col_led=AMOUNT-1-col;
+            ledArray[col_led*AMOUNT+row_led] = hwDriver;
+        }
+    }
+    
+    printf_P(PSTR("leds\n\r"));
+    for(int col=AMOUNT-1; col>=0; col--) {
+        for(int row=AMOUNT-1; row>=0; row--) {
+            if(col%2) {
+                row=AMOUNT-1-row; //uneven rows in reverse order
+            }
+            if(ledArray[row+col*AMOUNT]&(uint32_t)0b00000000000000000000000011111111)
+                printf_P(PSTR("1   "));
+            else
+                printf_P(PSTR("0   "));
+        }
+        printf_P(PSTR("\n\r"));
+    }
+    writeToLed(ledArray);
 }
 
 //FUNCTIONS FOR INPUT:
@@ -187,7 +225,7 @@ void masterShiftMatrix(Led letter[][LETTER_WIDTH]) {
         cr[i] = letter[i][columnLetterToShiftIn]; //copying a column of the letter to be shifted in
     }
     shiftMatrix(cr);
-    printLedMatrixToTerminal(main_matrix); //testing print
+    //printLedMatrixToTerminal(main_matrix); //testing print
     if(columnLetterToShiftIn ==3) {
         columnLetterToShiftIn=0;//this letter is shifted in, next letter will be shifted in on the next call
     }
@@ -296,7 +334,7 @@ void fillLedMatrixWithValue(Led m[][AMOUNT], uint8_t brightness, uint8_t red, ui
 void printLedMatrixToTerminal(Led m[][AMOUNT]) {
     for(int row=0; row<AMOUNT; row++) {
         for(int col=0; col<AMOUNT; col++) {
-            printf_P(PSTR("%5d"),m[row][col].brightness);
+            printf_P(PSTR("%5d    "),m[row][col].brightness);
         }
         printf_P(PSTR("\n\r"));
     }
@@ -308,7 +346,7 @@ void printLedMatrixToTerminal(Led m[][AMOUNT]) {
 void printMatrixToTerminal_P(const uint8_t matrix[][LETTER_WIDTH]){
     for(int i=0; i<AMOUNT; i++) {
         for(int j=0; j<LETTER_WIDTH; j++) {
-            printf_P(PSTR("%5d"),pgm_read_byte(&matrix[i][j]));
+            printf_P(PSTR("%5d    "),pgm_read_byte(&matrix[i][j]));
         }
         printf_P(PSTR("\n\r"));
     }
@@ -353,7 +391,33 @@ void sendColumn() {
 
 */
 
-int main(int argc, char *argv[]) {
+int main(void)
+{   
+    USART3_Init();
+    
+    initLedPoorten();
+    initGlobalVariables();
+    string_brightness = 1;
+    for(int i = 0; i < MAX_STRING_LEN; i++){
+        string_red[i] = 0xFF;
+    }
+    //uarts_setup();
+    //leds testing 
+    
+    while(1){
+
+        //fillLedMatrixWithValue(main_matrix,20,31,0,0);
+        for(int i=0;i<40;i++){
+            masterShiftMatrixFullString();
+            driveLeds();
+        }
+        
+        
+        
+    }
+}
+
+/*int main(int argc, char *argv[]) {
 
     Led matrix0[AMOUNT][AMOUNT];
 
@@ -376,4 +440,4 @@ int main(int argc, char *argv[]) {
         masterShiftMatrixFullString();
     }
 
-}
+}*/

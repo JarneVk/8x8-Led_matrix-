@@ -8,6 +8,10 @@
 #define PRINTFP
 #define MLENGTH 20
 
+#define AMOUNT 8
+#define LETTER_WIDTH 4
+#define MAX_STRING_LEN 30
+
 //ontvanger
 void uarts_setup();
 
@@ -36,6 +40,17 @@ Define for easy string literal use
 #define printStringLiteral(ARG) PROG_printString(PSTR(ARG))
 void PROG_printString(const char data[]);
 
+
+void masterShiftMatrixFullString();
+
+void initGlobalVariables();
+
+void driveLeds();
+
+uint8_t string_red[MAX_STRING_LEN]; //the amount of red for each letter of the string
+uint8_t string_green[MAX_STRING_LEN]; //the amount of green for each letter of the string
+uint8_t string_blue[MAX_STRING_LEN]; //the amount of blue for each letter of the string
+uint8_t string_brightness; //the brightness of the string to be displayed on the leds
 
 uint8_t zender_buffer_uart1;
 uint8_t ontvanger_buffer_uart0;

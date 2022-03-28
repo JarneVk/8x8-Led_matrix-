@@ -39,7 +39,8 @@ PRG = pkobn_updi
 # program source files (not including external libraries)
 SRC_SLAVE = ./Slave/main.c
 SRC_MASTER = ./Master/main.c
-SRC_TEST = ./Test/high_level_test.c
+SRC_TEST = 
+#SRC_TEST = ./Test/main.c
 SRC = ./low_level_code/low_level_aansturing_leds.c ./low_level_code/shiftTimer.c \
 ./Test/uart_test.c  ./HL.c\
 ./low_level_code/usartOntvanger.c ./low_level_code/usartZender.c ./low_level_code/uartAlgemeen.c ./low_level_code/computerCom.c
@@ -63,12 +64,7 @@ INCLUDE := $(foreach dir, $(EXT), -I$(dir))
 #CFLAGS    = -Wall -DF_CPU=$(CLK) -mmcu=$(MCU) $(INCLUDE) -B ./atmega4809
 CFLAGS    = -DF_CPU=$(CLK) -x c -funsigned-char -funsigned-bitfields -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax\
  -Wall -mmcu=atmega4809 -B "./atmega4809" -c -std=gnu99 #-MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"
-<<<<<<< HEAD
 LINKERFLAGS =  -Wl,--start-group -Wl,-lm  -Wl,--end-group -Wl,--gc-sections -mrelax -mmcu=atmega4809 -Wl,-u,vfprintf -lprintf_min -B "./atmega4809"  
-=======
-# LINKERFLAGS =  -Wl,--start-group -Wl,-lm  -Wl,--end-group -Wl,--gc-sections -mrelax -mmcu=atmega4809 -Wl,-u,vfprintf -lprintf_min -B "./atmega4809"
-LINKERFLAGS =  -Wl,--start-group -Wl,-lm  -Wl,--end-group -Wl,--gc-sections -mrelax -mmcu=atmega4809 -Wl,-u,vfprintf -lprintf_flt -lm -B "./atmega4809"
->>>>>>> JavaSerialCom
 
 # executables
 AVRDUDE = avrdude -c $(PRG) -p $(MCU)
