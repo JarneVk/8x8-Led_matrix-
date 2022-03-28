@@ -9,6 +9,7 @@ aansturing Leds : APA102
 */
 
 #include <avr/io.h>
+#include <util/delay.h>
 #include "../HeaderMatrix.h"
 
 void initLedPoorten(){
@@ -18,23 +19,31 @@ void initLedPoorten(){
 }
 
 void writeToLed(uint32_t bits[]){
-
+    PORTB_OUT &= ~PIN5_bm;
     for(int i=0; i<32; i++){    //32x0
-        PORTB_OUT &= ~PIN5_bm;
+        //_delay_ms(1);
         PORTB_OUT |= PIN4_bm;
+        //_delay_ms(1);
         PORTB_OUT &= ~PIN4_bm;
+        //_delay_ms(1);
     }
     for(int i=0; i<64;i++){             // led info doorsturen
         for(int j=0; j<32;j++){
-            if(bits[i]&(1<<j)){
+            if(bits[i]&((uint32_t)1<<(31-j))){
                 PORTB_OUT |= PIN5_bm;
+                //_delay_ms(1);
                 PORTB_OUT |= PIN4_bm;
+                //_delay_ms(1);
                 PORTB_OUT &= ~PIN4_bm;
+                //_delay_ms(1);
             }
             else{
                 PORTB_OUT &= ~PIN5_bm;
+                //_delay_ms(1);
                 PORTB_OUT |= PIN4_bm;
+                //_delay_ms(1);
                 PORTB_OUT &= ~PIN4_bm;
+                //_delay_ms(1);
             }
         }
     }

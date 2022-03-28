@@ -1,3 +1,13 @@
+/*
+usart onvanger zorgt voor de low level aansturing van de usart poorten die aan de IRED worden gekoppeld 
+het zal enkel ontvangen en kan hierop zelf antwoorden met NACK(packet) of ACK(packet)
+
+werking :	- 	Er moet een externe functie 'int writeUartData(uint8_t data)' worden aangemaakt.
+				Deze functie geeft een 1 terug als ze nog data verwacht en een 0 als ze geen data meer verwacht (voor die verzending).
+
+			- 	Dit programma zal een interupt generen als het een packetje ontvangt. 
+				De errors worden automatisch afgehandeld
+*/
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -25,6 +35,10 @@ void uartsetup_ontvanger_uart0(){
 	
 }
 
+/* Speciale Data responses 
+		ACK :   1 0000 0001
+		NACK :	1 0000 0010	
+*/
 void sendData_ontvanger_usart0(uint8_t hexgetal){
     while(!(USART0_STATUS & USART_DREIF_bm));
     USART0_TXDATAL = hexgetal;
