@@ -5,8 +5,15 @@
 
 int main(void)
 {
+    //initialisatie 
+    USART3_Init();
+    initLedPoorten();
+    initGlobalVariables();
+    uarts_setup();
+    shiftTimer_setup();
+    //string in matrix zetten
+    getUserInput();
     
-    /* Replace with your application code */
     while (1) 
     {
 		

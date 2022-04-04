@@ -21,7 +21,13 @@ werking: 	- 	Er moet een externe functie 'uint8_t getNextOutputData()' worden di
 
 #include "../HeaderMatrix.h"
 
-
+void zender_timer_setup(){
+	TCB1_CCMPL = 0xFF;
+	TCB1_CCMPH = 0xFF;
+	TCB1_CTRLA = 0b00000011;
+	TCB1_CTRLB = 0x00;		//timeout mode
+	TCB1_INTCTRL = 0x01;	//enable inetrups
+}
 
 
 void uartsetup_zender_uart1(){
@@ -35,23 +41,9 @@ void uartsetup_zender_uart1(){
 
 	zender_buffer_uart1 = 0;
 
-	zender_timer_setup();
-
-	//LED voor te testen 
-	PORTC_DIR |= PIN4_bm;
-	PORTC_DIR |= PIN5_bm;
+	//zender_timer_setup();
 		
 }
-
-void zender_timer_setup(){
-	TCB1_CCMPL = 0xFF;
-	TCB1_CCMPH = 0xFF;
-	TCB1_CTRLA = 0b00000011;
-	TCB1_CTRLB = 0x00;		//timeout mode
-	TCB1_INTCTRL = 0x01;	//enable inetrups
-}
-
-
 
 void sendData_zender_usart1(uint8_t hexgetal){ 
 	zender_buffer_uart1 = hexgetal;
@@ -60,9 +52,8 @@ void sendData_zender_usart1(uint8_t hexgetal){
     USART1_TXDATAL = hexgetal;
 }
 
-void SendNewColumn(){  
-	PORTC_OUT &= ~PIN5_bm;
-
+void sendNewColumn(){ 
+	printf_P(PSTR("senNewColumn"));
 	ontvang_i=0;
 
 	zender_count_timeout = 0;
@@ -86,8 +77,6 @@ void RX_ontvanger_interupt(){
 		sendData_zender_usart1(zender_buffer_uart1);
 	} else if(data == 3){
 		//stop met zenden END
-		PORTC_OUT |= PIN5_bm;
-		ledsAansturen();
 	}
 
 }
@@ -103,6 +92,7 @@ ISR(TCB1_INT_vect){
 	zender_count_timeout += 1;
 	if(zender_count_timeout >= 4){		//verbinding verbroken
 		zender_count_timeout = 0;
+		driveLeds();
 		TCB1_CTRLB = 0x01;	
 	}
 	else{

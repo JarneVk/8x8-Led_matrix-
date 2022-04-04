@@ -39,11 +39,12 @@ PRG = pkobn_updi
 # program source files (not including external libraries)
 SRC_SLAVE = ./Slave/main.c
 SRC_MASTER = ./Master/main.c
-SRC_TEST = 
-#SRC_TEST = ./Test/main.c
-SRC = ./low_level_code/low_level_aansturing_leds.c ./low_level_code/shiftTimer.c \
-./Test/uart_test.c  ./HL.c\
+#SRC_TEST = 
+SRC_TEST = ./Test/main.c
+SRC = ./low_level_code/low_level_aansturing_leds.c \
+./Test/uart_test.c ./HL.c ./low_level_code/shiftTimer.c \
 ./low_level_code/usartOntvanger.c ./low_level_code/usartZender.c ./low_level_code/uartAlgemeen.c ./low_level_code/computerCom.c
+
 OUTPUT_SLAVE = ./Slave_build/
 OUTPUT_MASTER = ./Master_build/
 OUTPUT_TEST = ./Test_build/

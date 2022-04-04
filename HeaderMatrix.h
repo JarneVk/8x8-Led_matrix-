@@ -19,7 +19,7 @@ void uarts_setup();
 //zender
 void timer_setup();
 uint8_t getNextOutputData();
-void SendNewColumn();
+//void SendColumn();
 
 //Led's
 void initLedPoorten();
@@ -56,9 +56,12 @@ uint8_t zender_buffer_uart1;
 uint8_t ontvanger_buffer_uart0;
 uint8_t zender_verbinding;
 uint8_t zender_count_timeout;
+uint8_t ontvangerNAck_count;
+uint8_t stop_antwoorden;
 
 uint8_t columnIndex;
 uint8_t part;
 
 
 int ontvang_i; //testing
+void ledsAansturen();

@@ -22,18 +22,20 @@ void shiftTimer_setup(){
 
 	//TCB1_EVCTRL |= PIN4_bm; 	// om de timer te starten 
 
-
-	//led voor testing
-	PORTC_DIR |= PIN6_bm;
+	//LED voor te testen 
+	PORTC_DIR |= PIN4_bm;
+	PORTC_DIR |= PIN5_bm;
 
 }
 
 
 ISR(TCB0_INT_vect){
+	PORTC_OUT ^= PIN5_bm;
 	// shift matrix
-	PORTC_OUT ^= PIN6_bm;
 	TCB0_INTFLAGS = 0x01;  //interupt cleren zodat timer door kan
-	SendNewColumn();
-	
+	stop_antwoorden = 0;
+	masterShiftMatrixFullString();
+	sendColumn();
+	driveLeds(); //enkel in master
 
 }

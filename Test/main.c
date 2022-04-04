@@ -6,17 +6,17 @@
 
 int main(void)
 {   
+    /*
     USART3_Init();
-    
     initLedPoorten();
     initGlobalVariables();
-    string_brightness = 1;
+    /*string_brightness = 1;
     for(int i = 0; i < MAX_STRING_LEN; i++){
         string_red[i] = 0xFF;
-    }
+    }*/
     //uarts_setup();
     //leds testing 
-    
+    /*
     while(1){
 
         masterShiftMatrixFullString();
@@ -24,9 +24,9 @@ int main(void)
 
 
         
-    }/*
-                brightness    blue    green    red
-                             |       |       |      |      
+    }
+    //            brightness    blue    green    red
+    //                         |       |       |      |      
    uint32_t bits = 0b11100001000000001111111111111111;
    while (1){
         uint32_t array[64];

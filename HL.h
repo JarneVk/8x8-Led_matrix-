@@ -22,7 +22,6 @@ typedef struct led{
 
 //**********I/O MODULE**********
 uint16_t ledToOutput(Led pixel);
-uint8_t getNextOuputData();
 uint32_t ledToHardwareDriver(Led pixel);
 void inputToLed(Led pixel, uint8_t input1, uint8_t input2);
 void getUserInput();
@@ -40,7 +39,7 @@ void printLedMatrixToTerminal(Led m[][AMOUNT]);
 void printMatrixToTerminal(uint8_t matrix[][LETTER_WIDTH]);
 void initLedMatrix1d(Led matrix[AMOUNT], uint8_t value);
 void sendColumn();
-
+void sendNewColumn();
 
 //*****global variables*****:
 

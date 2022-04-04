@@ -4,7 +4,6 @@
 
 
 
-
 //**********INIT MODULE**********
 
 //function to initialise all global variables used for the led board
@@ -46,7 +45,7 @@ uint16_t ledToOutput(Led pixel) {
 //twice with this index so that both part1 and part2 can be transmitted. -->global variable
 //@param columnIndex: the index of the element of the column you are trying to send -->global variable
 //@return: the next element to be send to the slave (in 16 bit compressed format BBBBBBBBGGGGRRRR)
-uint8_t getNextOuputData() {
+uint8_t getNextOutputData() {
     uint16_t nextElement;
     if(columnIndex > 7) {
         return 0; // columnIndex out of bounce
@@ -368,11 +367,12 @@ void initLedMatrix1d(Led matrix[AMOUNT], uint8_t value){
 }
 
 void sendColumn() {
-    //sendNewColumn (function from jakke)
+    sendNewColumn(); //function in uartZender
 }
 
 /*
     main for master
+    initGlobalVariables()
     initHardware()
     getUserInput()
     masterShiftMatrixFullString() <---- potentially with gui
@@ -390,7 +390,7 @@ void sendColumn() {
     driveLeds()
 
 */
-
+/*
 int main(void)
 {   
     USART3_Init();
@@ -416,7 +416,7 @@ int main(void)
         
     }
 }
-
+*/
 /*int main(int argc, char *argv[]) {
 
     Led matrix0[AMOUNT][AMOUNT];
