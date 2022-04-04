@@ -441,3 +441,15 @@ int main(void)
     }
 
 }*/
+
+
+//na discord meeting op 4 april:
+//bericht aan Jarne : voor het ontvangen van de data wordt eerst uint_8 array_ont[16] opgevult met de 16 ontvangen pakketjes
+//daarna wordt deze gebruikt om columnreceived in te vullen met volgende code:
+/*
+Led columnReceived[AMOUNT]; //<- ontvangen kolom
+for(int i=0;i<AMOUNT;i++) {
+    inputToLed(columnReceived[I],array_ont[2i],array_ont[2i+1]); //<— invullen column received
+}
+shiftMatrix(columnReceived);
+*/
