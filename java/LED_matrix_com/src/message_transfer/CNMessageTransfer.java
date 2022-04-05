@@ -8,8 +8,14 @@ public class CNMessageTransfer{
 	
 	private SerialPort comPort;
 	private byte[] data;
+	public static final byte START_OF_TRANSMISSION = 1;
 	public static final byte END_OF_PHASE = 3;
 	
+	/**
+	 * 
+	 * @param i Represents what board you want to communicate with (0 if there is only one connected)
+	 * @throws IOException
+	 */
 	public CNMessageTransfer(int i) throws IOException {
 		boolean win = false;
 		if(System.getProperty("os.name").toLowerCase().contains("windows"));
@@ -28,7 +34,7 @@ public class CNMessageTransfer{
 			comPort = curioVComs.get(i);
 			if(!comPort.openPort())
 				throw(new IOException("Failed to open port"));
-			//moet uiteindelijk SerialPortMessageListener worden
+			//moet uiteindelijk SerialPortMessageListener worden wordt bij zenden niet gebruikt gewoon voor debug
 			comPort.addDataListener(new SerialPortMessageListener() {
 
 				@Override
@@ -83,8 +89,16 @@ public class CNMessageTransfer{
 			message[i] = data[i];
 		}
 		message[data.length] = 3;
-		System.out.println(bytesToHex(message));
+//		System.out.println(bytesToHex(message));
 		writeBytes(message);
+	}
+	
+	/**
+	 * DEZE JORN
+	 * @param mes
+	 */
+	public void sendMessage(Message mes) {
+		writeBytes(mes.getMessageBytes());
 	}
 	
 	private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();

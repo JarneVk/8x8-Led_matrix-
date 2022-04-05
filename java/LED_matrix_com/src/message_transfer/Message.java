@@ -2,10 +2,19 @@ package message_transfer;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-
+/**
+ * Message to be sent to curiosity nano board
+ * @author Lucas Van Laer
+ *
+ */
 public class Message {
-	
+	/**
+	 * Message to be displayed
+	 */
 	private String message;
+	/**
+	 * Colors of to be displayed message
+	 */
 	private MessageColor messageColor;
 	
 	public Message() {
@@ -20,17 +29,22 @@ public class Message {
 		this.message = message;
 	}
 	
+	/**
+	 * Formats data so it can be sent
+	 * @return returns formatted message in byte array
+	 */
 	public byte[] getMessageBytes() {
 		byte[] stringBytes = message.getBytes(StandardCharsets.UTF_8);
 		int lenLeds = messageColor.getColors().size()*2;
 		System.out.println(stringBytes.length + 1 + lenLeds + 1 + messageColor.getColorsIndex().size() + 1 + 1);
 		System.out.println(stringBytes.length);
 		System.out.println(lenLeds);
-		int messageLen = stringBytes.length + 1 + lenLeds + 1 + messageColor.getColorsIndex().size() + 1 + 1;
+		int messageLen = 1 + stringBytes.length + 1 + lenLeds + 1 + messageColor.getColorsIndex().size() + 1 + 1;
 		byte[] messageBytes = new byte[messageLen];
 		int currentIndex = 0;
-		for(; currentIndex < stringBytes.length; currentIndex++) {
-			messageBytes[currentIndex] = stringBytes[currentIndex];
+		messageBytes[currentIndex++] = CNMessageTransfer.START_OF_TRANSMISSION;
+		for(; currentIndex < stringBytes.length + 1; currentIndex++) {
+			messageBytes[currentIndex] = stringBytes[currentIndex - 1];
 			
 		}
 		messageBytes[currentIndex++] = CNMessageTransfer.END_OF_PHASE;
@@ -66,8 +80,12 @@ public class Message {
 		return messageColor;
 	}
 
-
-	private class MessageColor{
+	/**
+	 * Class that represents the colors for the message.
+	 * Default: white for entire message
+	 * @author Lucas Van Laer
+	 */
+	public class MessageColor{
 		private ArrayList<Led> colors;
 		private ArrayList<Integer> colorsIndex;
 		private int internalIndex;
@@ -95,12 +113,24 @@ public class Message {
 			this.colorsIndex = colorsIndex;
 		}
 		
+		/**
+		 * Sets the color for the previous index till the chosen index.
+		 * -1 represents till the end of the message (no check on index order nor out of bounds)
+		 * @param color of the chosen characters
+		 * @param EndOfColorIndex The last character to have said color, range: 0->length-1
+		 */
 		public void setColor(Led color, int EndOfColorIndex) {
 			getColors().add(internalIndex, color);
 			getColorsIndex().add(internalIndex, EndOfColorIndex);
 			internalIndex += 1;
 		}
 		
+		/**
+		 * Sets the internal index to newIndex.
+		 * This is where setColor will start setting the color (duh).
+		 * starts at zero
+		 * @param newIndex
+		 */
 		public void setInternalColorIndex(int newIndex) {
 			internalIndex = newIndex;
 		}

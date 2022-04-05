@@ -9,15 +9,35 @@ import com.fazecast.jSerialComm.SerialPort;
 public class Test {
 	
 	public static void main(String[] args) {
-		testLed();
+//		testLed();
 		testMessage();
 	}
 	
 	public static void testMessage() {
 		Message mes = new Message();
-		mes.setMessage("something");
+		mes.setMessage("somethinggf");
+//		mes.getMessageColor().setColor(new Led(255,100,50,20), 0);
 		System.out.println(CNMessageTransfer.bytesToHex(mes.getMessageBytes()));
-		
+		try {
+			CNMessageTransfer cn = new CNMessageTransfer(0);
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			cn.sendMessage(mes);
+			while(true) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				System.out.println(cn.getData());
+//				System.out.println(cn.getHexString());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static void testLed() {
