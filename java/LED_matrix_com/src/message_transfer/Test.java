@@ -9,6 +9,30 @@ import com.fazecast.jSerialComm.SerialPort;
 public class Test {
 	
 	public static void main(String[] args) {
+		testLed();
+		testMessage();
+	}
+	
+	public static void testMessage() {
+		Message mes = new Message();
+		mes.setMessage("something");
+		System.out.println(CNMessageTransfer.bytesToHex(mes.getMessageBytes()));
+		
+	}
+	
+	public static void testLed() {
+		Led l = new Led();
+		l.setBlue(128);
+		l.setGreen(255);
+		l.setRed(128);
+		l.setBrightness(3);
+		System.out.println(l);
+		System.out.println(l.getBrightnessRedMerge());
+		System.out.println(CNMessageTransfer.bytesToHex(new byte[] {l.getBrightnessRedMerge()}));
+		System.out.println(CNMessageTransfer.bytesToHex(new byte[] {l.getGreenBlueMerge()}));
+	}
+	
+	public static void testCom() {
 //		FileSystemView fsv = FileSystemView.getFileSystemView();
 //		File[] roots = File.listRoots();
 //		

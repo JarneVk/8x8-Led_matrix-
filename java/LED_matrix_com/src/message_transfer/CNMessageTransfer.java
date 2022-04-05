@@ -8,6 +8,7 @@ public class CNMessageTransfer{
 	
 	private SerialPort comPort;
 	private byte[] data;
+	public static final byte END_OF_PHASE = 3;
 	
 	public CNMessageTransfer(int i) throws IOException {
 		boolean win = false;
@@ -95,6 +96,16 @@ public class CNMessageTransfer{
 	        hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
 	    }
 	    return new String(hexChars);
+	}
+	
+	public static byte integerToUnsignedByte(int in) {
+		if(in > 255 || in< 0)
+			throw(new IllegalArgumentException("integer out of range"));
+		if(in > 127) {
+			return (byte)(in - 256);
+		}else {
+			return (byte)(in);
+		}
 	}
 	
 	public void closePort() {
