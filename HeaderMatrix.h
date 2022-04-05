@@ -6,7 +6,19 @@
 //vb van gebruik printf_P(PSTR("dit mag alleen een literal string zijn %d"),i)
 //  string in prog space^   ^ define voor string in program space te zetten
 #define PRINTFP
-#define MLENGTH 20
+#ifdef PRINTFP
+#include <stdio.h>
+#endif
+
+typedef struct led{
+    uint8_t brightness; // amount of brightness : value between 0-31
+    uint8_t red; //amount of red : value between 0-31
+    uint8_t green; //amount of green : value between 0-31
+    uint8_t blue; //amount of blue : value between 0-31
+}Led;
+
+#define MAX_STRING_LEN 30
+#define MAX_MESSAGE_COLORS 5
 
 //ontvanger
 
@@ -38,6 +50,7 @@ Define for easy string literal use
 */
 #define printStringLiteral(ARG) PROG_printString(PSTR(ARG))
 void PROG_printString(const char data[]);
+void SRAM_printBytes(uint8_t *data, uint8_t amount);
 
 
 uint8_t zender_buffer_uart1;
@@ -47,3 +60,10 @@ uint8_t zender_count_timeout;
 
 uint8_t columnIndex;
 uint8_t part;
+
+
+//sent data
+char inputString[MAX_STRING_LEN];
+Led stringColor[MAX_MESSAGE_COLORS];
+uint8_t colorIndex[MAX_MESSAGE_COLORS];
+
