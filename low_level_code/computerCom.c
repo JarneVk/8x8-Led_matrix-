@@ -120,8 +120,7 @@ ISR(USART3_RXC_vect){
                 if(inc != 3){
                     if(indexIn <= MAX_MESSAGE_COLORS - 1){
                         if(sendPhase == 1){
-                            //bit shift misschien nog niet goed, moet gechecked worden
-                            stringColor[indexIn].brightness = ((inc>>3) & 0x1E);
+                            stringColor[indexIn].brightness = ((inc>>4) & 0x0f);
                             stringColor[indexIn].red = (inc<<4) & 0xf0;
                             sendPhase++;
                         }else{
