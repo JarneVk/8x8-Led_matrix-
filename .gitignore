@@ -11,3 +11,5 @@ Test.txt
 usartOntvanger_oud.c
 usartZender_oud.c
 java/.metadata/*
+java/LED_matrix_com/bin/*
+java\LED_matrix_com\.settings\*

@@ -54,6 +54,7 @@ int main(void)
     //uart zender testing 
     //shiftTimer_setup();
     
+
     //uart ontvanger (hier niets voor doen)
     /*
     while (1)
