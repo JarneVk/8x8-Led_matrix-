@@ -39,7 +39,7 @@ PRG = pkobn_updi
 # program source files (not including external libraries)
 SRC_SLAVE = ./Slave/main.c
 SRC_MASTER = ./Master/main.c
-SRC_TEST = ./HL.c
+SRC_TEST = ./Test/usb_test.c
 SRC = ./low_level_code/computerCom.c
 # SRC_TEST = ./Test/high_level_test.c
 # SRC = ./low_level_code/low_level_aansturing_leds.c ./low_level_code/shiftTimer.c \
@@ -72,7 +72,8 @@ LINKERFLAGS =  -Wl,--start-group -Wl,-lm  -Wl,--end-group -Wl,--gc-sections -mre
 AVRDUDE = avrdude -c $(PRG) -p $(MCU)
 OBJCOPY = avr-objcopy
 OBJDUMP = avr-objdump
-SIZE    = avr-size --format=avr --mcu=atmega4809
+SIZE	= avr-objdump -Pmem-usage
+# SIZE    = avr-size -C --format=avr --mcu=atmega4809
 CC      = avr-gcc
 
 # generate list of objects
@@ -153,39 +154,43 @@ endif
 # other targets
 # objects from c files
 %.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	@echo Compiling $<
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 # Creating output directories
 $(OUTPUT_SLAVE):
 ifeq ($(OS),Windows_NT)
-	-mkdir $(subst /,\,$(subst ./,,$(OUTPUT_SLAVE)))
+	@-mkdir $(subst /,\,$(subst ./,,$(OUTPUT_SLAVE)))
 else
-	mkdir -p $(OUTPUT_SLAVE)
+	@mkdir -p $(OUTPUT_SLAVE)
 endif
 
 $(OUTPUT_MASTER):
 ifeq ($(OS),Windows_NT)
-	-mkdir $(subst /,\,$(subst ./,,$(OUTPUT_MASTER)))
+	@-mkdir $(subst /,\,$(subst ./,,$(OUTPUT_MASTER)))
 else
-	mkdir -p $(OUTPUT_MASTER)
+	@mkdir -p $(OUTPUT_MASTER)
 endif
 
 $(OUTPUT_TEST):
 ifeq ($(OS),Windows_NT)
-	-mkdir $(subst /,\,$(subst ./,,$(OUTPUT_TEST)))
+	@-mkdir $(subst /,\,$(subst ./,,$(OUTPUT_TEST)))
 else
-	mkdir -p $(OUTPUT_TEST)
+	@mkdir -p $(OUTPUT_TEST)
 endif
 
 # elf files
 $(PRJ_SLAVE).elf: $(OUTPUT_SLAVE) $(OBJ_SLAVE)
-	$(CC) -o $(OUTPUT_SLAVE)$(PRJ_SLAVE).elf $(OBJ_SLAVE) -Wl,-Map="$(OUTPUT_SLAVE)$(PRJ_SLAVE).map" $(LINKERFLAGS)
+	@echo Creating $(OUTPUT_SLAVE)$(PRJ_SLAVE).elf
+	@$(CC) -o $(OUTPUT_SLAVE)$(PRJ_SLAVE).elf $(OBJ_SLAVE) -Wl,-Map="$(OUTPUT_SLAVE)$(PRJ_SLAVE).map" $(LINKERFLAGS)
 
 $(PRJ_MASTER).elf: $(OUTPUT_MASTER) $(OBJ_MASTER)
-	$(CC) -o $(OUTPUT_MASTER)$(PRJ_MASTER).elf $(OBJ_MASTER) -Wl,-Map="$(OUTPUT_MASTER)$(PRJ_MASTER).map" $(LINKERFLAGS)
+	@echo Creating $(OUTPUT_MASTER)$(PRJ_MASTER).elf
+	@$(CC) -o $(OUTPUT_MASTER)$(PRJ_MASTER).elf $(OBJ_MASTER) -Wl,-Map="$(OUTPUT_MASTER)$(PRJ_MASTER).map" $(LINKERFLAGS)
 
 $(PRJ_TEST).elf: $(OUTPUT_TEST) $(OBJ_TEST)
-	$(CC) -o $(OUTPUT_TEST)$(PRJ_TEST).elf $(OBJ_TEST) -Wl,-Map="$(OUTPUT_TEST)$(PRJ_TEST).map" $(LINKERFLAGS)
+	@echo Creating $(OUTPUT_TEST)$(PRJ_TEST).elf
+	@$(CC) -o $(OUTPUT_TEST)$(PRJ_TEST).elf $(OBJ_TEST) -Wl,-Map="$(OUTPUT_TEST)$(PRJ_TEST).map" $(LINKERFLAGS)
 
 # hex files
 $(PRJ_SLAVE).hex: $(PRJ_SLAVE).elf
@@ -194,8 +199,9 @@ ifeq ($(OS),Windows_NT)
 else
 	rm -f $(OUTPUT_SLAVE)$(PRJ_SLAVE).hex
 endif
-	$(OBJCOPY) -j .text -j .data -O ihex $(OUTPUT_SLAVE)$(PRJ_SLAVE).elf $(OUTPUT_SLAVE)$(PRJ_SLAVE).hex
-	$(SIZE) $(OUTPUT_SLAVE)$(PRJ_SLAVE).elf
+	@echo Creating $(OUTPUT_SLAVE)$(PRJ_SLAVE).hex from $(OUTPUT_SLAVE)$(PRJ_SLAVE).elf
+	@$(OBJCOPY) -j .text -j .data -O ihex $(OUTPUT_SLAVE)$(PRJ_SLAVE).elf $(OUTPUT_SLAVE)$(PRJ_SLAVE).hex
+	@$(SIZE) $(OUTPUT_SLAVE)$(PRJ_SLAVE).elf
 
 $(PRJ_MASTER).hex: $(PRJ_MASTER).elf
 ifeq ($(OS),Windows_NT)
@@ -203,8 +209,9 @@ ifeq ($(OS),Windows_NT)
 else
 	rm -f $(OUTPUT_MASTER)$(PRJ_MASTER).hex
 endif
-	$(OBJCOPY) -j .text -j .data -O ihex $(OUTPUT_MASTER)$(PRJ_MASTER).elf $(OUTPUT_MASTER)$(PRJ_MASTER).hex
-	$(SIZE) $(OUTPUT_MASTER)$(PRJ_MASTER).elf
+	@echo Creating $(OUTPUT_MASTER)$(PRJ_MASTER).hex from $(OUTPUT_MASTER)$(PRJ_MASTER).elf
+	@$(OBJCOPY) -j .text -j .data -O ihex $(OUTPUT_MASTER)$(PRJ_MASTER).elf $(OUTPUT_MASTER)$(PRJ_MASTER).hex
+	@$(SIZE) $(OUTPUT_MASTER)$(PRJ_MASTER).elf
 
 $(PRJ_TEST).hex: $(PRJ_TEST).elf
 ifeq ($(OS),Windows_NT)
@@ -212,5 +219,6 @@ ifeq ($(OS),Windows_NT)
 else
 	rm -f $(OUTPUT_TEST)$(PRJ_TEST).hex
 endif
-	$(OBJCOPY) -j .text -j .data -O ihex $(OUTPUT_TEST)$(PRJ_TEST).elf $(OUTPUT_TEST)$(PRJ_TEST).hex
-	$(SIZE) $(OUTPUT_TEST)$(PRJ_TEST).elf
+	@echo Creating $(OUTPUT_TEST)$(PRJ_TEST).hex from $(OUTPUT_TEST)$(PRJ_TEST).elf
+	@$(OBJCOPY) -j .text -j .data -O ihex $(OUTPUT_TEST)$(PRJ_TEST).elf $(OUTPUT_TEST)$(PRJ_TEST).hex
+	@$(SIZE) $(OUTPUT_TEST)$(PRJ_TEST).elf

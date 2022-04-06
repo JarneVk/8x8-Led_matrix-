@@ -7,3 +7,5 @@ Master.txt
 Slave.txt
 Test.txt
 java/.metadata/*
+java/LED_matrix_com/bin/*
+java\LED_matrix_com\.settings\*
