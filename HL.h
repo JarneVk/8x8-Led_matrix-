@@ -9,12 +9,12 @@
 // #define MAX_STRING_LEN 30
 
 //structure to represent a single led in led matrix
-typedef struct led{
-    uint8_t brightness; // amount of brightness : value between 0-31
-    uint8_t red; //amount of red : value between 0-31
-    uint8_t green; //amount of green : value between 0-31
-    uint8_t blue; //amount of blue : value between 0-31
-}Led;
+// typedef struct led{
+//     uint8_t brightness; // amount of brightness : value between 0-31
+//     uint8_t red; //amount of red : value between 0-31
+//     uint8_t green; //amount of green : value between 0-31
+//     uint8_t blue; //amount of blue : value between 0-31
+// }Led;
 
 //function prototypes:
 //**********INIT MODULE**********
