@@ -10,12 +10,19 @@ const char test[] PROGMEM = "test2\n\r";
 
 int main(void){
     USART3_Init();
-    uint8_t i = 0;
+    // uint8_t i = 0;
     while(1){
 
         //printStringLiteral("test");
         // printf_P(PSTR("%d"),i);
-        // USART3_sendChar((char)0x03);
+        SRAM_printBytes((uint8_t*)stringColor, sizeof(stringColor));
+        USART3_sendChar('\n');
+        USART3_sendChar('\r');
+        SRAM_printBytes((uint8_t*)colorIndex, sizeof(colorIndex));
+        USART3_sendChar('\n');
+        USART3_sendChar('\r');
+        USART3_sendChar((char)0x03);
+        _delay_ms(500);
 
         // int i = 0;
         // while(pgm_read_byte(&test[i]) != '\0'){

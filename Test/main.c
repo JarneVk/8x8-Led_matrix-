@@ -5,7 +5,7 @@
 
 int main(void)
 {
-    initLedPoorten();
+    // initLedPoorten();
     uarts_setup();
     //leds testing 
     /*
@@ -25,7 +25,7 @@ int main(void)
 
     */
     //uart zender testing 
-    shiftTimer_setup();
+    // shiftTimer_setup();
 
     //uart ontvanger (hier niets voor doen)
     while (1)
