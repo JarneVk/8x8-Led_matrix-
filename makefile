@@ -73,7 +73,6 @@ AVRDUDE = avrdude -c $(PRG) -p $(MCU)
 OBJCOPY = avr-objcopy
 OBJDUMP = avr-objdump
 SIZE	= avr-objdump -Pmem-usage
-# SIZE    = avr-size -C --format=avr --mcu=atmega4809
 CC      = avr-gcc
 
 # generate list of objects
