@@ -29,7 +29,6 @@ void uartsetup_ontvanger_uart0(){
 	USART0_EVCTRL = 0x01; //disable IrDA
 
 	ontvanger_buffer_uart0 = 0;
-	ontvangerNAck_count = 0;
 
 	//LED voor te testen 
 	PORTC_DIR |= PIN7_bm;
@@ -56,9 +55,8 @@ void RX_inperupt_ontvanger(){
 		//NACK
 		printf_P(PSTR("NACK \n\r"));
 		sendData_ontvanger_usart0(2);
-		ontvangerNAck_count += 1;
 	} else{
-		ontvangerNAck_count = 0;
+		
 		printf_P(PSTR("%d \n\r"),bits[0]);
 		if(writeOntvangenData(bits[0]) == 0){
 			sendData_ontvanger_usart0(1);
@@ -66,7 +64,6 @@ void RX_inperupt_ontvanger(){
 			// END
 			sendData_ontvanger_usart0(3);
 			ontvang_i=0;
-			ledsAansturen();
 		}
 	}
 
@@ -74,18 +71,9 @@ void RX_inperupt_ontvanger(){
 
 ISR(USART0_RXC_vect){
 	PORTC_OUT |= PIN7_bm;
-	if(stop_antwoorden){
-		//doe niks meer 
-	}
-	else if(ontvangerNAck_count > 4){
-		ledsAansturen();
-		ontvangerNAck_count = 0;
-		stop_antwoorden = 1;
-	} else {
-		printf_P(PSTR("ontvanger interupt : "));
-		RX_inperupt_ontvanger();
-		PORTC_OUT &= ~PIN7_bm;
-	}
+	printf_P(PSTR("ontvanger interupt : "));
+	RX_inperupt_ontvanger();
+	PORTC_OUT &= ~PIN7_bm;
 }
 
 

@@ -22,10 +22,12 @@ werking: 	- 	Er moet een externe functie 'uint8_t getNextOutputData()' worden di
 #include "../HeaderMatrix.h"
 
 void zender_timer_setup(){
-	TCB1_CCMPL = 0xFF;
-	TCB1_CCMPH = 0xFF;
-	TCB1_CTRLA = 0b00000011;
-	TCB1_CTRLB = 0x00;		//timeout mode
+	printf_P(PSTR("init timeout timer \n\r"));
+	TCB1_CCMPL = 0x00;
+	TCB1_CCMPH = 0x10;
+	TCB1_CTRLA = 0b00000101;
+	TCB1_CTRLB = 0b00000001;		//timeout mode
+	TCB1_EVCTRL = 0b00010001;
 	TCB1_INTCTRL = 0x01;	//enable inetrups
 }
 
@@ -40,8 +42,9 @@ void uartsetup_zender_uart1(){
 	USART1_EVCTRL = 0x01; //disable IrDA
 
 	zender_buffer_uart1 = 0;
+	NAck_count = 0;
 
-	//zender_timer_setup();
+	zender_timer_setup();
 		
 }
 
@@ -56,6 +59,7 @@ void sendNewColumn(){
 	printf_P(PSTR("senNewColumn"));
 	ontvang_i=0;
 
+	NAck_count = 0;
 	zender_count_timeout = 0;
 	columnIndex = 0;
 	part =0;
@@ -72,30 +76,47 @@ void RX_ontvanger_interupt(){
 	uint8_t data = USART1_RXDATAL;
 	printf_P(PSTR(" %d \n\r"),data);
 	if(data == 1){	//ACK
+		NAck_count = 0;
 		sendData_zender_usart1(getNextOutputData());
-	} else if(data == 2){
+	} else if(data == 2){ //NACK
+		NAck_count += 1;
 		sendData_zender_usart1(zender_buffer_uart1);
 	} else if(data == 3){
 		//stop met zenden END
+		TCB1_CTRLB = 0x01;
+		ledsAansturen();
+		driveLeds();
 	}
 
 }
 
 ISR(USART1_RXC_vect){
 	printf_P(PSTR("zender interupt : "));
-	RX_ontvanger_interupt();
+	if(NAck_count > 4){
+		//stop met antwoorden
+	} else{
+		RX_ontvanger_interupt();
+	}
+	
+
 }
 
+
 ISR(TCB1_INT_vect){
-	printf_P(PSTR("timeout \n\r"));
+	TCB1_EVCTRL &= ~TCB_EDGE_bm;
+	PORTC_OUT ^= PIN5_bm;
 	TCB1_INTFLAGS = 0x01;
+	TCB1_EVCTRL |= TCB_EDGE_bm;
+	printf_P(PSTR("timeout \n\r"));
+	/*
 	zender_count_timeout += 1;
 	if(zender_count_timeout >= 4){		//verbinding verbroken
 		zender_count_timeout = 0;
 		driveLeds();
+		ledsAansturen();
 		TCB1_CTRLB = 0x01;	
 	}
 	else{
 		sendData_zender_usart1(ontvanger_buffer_uart0);
-	}
+	}*/
 }
