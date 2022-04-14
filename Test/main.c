@@ -8,6 +8,7 @@
 int main(void)
 {   
     CPU_SREG = 0b10000000;
+    TCA0_SINGLE_CTRLA = 0b00001111;
     
     USART3_Init();
     zender_timer_setup();
@@ -16,11 +17,12 @@ int main(void)
 
     while (1)
     {   
-        if(TCB1_STATUS = 0x01){
+        if(TCB1_STATUS == 0x01){
             PORTC_OUT |= PIN4_bm;
             printf_P(PSTR("%d %d \n\r"),TCB1_CNTH,TCB1_CNTL);
         }
         _delay_ms(5000);
+        zender_count_timeout = 0;
         // laat de interups werken
     }
     
