@@ -29,7 +29,7 @@ void zender_timer_setup(){
 	printf_P(PSTR("init timeout timer \n\r"));
 	
 	TCB1_CCMPL = 0x00;
-	TCB1_CCMPH = 0x04;
+	TCB1_CCMPH = 0x10;
 	TCB1_CTRLA = 0b00000101;
 	TCB1_CTRLB = 0b00000000;		//periodic
 	TCB1_INTCTRL = 0x01;	//enable inetrups
@@ -39,7 +39,7 @@ void zender_timer_setup(){
 void uartsetup_zender_uart1(){
 	printf_P(PSTR("init zender \n\r"));
 	USART1_BAUD = 0x056D;
-	USART1_CTRLC = 0b00100011;  //8 bit mode
+	USART1_CTRLC = 0b00100111;  //8 bit mode
 	PORTC_DIRSET = 0x01;
 	USART1_CTRLB = 0b11000000;
 	USART1_CTRLA = 0b10000000;
@@ -80,16 +80,18 @@ void RX_ontvanger_interupt(){
 	//reset de timout counter
 	STOP_TIMER;
 	TCB1_CNTL = 0x00;
-	TCB1_CNTH = 0x00;
-	START_TIMER;	
+	TCB1_CNTH = 0x00;	
+	zender_count_timeout = 0;
 	uint8_t data = USART1_RXDATAL;
 	printf_P(PSTR(" %d \n\r"),data);
 	if(data == 1){	//ACK
 		NAck_count = 0;
 		sendData_zender_usart1(getNextOutputData());
+		START_TIMER;
 	} else if(data == 2){ //NACK
 		NAck_count += 1;
 		sendData_zender_usart1(zender_buffer_uart1);
+		START_TIMER;
 	} else if(data == 3){
 		//stop met zenden END
 		TCB1_CTRLB = 0x01;
@@ -127,7 +129,7 @@ ISR(TCB1_INT_vect){
 		printf_P(PSTR("stop timer \n\r"));
 	}
 	else{
-		//sendData_zender_usart1(ontvanger_buffer_uart0);
+		sendData_zender_usart1(ontvanger_buffer_uart0);
 		START_TIMER;
 	}
 }

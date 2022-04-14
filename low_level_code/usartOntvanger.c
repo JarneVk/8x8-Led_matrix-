@@ -22,7 +22,7 @@ werking :	- 	Er moet een externe functie 'int writeUartData(uint8_t data)' worde
 void uartsetup_ontvanger_uart0(){
 	printf_P(PSTR("init ontvanger \n\r"));
 	USART0_BAUD = 0x056D;
-	USART0_CTRLC = 0b00100011;  //8 bit mode
+	USART0_CTRLC = 0b00100111;  //8 bit mode
 	PORTA_DIRSET = 0x01;
 	USART0_CTRLB = 0b11000000;
 	USART0_CTRLA = 0b10000000;
