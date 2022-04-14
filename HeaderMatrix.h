@@ -31,7 +31,7 @@ void uarts_setup();
 //zender
 void timer_setup();
 uint8_t getNextOutputData();
-//void SendColumn();
+uint8_t timerEventToggle;
 
 //Led's
 void initLedPoorten();
@@ -79,3 +79,7 @@ uint8_t part;
 int ontvang_i; //testing
 void ledsAansturen();
 void zender_timer_setup();
+
+char inputString[MAX_STRING_LEN];
+Led stringColor[MAX_MESSAGE_COLORS];
+uint8_t colorIndex[MAX_MESSAGE_COLORS];
