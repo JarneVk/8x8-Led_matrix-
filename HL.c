@@ -118,13 +118,28 @@ void driveLeds(){
 
 //FUNCTIONS FOR INPUT:
 
+static uint8_t array_ont[16];
+int writeOntvangenData(uint8_t data){
+    if(ontvang_i>16){
+        Led columnReceived[AMOUNT]; 
+        decompressReceivedPackages(columnReceived,array_ont);
+        shiftMatrix(columnReceived);
+        return 1;
+    } else  {
+        array_ont[ontvang_i] = data;
+        ontvang_i ++;
+        return 0;
+    }
+}
+
+
 //function to decompress 16 received packages (in array_ont) and put the result in a columnReceived array
 //that is ready to be shifted in to the main_matrix of the slave with shiftMatrix(columnReceived);
 //@param columnReceived: a Led array that will be filled in by this function
 //@param array_ont: the array that contains the 16 received packages
 void decompressReceivedPackages(Led columnReceived[], uint8_t array_ont[]) {
     for(int i=0;i<AMOUNT;i++) {
-        inputToLed(columnReceived[I],array_ont[2i],array_ont[2i+1]); //<— invullen column received
+        inputToLed(columnReceived[i],array_ont[2*i],array_ont[2*i+1]); //<— invullen column received
     }
 }
 

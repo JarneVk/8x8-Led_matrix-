@@ -4,15 +4,15 @@
 #include<stdio.h>
 #include "../HeaderMatrix.h"
 
-static uint32_t array[8] = {0,0,0,0,0,0,0,0};
-static int packetje=0; 
+
+//static int packetje=0; 
 /*
 uint8_t getNextOutputData(){
    return 0b11101010;
 }*/
 
 //uart ontvanger testing 
-
+/*
 static uint8_t array_ont[16];
 int writeOntvangenData(uint8_t data){
     if(ontvang_i>16){
@@ -23,7 +23,8 @@ int writeOntvangenData(uint8_t data){
         return 0;
     }
 }
-
+*/
+/*
 void ledsAansturen(){
     static uint32_t newArray[8];
     int z = 0;
@@ -37,5 +38,6 @@ void ledsAansturen(){
     }
     //writeToLed(newArray);
 }
+*/
 
 

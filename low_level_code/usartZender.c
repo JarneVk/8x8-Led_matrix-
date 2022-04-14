@@ -98,7 +98,7 @@ void RX_ontvanger_interupt(){
 	} else if(data == 3){
 		//stop met zenden END
 		TCB1_CTRLB = 0x01;
-		ledsAansturen();
+		//ledsAansturen();
 		driveLeds();
 	}
 
@@ -128,7 +128,7 @@ ISR(TCB1_INT_vect){
 	if(zender_count_timeout >= 4){		//verbinding verbroken
 		zender_count_timeout = 0;
 		driveLeds();
-		ledsAansturen();	
+		//ledsAansturen();	
 		printf_P(PSTR("stop timer \n\r"));
 	}
 	else{
