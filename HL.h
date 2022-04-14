@@ -23,6 +23,7 @@
 //**********I/O MODULE**********
 uint16_t ledToOutput(Led pixel);
 uint32_t ledToHardwareDriver(Led pixel);
+void decompressReceivedPackages(Led columnReceived[], uint8_t array_ont[]);
 void inputToLed(Led pixel, uint8_t input1, uint8_t input2);
 void getUserInput();
 

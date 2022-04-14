@@ -118,6 +118,16 @@ void driveLeds(){
 
 //FUNCTIONS FOR INPUT:
 
+//function to decompress 16 received packages (in array_ont) and put the result in a columnReceived array
+//that is ready to be shifted in to the main_matrix of the slave with shiftMatrix(columnReceived);
+//@param columnReceived: a Led array that will be filled in by this function
+//@param array_ont: the array that contains the 16 received packages
+void decompressReceivedPackages(Led columnReceived[], uint8_t array_ont[]) {
+    for(int i=0;i<AMOUNT;i++) {
+        inputToLed(columnReceived[I],array_ont[2i],array_ont[2i+1]); //<— invullen column received
+    }
+}
+
 //function that converts the received input bytes (input1 and input2) in compressed format to Led structure format
 //this is the inverse operation of ledToOuput (decrompession)
 //@param Pixel: an element of the column received to be initialized with the values received from the compressed format
