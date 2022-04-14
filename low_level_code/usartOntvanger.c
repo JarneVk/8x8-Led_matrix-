@@ -36,8 +36,8 @@ void uartsetup_ontvanger_uart0(){
 }
 
 /* Speciale Data responses 
-		ACK :   1 0000 0001
-		NACK :	1 0000 0010	
+		ACK :    0000 0001
+		NACK :	 0000 0010	
 */
 void sendData_ontvanger_usart0(uint8_t hexgetal){
     while(!(USART0_STATUS & USART_DREIF_bm));
@@ -56,10 +56,13 @@ void RX_inperupt_ontvanger(){
 		printf_P(PSTR("NACK \n\r"));
 		sendData_ontvanger_usart0(2);
 	} else{
-		
 		printf_P(PSTR("%d \n\r"),bits[0]);
-		if(writeOntvangenData(bits[0]) == 0){
-			sendData_ontvanger_usart0(1);
+		if(bits[1]==0x01){
+			printf_P(PSTR("startframe \n\r"));
+			//clear slave variable voor nieuw frame
+		}
+		else if(writeOntvangenData(bits[0]) == 0){
+			sendData_ontvanger_usart0(1); //ACK
 		} else {
 			// END
 			sendData_ontvanger_usart0(3);

@@ -29,7 +29,7 @@ void zender_timer_setup(){
 	printf_P(PSTR("init timeout timer \n\r"));
 	
 	TCB1_CCMPL = 0x00;
-	TCB1_CCMPH = 0x10;
+	TCB1_CCMPH = 0x04;
 	TCB1_CTRLA = 0b00000101;
 	TCB1_CTRLB = 0b00000000;		//periodic
 	TCB1_INTCTRL = 0x01;	//enable inetrups
@@ -67,13 +67,16 @@ void sendNewColumn(){
 	zender_count_timeout = 0;
 	columnIndex = 0;
 	part =0;
-	sendData_zender_usart1(getNextOutputData());
+
+	//zend start frame
+	USART1_TXDATAH = 0x01;
+	sendData_zender_usart1(60); //00111100 als onder byte voor start frame
 	START_TIMER;
 }
 
 /* Speciale Data responses 
-		ACK :   1 0000 0001
-		NACK :	1 0000 0010	
+		ACK :    0000 0001
+		NACK :	 0000 0010	
 */
 
 void RX_ontvanger_interupt(){
