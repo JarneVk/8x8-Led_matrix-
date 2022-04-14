@@ -21,14 +21,23 @@ werking: 	- 	Er moet een externe functie 'uint8_t getNextOutputData()' worden di
 
 #include "../HeaderMatrix.h"
 
+#define START_TIMER TCB1_CTRLA |= 0b00000100;
+#define STOP_TIMER TCB1_CTRLA |= 0b00000110;
+
 void zender_timer_setup(){
 	printf_P(PSTR("init timeout timer \n\r"));
-	TCB1_CCMPL = 0x00;
-	TCB1_CCMPH = 0x10;
-	TCB1_CTRLA = 0b00000101;
-	TCB1_CTRLB = 0b00000001;		//timeout mode
-	TCB1_EVCTRL = 0b00010001;
+	/*
+	TCB1_CCMPL = 0xFF;
+	TCB1_CCMPH = 0x00;
+	TCB1_CTRLA = 0b00000111;
+	TCB1_CTRLB = 0b00000000;		//periodic
+	TCB1_EVCTRL = 0b00000001;
 	TCB1_INTCTRL = 0x01;	//enable inetrups
+	*/
+
+	//met timer A
+	TCA0_SINGLE_CTRLA = 0b00001111;
+
 }
 
 
@@ -64,7 +73,7 @@ void sendNewColumn(){
 	columnIndex = 0;
 	part =0;
 	sendData_zender_usart1(getNextOutputData());
-	TCB1_CTRLB = 0x00;
+	START_TIMER;
 }
 
 /* Speciale Data responses 
@@ -72,7 +81,12 @@ void sendNewColumn(){
 		NACK :	1 0000 0010	
 */
 
-void RX_ontvanger_interupt(){	
+void RX_ontvanger_interupt(){
+	//reset de timout counter
+	STOP_TIMER;
+	TCB1_CNTL = 0x00;
+	TCB1_CNTH = 0x00;
+	START_TIMER;	
 	uint8_t data = USART1_RXDATAL;
 	printf_P(PSTR(" %d \n\r"),data);
 	if(data == 1){	//ACK
@@ -103,20 +117,22 @@ ISR(USART1_RXC_vect){
 
 
 ISR(TCB1_INT_vect){
-	TCB1_EVCTRL &= ~TCB_EDGE_bm;
+	STOP_TIMER;
+	TCB1_CNTL = 0x00;
+	TCB1_CNTH = 0x00;
 	PORTC_OUT ^= PIN5_bm;
-	TCB1_INTFLAGS = 0x01;
-	TCB1_EVCTRL |= TCB_EDGE_bm;
 	printf_P(PSTR("timeout \n\r"));
-	/*
 	zender_count_timeout += 1;
 	if(zender_count_timeout >= 4){		//verbinding verbroken
 		zender_count_timeout = 0;
-		driveLeds();
-		ledsAansturen();
-		TCB1_CTRLB = 0x01;	
+		//driveLeds();
+		//ledsAansturen();	
+		printf_P(PSTR("stop timer \n\r"));
 	}
 	else{
 		sendData_zender_usart1(ontvanger_buffer_uart0);
-	}*/
+		START_TIMER;
+		TCB1_INTFLAGS = 0x01;
+	}
+	
 }
