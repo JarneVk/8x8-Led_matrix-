@@ -21,23 +21,18 @@ werking: 	- 	Er moet een externe functie 'uint8_t getNextOutputData()' worden di
 
 #include "../HeaderMatrix.h"
 
-#define START_TIMER TCB1_CTRLA |= 0b00000100;
-#define STOP_TIMER TCB1_CTRLA |= 0b00000110;
+//niet meest cleane manier om de timer te stoppen
+#define START_TIMER TCB1_CTRLA = 0b00000101;
+#define STOP_TIMER TCB1_CTRLA  = 0b00000100;
 
 void zender_timer_setup(){
 	printf_P(PSTR("init timeout timer \n\r"));
-	/*
-	TCB1_CCMPL = 0xFF;
-	TCB1_CCMPH = 0x00;
-	TCB1_CTRLA = 0b00000111;
+	
+	TCB1_CCMPL = 0x00;
+	TCB1_CCMPH = 0x04;
+	TCB1_CTRLA = 0b00000101;
 	TCB1_CTRLB = 0b00000000;		//periodic
-	TCB1_EVCTRL = 0b00000001;
 	TCB1_INTCTRL = 0x01;	//enable inetrups
-	*/
-
-	//met timer A
-	TCA0_SINGLE_CTRLA = 0b00001111;
-
 }
 
 
@@ -117,22 +112,22 @@ ISR(USART1_RXC_vect){
 
 
 ISR(TCB1_INT_vect){
+
 	STOP_TIMER;
 	TCB1_CNTL = 0x00;
 	TCB1_CNTH = 0x00;
 	PORTC_OUT ^= PIN5_bm;
+	TCB1_INTFLAGS = 0x01;
 	printf_P(PSTR("timeout \n\r"));
 	zender_count_timeout += 1;
 	if(zender_count_timeout >= 4){		//verbinding verbroken
 		zender_count_timeout = 0;
-		//driveLeds();
-		//ledsAansturen();	
+		driveLeds();
+		ledsAansturen();	
 		printf_P(PSTR("stop timer \n\r"));
 	}
 	else{
-		sendData_zender_usart1(ontvanger_buffer_uart0);
+		//sendData_zender_usart1(ontvanger_buffer_uart0);
 		START_TIMER;
-		TCB1_INTFLAGS = 0x01;
 	}
-	
 }
