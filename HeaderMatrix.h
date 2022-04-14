@@ -83,3 +83,6 @@ void zender_timer_setup();
 char inputString[MAX_STRING_LEN];
 Led stringColor[MAX_MESSAGE_COLORS];
 uint8_t colorIndex[MAX_MESSAGE_COLORS];
+
+
+void endOntvanger();

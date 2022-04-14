@@ -66,6 +66,7 @@ void RX_inperupt_ontvanger(){
 		} else {
 			// END
 			sendData_ontvanger_usart0(3);
+			endOntvanger();
 			ontvang_i=0;
 		}
 	}

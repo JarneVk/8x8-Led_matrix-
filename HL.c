@@ -121,15 +121,18 @@ void driveLeds(){
 static uint8_t array_ont[16];
 int writeOntvangenData(uint8_t data){
     if(ontvang_i>16){
-        Led columnReceived[AMOUNT]; 
-        decompressReceivedPackages(columnReceived,array_ont);
-        shiftMatrix(columnReceived);
         return 1;
     } else  {
         array_ont[ontvang_i] = data;
         ontvang_i ++;
         return 0;
     }
+}
+
+void endOntvanger(){
+    Led columnReceived[AMOUNT]; 
+    decompressReceivedPackages(columnReceived,array_ont);
+    shiftMatrix(columnReceived);
 }
 
 
