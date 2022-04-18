@@ -7,11 +7,15 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import java.awt.event.*;
+import java.io.IOException;
+import java.text.MessageFormat;
+
+import message_transfer.*;
 
 class color2 extends JFrame implements ActionListener, ChangeListener   {
 	JSlider sR, sG, sB;
 	JLabel lR, lG, lB;
-	JButton bF, bB;
+	JButton bF, bB, bSend;
 	JTextField jText;
 
 	
@@ -24,7 +28,7 @@ class color2 extends JFrame implements ActionListener, ChangeListener   {
 	// constructor
 	color2()
 	{
-		super("color2");
+		super("color");
 		
 
 		jText = new JTextField("Sample Text");
@@ -46,11 +50,13 @@ class color2 extends JFrame implements ActionListener, ChangeListener   {
 		// create button
 		bF = new JButton("Front");
 		bB  = new JButton("Back");
+		bSend = new JButton("Send");
 		
 		
 		// add ActionListener
 		bF.addActionListener(this);
 		bB.addActionListener(this);
+		bSend.addActionListener(this);
 
 		// add ChangeListener
 		sR.addChangeListener(this);
@@ -70,6 +76,8 @@ class color2 extends JFrame implements ActionListener, ChangeListener   {
 		p.add(bB);
 		p.add(lText);
 		p.add(jText);
+		p.add(bSend);
+		
 		p2.setLayout(new GridLayout(0, 8));
 		
 		//button grid
@@ -163,6 +171,24 @@ class color2 extends JFrame implements ActionListener, ChangeListener   {
 			sG.setBackground(c);
 			sB.setBackground(c);
 			
+		}
+		else if (s.equals("Send")){
+			System.out.print("testing b\n");
+			Color sendC = jText.getForeground();
+			int sendR = sendC.getRed();
+			int sendG = sendC.getGreen();
+			int sendB = sendC.getBlue();
+			String sendS = jText.getText();
+			
+			Led led = new Led(sendR,sendG,sendB,31);
+			Message message = new Message();
+			message.setMessage(sendS);
+			message.setColor(led,-1);
+			CNMessageTransfer cnm;
+			
+			System.out.println((led.getGreen()));
+			
+			System.out.println(CNMessageTransfer.bytesToHex(message.getMessageBytes()));
 		}
 		else {
 			for(int j=7;j>=0;j--){
