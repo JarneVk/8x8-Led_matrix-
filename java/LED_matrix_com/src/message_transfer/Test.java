@@ -16,8 +16,9 @@ public class Test {
 	public static void testMessage() {
 		Message mes = new Message();
 		mes.setMessage("test");
-		mes.getMessageColor().setFgColor(new Led(255,100,50,20), 0);
-		mes.getMessageColor().setBgRangeColor(new Led(255,100,50,20), 0,2);
+		mes.setFgRangeColor(new Led(255,0,255), 0, -1);
+		mes.setBgRangeColor(new Led(0,255,0), 0, -1);
+		mes.setBrightness(10);
 		System.out.println(CNMessageTransfer.bytesToHex(mes.getMessageBytes()));
 		try {
 			CNMessageTransfer cn = new CNMessageTransfer(0);
@@ -46,10 +47,9 @@ public class Test {
 		l.setBlue(128);
 		l.setGreen(255);
 		l.setRed(128);
-		l.setBrightness(3);
 		System.out.println(l);
-		System.out.println(l.getBrightnessRedMerge());
-		System.out.println(CNMessageTransfer.bytesToHex(new byte[] {l.getBrightnessRedMerge()}));
+		System.out.println(l.getCompressedRed());
+		System.out.println(CNMessageTransfer.bytesToHex(new byte[] {l.getCompressedRed()}));
 		System.out.println(CNMessageTransfer.bytesToHex(new byte[] {l.getGreenBlueMerge()}));
 	}
 	

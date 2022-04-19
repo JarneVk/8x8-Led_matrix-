@@ -1,27 +1,15 @@
 package message_transfer;
 
 public class Led {
-	private byte brightness;
 	private byte red;
 	private byte green;
 	private byte blue;
 	
 	public Led() {}
-	public Led(int red, int green, int b, int brightness) {
-		setBrightness(brightness);
+	public Led(int red, int green, int b) {
 		setRed(red);
 		setGreen(green);
 		setBlue(b);
-	}
-	
-	public int getBrightness() {
-		return Byte.toUnsignedInt(brightness);
-	}
-	
-	public void setBrightness(int brightness){
-		if(brightness > 31 || brightness < 0)
-			throw(new IllegalArgumentException("Brightness out of range"));
-		this.brightness = CNMessageTransfer.integerToUnsignedByte(brightness);
 	}
 	
 	public int getRed() {
@@ -48,8 +36,8 @@ public class Led {
 		this.blue = CNMessageTransfer.integerToUnsignedByte(blue);
 	}
 	
-	public byte getBrightnessRedMerge() {
-		return (byte) (((brightness >>> 1) & 0x0f) << 4 | ((red>>>4) & 0x0f));
+	public byte getCompressedRed() {
+		return (byte) (((red>>>4) & 0x0f));
 	}
 	
 	public byte getGreenBlueMerge() {
@@ -57,7 +45,7 @@ public class Led {
 	}
 	
 	public String toString() {
-		return "Red: " + getRed() + " Green: " + getGreen() + " Blue: " + getBlue() + " Brightness: " + getBrightness();
+		return "Red: " + getRed() + " Green: " + getGreen() + " Blue: " + getBlue();
 	}
 
 }

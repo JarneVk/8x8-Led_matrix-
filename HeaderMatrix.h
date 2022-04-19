@@ -57,6 +57,7 @@ void masterShiftMatrixFullString();
 void initGlobalVariables();
 
 void driveLeds();
+void getUserInput();
 
 uint8_t string_red[MAX_STRING_LEN]; //the amount of red for each letter of the string
 uint8_t string_green[MAX_STRING_LEN]; //the amount of green for each letter of the string

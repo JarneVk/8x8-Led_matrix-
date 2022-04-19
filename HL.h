@@ -25,7 +25,7 @@ uint16_t ledToOutput(Led pixel);
 uint32_t ledToHardwareDriver(Led pixel);
 void decompressReceivedPackages(Led columnReceived[], uint8_t array_ont[]);
 void inputToLed(Led pixel, uint8_t input1, uint8_t input2);
-void getUserInput();
+// void getUserInput();
 
 //**********DATA PROCESSING**********
 void enterLetterInMatrix(Led m[][LETTER_WIDTH],const uint8_t letterMatrix[][LETTER_WIDTH], uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue);
@@ -57,7 +57,7 @@ uint8_t columnLetterToShiftIn; //the column of the letter to be shifted in 0-3
 uint8_t letterNr; //the counter of the letter in the string
 
 //general use global variables
-char string[MAX_STRING_LEN]="Something"; //the string to be displayed on screen
+char string[MAX_STRING_LEN + 1]="Something"; //the string to be displayed on screen
 // uint8_t string_red[MAX_STRING_LEN]; //the amount of red for each letter of the string
 // uint8_t string_green[MAX_STRING_LEN]; //the amount of green for each letter of the string
 // uint8_t string_blue[MAX_STRING_LEN]; //the amount of blue for each letter of the string

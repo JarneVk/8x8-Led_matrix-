@@ -20,7 +20,6 @@ public class Message {
 	
 	public Message() {
 		messageColor = new MessageColor();
-		messageColor.setMessage(this);
 	}
 	
 	public String getMessage() {
@@ -41,7 +40,7 @@ public class Message {
 		//System.out.println(stringBytes.length + 1 + lenLeds + 1 + messageColor.getColorsIndex().size() + 1 + 1);
 //		System.out.println(stringBytes.length);
 //		System.out.println(lenLeds);
-		int lenMessage = 1 + lenString + 1 + lenString + 1 + lenString + 1 + 1;
+		int lenMessage = 1 + lenString + 1 + lenString*2 + 1 + lenString*2 + 1 + 1;
 		byte[] messageBytes = new byte[lenMessage];
 		int currentIndex = 0;
 		messageBytes[currentIndex++] = CNMessageTransfer.START_OF_TRANSMISSION;
@@ -50,20 +49,26 @@ public class Message {
 			
 		}
 		messageBytes[currentIndex++] = CNMessageTransfer.END_OF_PHASE;
-		for(int i = 0; i < lenString; i++) {
-			messageBytes[currentIndex + i] = messageColor.getFgColors().get(i).getBrightnessRedMerge();
+		System.out.println(CNMessageTransfer.bytesToHex(
+				new byte[] {(byte)(((messageColor.getBrightness() >>> 1) & 0x0f) << 4)}));
+		System.out.println(CNMessageTransfer.bytesToHex(
+				new byte[] {(byte)(((messageColor.getFgColors().get(0).getGreenBlueMerge())))}));
+		messageBytes[currentIndex] = (byte) ((((messageColor.getBrightness() >>> 1) & 0x0f) << 4) | messageColor.getFgColors().get(0).getCompressedRed());
+		messageBytes[currentIndex + 1] = messageColor.getFgColors().get(0).getGreenBlueMerge();
+		for(int i = 2; i < lenString*2; i+=2) {
+			messageBytes[currentIndex + i] = messageColor.getFgColors().get(i).getCompressedRed();
 			messageBytes[currentIndex + i + 1] = messageColor.getFgColors().get(i).getGreenBlueMerge();
 			
 		}
-		currentIndex += lenString;
+		currentIndex += lenString*2;
 		
 		messageBytes[currentIndex++] = CNMessageTransfer.END_OF_PHASE;
-		for(int i = 0; i < lenString; i++) {
-			messageBytes[currentIndex + i] = messageColor.getBgColors().get(i).getBrightnessRedMerge();
+		for(int i = 0; i < lenString*2; i+=2) {
+			messageBytes[currentIndex + i] = messageColor.getBgColors().get(i).getCompressedRed();
 			messageBytes[currentIndex + i + 1] = messageColor.getBgColors().get(i).getGreenBlueMerge();
 			
 		}
-		currentIndex += lenString;
+		currentIndex += lenString*2;
 		
 		messageBytes[currentIndex++] = CNMessageTransfer.END_OF_PHASE;
 		//hier dan 8x8 array leds
@@ -72,8 +77,24 @@ public class Message {
 		return messageBytes;
 	}
 	
-	public void setColor(Led color, int index) {
-		getMessageColor().setFgColor(color, index);
+	public void setFgColor(Led color, int characterIndex) {
+		getMessageColor().setFgColor(color, characterIndex);
+	}
+	
+	public void setBrightness(int brightness){
+		getMessageColor().setBrightness(brightness);
+	}
+	
+	public void setFgRangeColor(Led color, int startCharacterIndex, int stopCharacterIndex) {
+		getMessageColor().setFgRangeColor(color, startCharacterIndex, stopCharacterIndex);
+	}
+	
+	public void setBgColor(Led color, int characterIndex) {
+		getMessageColor().setBgColor(color, characterIndex);
+	}
+	
+	public void setBgRangeColor(Led color, int startCharacterIndex, int stopCharacterIndex) {
+		getMessageColor().setBgRangeColor(color, startCharacterIndex, stopCharacterIndex);
 	}
 
 	public MessageColor getMessageColor() {
@@ -86,16 +107,18 @@ public class Message {
 	 * @author Lucas Van Laer
 	 */
 	public class MessageColor{
-		private Message message;
 		private ArrayList<Led> fgColors;
 		private ArrayList<Led> bgColors;
+		private byte brightness;
 		
 		private MessageColor() {
 			setFgColors(new ArrayList<Led>());
 			setBgColors(new ArrayList<Led>());
-			setFgRangeColor(new Led(255,255,255,10), 0, Message.MAX_STRING_LEN); //default foreground white 10 brightness from begin to end of message
-			setBgRangeColor(new Led(0,0,0,0), 0, Message.MAX_STRING_LEN); //default background black 0 brightness from begin to end of message
+			setFgRangeColor(new Led(255,255,255), 0, -1); //default foreground white 10 brightness from begin to end of message
+			setBgRangeColor(new Led(0,0,0), 0, -1); //default background black 0 brightness from begin to end of message
+			setBrightness(10);
 		}
+
 
 		public ArrayList<Led> getFgColors() {
 			return fgColors;
@@ -131,6 +154,8 @@ public class Message {
 		}
 		
 		public void setFgRangeColor(Led color, int startCharacterIndex, int stopCharacterIndex) {
+			if(stopCharacterIndex < 0)
+				stopCharacterIndex = Message.MAX_STRING_LEN;
 			for(int i = startCharacterIndex; i < stopCharacterIndex; i++) {
 				setFgColor(color,i);
 			}
@@ -147,17 +172,21 @@ public class Message {
 		}
 		
 		public void setBgRangeColor(Led color, int startCharacterIndex, int stopCharacterIndex) {
+			if(stopCharacterIndex < 0)
+				stopCharacterIndex = Message.MAX_STRING_LEN;
 			for(int i = startCharacterIndex; i < stopCharacterIndex; i++) {
 				setBgColor(color,i);
 			}
 		}
 
-		public Message getMessage() {
-			return message;
+		public void setBrightness(int brightness){
+			if(brightness > 31 || brightness < 0)
+				throw(new IllegalArgumentException("Brightness out of range"));
+			this.brightness = CNMessageTransfer.integerToUnsignedByte(brightness);
 		}
 
-		public void setMessage(Message message) {
-			this.message = message;
+		public byte getBrightness() {
+			return brightness;
 		}
 
 		

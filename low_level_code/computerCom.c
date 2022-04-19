@@ -87,70 +87,71 @@ void USART3_Init(){
  
 }
 
-//test
-// char inputString[MAX_STRING_LEN];
-// Led stringColor[MAX_MESSAGE_COLORS];
-// uint8_t colorIndex[MAX_MESSAGE_COLORS];
-// // char* inPointer = NULL;
+
 uint8_t lengthInputString = 0;
 uint8_t indexIn = 0;
 uint8_t sendPhase = 0;
 
 ISR(USART3_RXC_vect){
      uint8_t inc = USART3_RXDATAL;
-    if(inc == 1){
-        sendPhase = 0;
-        indexIn = 0;
-    }else{
-        switch(sendPhase){
-            case 0:
-                if(inc != 3){
-                    if(indexIn <= MAX_STRING_LEN - 2){ // -2 voor string termination
-                        inputString[indexIn] = inc;
+
+    switch(sendPhase){
+        case 0:
+            if(inc == 1){
+                sendPhase = 1;
+                indexIn = 0;
+            }break;
+        case 1:
+            if(inc != 3){
+                if(indexIn <= MAX_STRING_LEN){ // geen -1 voor string termination
+                    inputString[indexIn] = inc;
+                    indexIn++;
+                }
+            }else{
+                inputString[indexIn] = '\0';
+                lengthInputString = indexIn;
+                indexIn = 0;
+                sendPhase = 2;
+            } break;
+        case 2:
+            string_brightness = ((inc>>4) & 0x0f);
+            string_red[indexIn] = (inc) & 0x0f;
+            sendPhase = 4;
+            break;
+        case 3:
+        case 4:
+            if(inc != 3){
+                if(indexIn <= MAX_STRING_LEN - 1){
+                    if(sendPhase == 3){
+                        string_red[indexIn] = (inc) & 0x0f;
+                        sendPhase++;
+                    }else{
+                        string_green[indexIn] = (inc>>4) & 0x0f;
+                        string_blue[indexIn] = (inc) & 0x0f;
                         indexIn++;
+                        sendPhase--;
                     }
-                }else{
-                    inputString[indexIn] = '\0';
-                    lengthInputString = indexIn;
-                    indexIn = 0;
-                    sendPhase++;
-                } break;
-            case 1:
-            case 2:
-                if(inc != 3){
-                    if(indexIn <= MAX_STRING_LEN - 1){
-                        if(sendPhase == 1){
-                            stringfgColor[indexIn].brightness = ((inc>>4) & 0x0f);
-                            stringfgColor[indexIn].red = (inc) & 0x0f;
-                            sendPhase++;
-                        }else{
-                            stringfgColor[indexIn].blue = (inc>>4) & 0x0f;
-                            stringfgColor[indexIn].green = (inc) & 0x0f;
-                            indexIn++;
-                            sendPhase--;
-                        }
+                }
+            }else{
+                indexIn = 0;
+                sendPhase = 5;
+            } break;
+        case 5:
+        case 6:
+            if(inc != 3){
+                if(sendPhase == 5){
+                        string_red[indexIn] = (inc) & 0x0f;
+                        sendPhase++;
+                    }else{
+                        string_green[indexIn] = (inc>>4) & 0x0f;
+                        string_blue[indexIn] = (inc) & 0x0f;
+                        indexIn++;
+                        sendPhase--;
                     }
-                }else{
-                    indexIn = 0;
-                    sendPhase += 2;
-                } break;
-            case 3:
-            case 4:
-                if(inc != 3){
-                    if(sendPhase == 1){
-                            stringbgColor[indexIn].brightness = ((inc>>4) & 0x0f);
-                            stringbgColor[indexIn].red = (inc) & 0x0f;
-                            sendPhase++;
-                        }else{
-                            stringbgColor[indexIn].blue = (inc>>4) & 0x0f;
-                            stringbgColor[indexIn].green = (inc) & 0x0f;
-                            indexIn++;
-                            sendPhase--;
-                        }
-                }else{
-                    indexIn = 0;
-                    sendPhase = 0;
-                } break;
-        }
+            }else{
+                getUserInput();
+                indexIn = 0;
+                sendPhase = 0;
+            } break;
     }
 }

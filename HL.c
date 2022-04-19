@@ -164,12 +164,12 @@ char userInput[MAX_STRING_LEN]="Test str";
 void getUserInput() {
     //string niet declareren lokaal?
     for(int i=0; i<MAX_STRING_LEN; i++ ){
-        printf_P(PSTR("%c,%x"),userInput[i],userInput[i]);
+        printf_P(PSTR("%c,%x"),inputString[i],inputString[i]);
     }
     printf_P(PSTR("\n\r\n\r"));
     int i;
     for(i=0; i<MAX_STRING_LEN; i++ ){
-        if(userInput[i] == '\0') {
+        if(inputString[i] == '\0') {
             break; //end of user input
         }
         string[i]=userInput[i];
