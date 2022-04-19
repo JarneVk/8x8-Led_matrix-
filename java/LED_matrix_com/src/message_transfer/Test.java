@@ -15,8 +15,9 @@ public class Test {
 	
 	public static void testMessage() {
 		Message mes = new Message();
-		mes.setMessage("somethinggf");
-//		mes.getMessageColor().setColor(new Led(255,100,50,20), 0);
+		mes.setMessage("test");
+		mes.getMessageColor().setFgColor(new Led(255,100,50,20), 0);
+		mes.getMessageColor().setBgRangeColor(new Led(255,100,50,20), 0,2);
 		System.out.println(CNMessageTransfer.bytesToHex(mes.getMessageBytes()));
 		try {
 			CNMessageTransfer cn = new CNMessageTransfer(0);

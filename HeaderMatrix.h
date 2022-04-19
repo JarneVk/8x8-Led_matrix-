@@ -17,12 +17,10 @@ typedef struct led{
     uint8_t blue; //amount of blue : value between 0-31
 }Led;
 
-#define MAX_STRING_LEN 30
-#define MAX_MESSAGE_COLORS 5
 
 #define AMOUNT 8
 #define LETTER_WIDTH 4
-#define MAX_STRING_LEN 30
+#define MAX_STRING_LEN 35
 
 //ontvanger
 void uarts_setup();
@@ -80,9 +78,9 @@ int ontvang_i; //testing
 void ledsAansturen();
 void zender_timer_setup();
 
-char inputString[MAX_STRING_LEN];
-Led stringColor[MAX_MESSAGE_COLORS];
-uint8_t colorIndex[MAX_MESSAGE_COLORS];
+char inputString[MAX_STRING_LEN + 1];
+Led stringfgColor[MAX_STRING_LEN];
+Led stringbgColor[MAX_STRING_LEN];
 
 
 void endOntvanger();

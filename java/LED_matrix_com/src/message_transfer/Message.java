@@ -8,6 +8,7 @@ import java.util.ArrayList;
  *
  */
 public class Message {
+	public static final int MAX_STRING_LEN = 35;
 	/**
 	 * Message to be displayed
 	 */
@@ -18,7 +19,8 @@ public class Message {
 	private MessageColor messageColor;
 	
 	public Message() {
-		messageColor= new MessageColor();
+		messageColor = new MessageColor();
+		messageColor.setMessage(this);
 	}
 	
 	public String getMessage() {
@@ -35,35 +37,33 @@ public class Message {
 	 */
 	public byte[] getMessageBytes() {
 		byte[] stringBytes = message.getBytes(StandardCharsets.UTF_8);
-		int lenLeds = messageColor.getColors().size()*2;
+		int lenString = stringBytes.length;
 		//System.out.println(stringBytes.length + 1 + lenLeds + 1 + messageColor.getColorsIndex().size() + 1 + 1);
 //		System.out.println(stringBytes.length);
 //		System.out.println(lenLeds);
-		int messageLen = 1 + stringBytes.length + 1 + lenLeds + 1 + messageColor.getColorsIndex().size() + 1 + 1;
-		byte[] messageBytes = new byte[messageLen];
+		int lenMessage = 1 + lenString + 1 + lenString + 1 + lenString + 1 + 1;
+		byte[] messageBytes = new byte[lenMessage];
 		int currentIndex = 0;
 		messageBytes[currentIndex++] = CNMessageTransfer.START_OF_TRANSMISSION;
-		for(; currentIndex < stringBytes.length + 1; currentIndex++) {
+		for(; currentIndex < lenString + 1; currentIndex++) {
 			messageBytes[currentIndex] = stringBytes[currentIndex - 1];
 			
 		}
 		messageBytes[currentIndex++] = CNMessageTransfer.END_OF_PHASE;
-		for(int i = 0; i < messageColor.getColors().size(); i++) {
-			messageBytes[currentIndex + i] = messageColor.getColors().get(i).getBrightnessRedMerge();
-			messageBytes[currentIndex + i + 1] = messageColor.getColors().get(i).getGreenBlueMerge();
+		for(int i = 0; i < lenString; i++) {
+			messageBytes[currentIndex + i] = messageColor.getFgColors().get(i).getBrightnessRedMerge();
+			messageBytes[currentIndex + i + 1] = messageColor.getFgColors().get(i).getGreenBlueMerge();
 			
 		}
-		currentIndex += messageColor.getColors().size()*2;
+		currentIndex += lenString;
 		
 		messageBytes[currentIndex++] = CNMessageTransfer.END_OF_PHASE;
-		
-		for(int i = 0; i < messageColor.getColors().size(); i++) {
-			int index = messageColor.getColorsIndex().get(i);
-			if(index < 0)
-				index = stringBytes.length - 1;
-			messageBytes[currentIndex + i] = CNMessageTransfer.integerToUnsignedByte(index);
+		for(int i = 0; i < lenString; i++) {
+			messageBytes[currentIndex + i] = messageColor.getBgColors().get(i).getBrightnessRedMerge();
+			messageBytes[currentIndex + i + 1] = messageColor.getBgColors().get(i).getGreenBlueMerge();
+			
 		}
-		currentIndex += messageColor.getColors().size();
+		currentIndex += lenString;
 		
 		messageBytes[currentIndex++] = CNMessageTransfer.END_OF_PHASE;
 		//hier dan 8x8 array leds
@@ -73,7 +73,7 @@ public class Message {
 	}
 	
 	public void setColor(Led color, int index) {
-		getMessageColor().setColor(color, index);
+		getMessageColor().setFgColor(color, index);
 	}
 
 	public MessageColor getMessageColor() {
@@ -86,62 +86,80 @@ public class Message {
 	 * @author Lucas Van Laer
 	 */
 	public class MessageColor{
-		private ArrayList<Led> colors;
-		private ArrayList<Integer> colorsIndex;
-		private int internalIndex;
+		private Message message;
+		private ArrayList<Led> fgColors;
+		private ArrayList<Led> bgColors;
 		
-		public MessageColor() {
-			setColors(new ArrayList<Led>());
-			setColorsIndex(new ArrayList<Integer>());
-			setColor(new Led(255,255,255,10),-1); //default white 10 brightness from begin to end of message
-			setInternalColorIndex(0);
+		private MessageColor() {
+			setFgColors(new ArrayList<Led>());
+			setBgColors(new ArrayList<Led>());
+			setFgRangeColor(new Led(255,255,255,10), 0, Message.MAX_STRING_LEN); //default foreground white 10 brightness from begin to end of message
+			setBgRangeColor(new Led(0,0,0,0), 0, Message.MAX_STRING_LEN); //default background black 0 brightness from begin to end of message
 		}
 
-		public ArrayList<Led> getColors() {
-			return colors;
+		public ArrayList<Led> getFgColors() {
+			return fgColors;
 		}
 
-		public void setColors(ArrayList<Led> colors) {
-			this.colors = colors;
-		}
-
-		public ArrayList<Integer> getColorsIndex() {
-			return colorsIndex;
-		}
-
-		public void setColorsIndex(ArrayList<Integer> colorsIndex) {
-			this.colorsIndex = colorsIndex;
+		public void setFgColors(ArrayList<Led> colors) {
+			this.fgColors = colors;
 		}
 		
+		public ArrayList<Led> getBgColors() {
+			return bgColors;
+		}
+
+		public void setBgColors(ArrayList<Led> bgColors) {
+			this.bgColors = bgColors;
+		}
+
+
 		/**
 		 * Sets the color for the previous index till the chosen index.
 		 * -1 represents till the end of the message (no check on index order nor out of bounds)
 		 * @param color of the chosen characters
-		 * @param EndOfColorIndex The last character to have said color, range: 0->length-1
+		 * @param characterIndex The character to have said color
 		 */
-		public void setColor(Led color, int EndOfColorIndex) {
-			if(getColors().size() <= internalIndex) {
-                getColors().add(internalIndex, color);
-                getColorsIndex().add(internalIndex, EndOfColorIndex);
+		public void setFgColor(Led color, int characterIndex) {
+			if(characterIndex >= MAX_STRING_LEN)
+				throw(new IndexOutOfBoundsException("Index larger than MAX_STRING_LEN"));
+			if(getFgColors().size() <= characterIndex) {
+                getFgColors().add(characterIndex, color);
             }else {
-                getColors().set(internalIndex, color);
-                getColorsIndex().set(internalIndex, EndOfColorIndex);
+                getFgColors().set(characterIndex, color);
             }
-			internalIndex += 1;
 		}
 		
-		/**
-		 * Sets the internal index to newIndex.
-		 * This is where setColor will start setting the color (duh).
-		 * starts at zero
-		 * @param newIndex
-		 */
-		public void setInternalColorIndex(int newIndex) {
-			internalIndex = newIndex;
+		public void setFgRangeColor(Led color, int startCharacterIndex, int stopCharacterIndex) {
+			for(int i = startCharacterIndex; i < stopCharacterIndex; i++) {
+				setFgColor(color,i);
+			}
 		}
 		
-		public int getInternalColorIndex() {
-			return internalIndex;
+		public void setBgColor(Led color, int characterIndex) {
+			if(characterIndex >= MAX_STRING_LEN)
+				throw(new IndexOutOfBoundsException("Index larger than MAX_STRING_LEN"));
+			if(getBgColors().size() <= characterIndex) {
+                getBgColors().add(characterIndex, color);
+            }else {
+                getBgColors().set(characterIndex, color);
+            }
 		}
+		
+		public void setBgRangeColor(Led color, int startCharacterIndex, int stopCharacterIndex) {
+			for(int i = startCharacterIndex; i < stopCharacterIndex; i++) {
+				setBgColor(color,i);
+			}
+		}
+
+		public Message getMessage() {
+			return message;
+		}
+
+		public void setMessage(Message message) {
+			this.message = message;
+		}
+
+		
 	}
 }

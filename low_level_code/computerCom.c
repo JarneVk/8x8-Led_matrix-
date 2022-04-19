@@ -118,14 +118,14 @@ ISR(USART3_RXC_vect){
             case 1:
             case 2:
                 if(inc != 3){
-                    if(indexIn <= MAX_MESSAGE_COLORS - 1){
+                    if(indexIn <= MAX_STRING_LEN - 1){
                         if(sendPhase == 1){
-                            stringColor[indexIn].brightness = ((inc>>4) & 0x0f);
-                            stringColor[indexIn].red = (inc<<4) & 0xf0;
+                            stringfgColor[indexIn].brightness = ((inc>>4) & 0x0f);
+                            stringfgColor[indexIn].red = (inc) & 0x0f;
                             sendPhase++;
                         }else{
-                            stringColor[indexIn].blue = (inc>>4) & 0x0f;
-                            stringColor[indexIn].green = (inc<<4) & 0xf0;
+                            stringfgColor[indexIn].blue = (inc>>4) & 0x0f;
+                            stringfgColor[indexIn].green = (inc) & 0x0f;
                             indexIn++;
                             sendPhase--;
                         }
@@ -135,10 +135,18 @@ ISR(USART3_RXC_vect){
                     sendPhase += 2;
                 } break;
             case 3:
+            case 4:
                 if(inc != 3){
-                    if(indexIn <= MAX_MESSAGE_COLORS - 1){
-                        colorIndex[indexIn] = inc;
-                    }
+                    if(sendPhase == 1){
+                            stringbgColor[indexIn].brightness = ((inc>>4) & 0x0f);
+                            stringbgColor[indexIn].red = (inc) & 0x0f;
+                            sendPhase++;
+                        }else{
+                            stringbgColor[indexIn].blue = (inc>>4) & 0x0f;
+                            stringbgColor[indexIn].green = (inc) & 0x0f;
+                            indexIn++;
+                            sendPhase--;
+                        }
                 }else{
                     indexIn = 0;
                     sendPhase = 0;

@@ -15,10 +15,10 @@ int main(void){
 
         //printStringLiteral("test");
         // printf_P(PSTR("%d"),i);
-        SRAM_printBytes((uint8_t*)stringColor, sizeof(stringColor));
+        SRAM_printBytes((uint8_t*)stringfgColor, sizeof(stringfgColor));
         USART3_sendChar('\n');
         USART3_sendChar('\r');
-        SRAM_printBytes((uint8_t*)colorIndex, sizeof(colorIndex));
+        SRAM_printBytes((uint8_t*)stringbgColor, sizeof(stringbgColor));
         USART3_sendChar('\n');
         USART3_sendChar('\r');
         USART3_sendChar((char)0x03);
