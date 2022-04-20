@@ -18,8 +18,15 @@ public class Message {
 	 */
 	private MessageColor messageColor;
 	
+	
+	private Led[][] logo;
+	
 	public Message() {
 		messageColor = new MessageColor();
+		logo = new Led[8][8];
+		for(int i = 0; i < 8; i++)
+			for(int j = 0; j < 8; j++)
+				logo[i][j] = new Led(0, 0, 0);
 	}
 	
 	public String getMessage() {

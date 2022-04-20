@@ -1,6 +1,8 @@
 package message_transfer;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.fazecast.jSerialComm.*;
 
@@ -8,8 +10,13 @@ public class CNMessageTransfer{
 	
 	private SerialPort comPort;
 	private byte[] data;
+	private byte[] incMessage;
+	private Message outMessage;
+	private int index;
+	private boolean checkIn = false;
 	public static final byte START_OF_TRANSMISSION = 1;
 	public static final byte END_OF_PHASE = 3;
+	public static final byte AMOUNT_OF_PHASES = 4;
 	
 	/**
 	 * 
@@ -18,6 +25,8 @@ public class CNMessageTransfer{
 	 */
 	public CNMessageTransfer(int i) throws IOException {
 		boolean win = false;
+		incMessage = new byte[0];
+		//hier thread die blijft checken
 		if(System.getProperty("os.name").toLowerCase().contains("windows"));
 			win = true;
 		SerialPort[] comPorts = SerialPort.getCommPorts();
@@ -45,6 +54,42 @@ public class CNMessageTransfer{
 				@Override
 				public void serialEvent(SerialPortEvent arg0) {
 					data = arg0.getReceivedData();
+					System.out.println(getHexString());
+					System.out.println(index);
+					if(index != AMOUNT_OF_PHASES - 1) {
+						byte[] temp = new byte[incMessage.length + data.length];
+						for(int i = 0; i < incMessage.length; i++) {
+							temp[i] = incMessage[i];
+						}
+						for(int i = 0; i < data.length; i++) {
+							temp[incMessage.length + i] = data[i];
+						}
+						incMessage = temp;
+						setIndex(index + 1);
+						System.out.println(CNMessageTransfer.bytesToHex(incMessage));
+					}else {
+						
+//						System.out.println(CNMessageTransfer.bytesToHex(new byte[] {-128,3}));
+//						System.out.println(CNMessageTransfer.bytesToHex(incMessage));
+						
+						//dit in thread
+						boolean ok = true;
+						for(int i = 0; i < incMessage.length; i++) {
+							System.out.println("test");
+							if(incMessage[i] != outMessage.getMessageBytes()[i]) {
+								ok = false;
+								break;
+							}
+						}
+						System.out.print(ok);
+						if(ok){
+							writeBytes(new byte[] {-128,3});
+						}
+						//in thread
+						System.out.println("test");
+						
+						setIndex(0);
+					}
 				}
 
 				@Override
@@ -66,6 +111,9 @@ public class CNMessageTransfer{
 		}
 	}
 	
+	public void setIndex(int in) {
+		index = (in<AMOUNT_OF_PHASES)?in:0;
+	}
 	
 	public String getData() {
 		if(data != null)

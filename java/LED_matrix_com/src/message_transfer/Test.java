@@ -34,7 +34,7 @@ public class Test {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				System.out.println(cn.getData());
+//				System.out.println(cn.getData());
 //				System.out.println(cn.getHexString());
 			}
 		} catch (IOException e) {

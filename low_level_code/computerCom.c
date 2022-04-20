@@ -83,8 +83,40 @@ void USART3_Init(){
     //Enable receive interrupt
     USART3_CTRLA = 0b10000000;
 
+    TCB2_CCMPL = 0x00;
+	TCB2_CCMPH = 0x30;
+	TCB2_CTRLA = 0b00000101; 
+	TCB2_CTRLB = 0x01;		//periotic interupt
+	TCB2_INTCTRL = 0x01;	//enable inetrups
+
     sei();
  
+}
+
+
+void sendReceivedData(){
+    USART3_sendChar((char)0x01);
+
+    uint8_t lengte = 0;
+    while(inputString[lengte] != '\0'){
+        USART3_sendChar(inputString[lengte++]);
+    }
+    USART3_sendChar((char)0x03);
+    USART3_sendChar(string_brightness <<4 | string_red[0]);
+    USART3_sendChar(string_green[0] << 4 | string_blue[0]);
+    for(int i = 1; i < lengte; i++){
+        USART3_sendChar(string_red[i]);
+        USART3_sendChar(string_green[i] << 4 | string_blue[i]);
+    }
+
+    USART3_sendChar((char)0x03);
+    for(int i = 0; i < lengte; i++){
+        USART3_sendChar(string_bgred[i]);
+        USART3_sendChar(string_green[i] << 4 | string_blue[i]);
+    }
+    USART3_sendChar((char)0x03);
+    //logo
+    USART3_sendChar((char)0x03);
 }
 
 
@@ -92,8 +124,10 @@ uint8_t lengthInputString = 0;
 uint8_t indexIn = 0;
 uint8_t sendPhase = 0;
 
+
 ISR(USART3_RXC_vect){
-     uint8_t inc = USART3_RXDATAL;
+    uint8_t inc = USART3_RXDATAL;
+    
 
     switch(sendPhase){
         case 0:
@@ -139,19 +173,32 @@ ISR(USART3_RXC_vect){
         case 5:
         case 6:
             if(inc != 3){
-                if(sendPhase == 5){
-                        string_red[indexIn] = (inc) & 0x0f;
+                if(indexIn <= MAX_STRING_LEN - 1){
+                    if(sendPhase == 5){
+                        string_bgred[indexIn] = (inc) & 0x0f;
                         sendPhase++;
                     }else{
-                        string_green[indexIn] = (inc>>4) & 0x0f;
-                        string_blue[indexIn] = (inc) & 0x0f;
+                        string_bggreen[indexIn] = (inc>>4) & 0x0f;
+                        string_bgblue[indexIn] = (inc) & 0x0f;
                         indexIn++;
                         sendPhase--;
                     }
+                }
             }else{
-                getUserInput();
-                indexIn = 0;
+                sendReceivedData();
+                // getUserInput();
+                indexIn++;
                 sendPhase = 0;
             } break;
+        case 7:
+            if(inc != 3){
+                if(inc == 0xff){
+                    // USART3_sendChar('k');
+                    // USART3_sendChar((char)0x03);
+                    getUserInput();
+                }
+            }else{
+                sendPhase = 0;
+            }
     }
 }

@@ -43,6 +43,7 @@ void shiftTimer_reset();
 //computer communication
 void USART3_Init();
 void USART3_sendChar(char data);
+void sendReceivedData();
 
 /*
 Define for easy string literal use
@@ -62,6 +63,9 @@ void getUserInput();
 uint8_t string_red[MAX_STRING_LEN]; //the amount of red for each letter of the string
 uint8_t string_green[MAX_STRING_LEN]; //the amount of green for each letter of the string
 uint8_t string_blue[MAX_STRING_LEN]; //the amount of blue for each letter of the string
+uint8_t string_bgred[MAX_STRING_LEN]; //the amount of red for each letter of the string
+uint8_t string_bggreen[MAX_STRING_LEN]; //the amount of green for each letter of the string
+uint8_t string_bgblue[MAX_STRING_LEN]; //the amount of blue for each letter of the string
 uint8_t string_brightness; //the brightness of the string to be displayed on the leds
 
 uint8_t zender_buffer_uart1;
@@ -80,8 +84,6 @@ void ledsAansturen();
 void zender_timer_setup();
 
 char inputString[MAX_STRING_LEN + 1];
-Led stringfgColor[MAX_STRING_LEN];
-Led stringbgColor[MAX_STRING_LEN];
 
 
 void endOntvanger();
