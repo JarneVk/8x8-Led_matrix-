@@ -36,9 +36,9 @@ public class Message {
 	public byte[] getMessageBytes() {
 		byte[] stringBytes = message.getBytes(StandardCharsets.UTF_8);
 		int lenLeds = messageColor.getColors().size()*2;
-		System.out.println(stringBytes.length + 1 + lenLeds + 1 + messageColor.getColorsIndex().size() + 1 + 1);
-		System.out.println(stringBytes.length);
-		System.out.println(lenLeds);
+		//System.out.println(stringBytes.length + 1 + lenLeds + 1 + messageColor.getColorsIndex().size() + 1 + 1);
+//		System.out.println(stringBytes.length);
+//		System.out.println(lenLeds);
 		int messageLen = 1 + stringBytes.length + 1 + lenLeds + 1 + messageColor.getColorsIndex().size() + 1 + 1;
 		byte[] messageBytes = new byte[messageLen];
 		int currentIndex = 0;
@@ -120,8 +120,13 @@ public class Message {
 		 * @param EndOfColorIndex The last character to have said color, range: 0->length-1
 		 */
 		public void setColor(Led color, int EndOfColorIndex) {
-			getColors().add(internalIndex, color);
-			getColorsIndex().add(internalIndex, EndOfColorIndex);
+			if(getColors().size() <= internalIndex) {
+                getColors().add(internalIndex, color);
+                getColorsIndex().add(internalIndex, EndOfColorIndex);
+            }else {
+                getColors().set(internalIndex, color);
+                getColorsIndex().set(internalIndex, EndOfColorIndex);
+            }
 			internalIndex += 1;
 		}
 		
