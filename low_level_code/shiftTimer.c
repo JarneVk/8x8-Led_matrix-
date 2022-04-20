@@ -36,4 +36,5 @@ ISR(TCB0_INT_vect){
 	stop_antwoorden = 0;
 	masterShiftMatrixFullString();
 	sendColumn();
+	driveLeds();
 }

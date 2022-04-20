@@ -37,6 +37,7 @@ uint16_t ledToOutput(Led pixel) {
     red_send = (uint16_t)pixel.red; //take the 4 LSB's from brightness and put in bit 3 until 0 of red_send
     red_send&= 0b0000000000001111; //mask for bit 3 until 0
     output = brightness_send + blue_send + green_send + red_send; //concatenate the 4 pieces of information in a 2 byte unsigned int
+    printf_P(PSTR("output : %d \n\r"),output);
     return output;
 }
 
@@ -47,13 +48,14 @@ uint16_t ledToOutput(Led pixel) {
 //@return: the next element to be send to the slave (in 16 bit compressed format BBBBBBBBGGGGRRRR)
 uint8_t getNextOutputData() {
     uint16_t nextElement;
+    printf_P(PSTR("column index :%d \n\r"),columnIndex);
     if(columnIndex > 7) {
         return 0; // columnIndex out of bounce
     }
     nextElement = ledToOutput(columnSend[columnIndex]);
     if(part == 0) {
         part=1;
-        return (uint8_t)nextElement>>8;//return first 8 bit 
+        return (uint8_t)(nextElement>>8);//return first 8 bit 
     }
     else { //part==1
         part=0;
@@ -120,7 +122,7 @@ void driveLeds(){
 
 static uint8_t array_ont[16];
 int writeOntvangenData(uint8_t data){
-    if(ontvang_i>16){
+    if(ontvang_i>14){
         return 1;
     } else  {
         array_ont[ontvang_i] = data;
@@ -130,9 +132,18 @@ int writeOntvangenData(uint8_t data){
 }
 
 void endOntvanger(){
+    for(int i=0; i<16;i++){
+        printf_P(PSTR("%d"),array_ont[i]);
+    }
+    printf_P(PSTR("\n\r"));
     Led columnReceived[AMOUNT]; 
     decompressReceivedPackages(columnReceived,array_ont);
+    for(int i=0;i<AMOUNT;i++){
+        printf_P(PSTR("%d"),columnReceived[i].brightness);
+    }
+    
     shiftMatrix(columnReceived);
+    driveLeds();
 }
 
 
@@ -142,7 +153,9 @@ void endOntvanger(){
 //@param array_ont: the array that contains the 16 received packages
 void decompressReceivedPackages(Led columnReceived[], uint8_t array_ont[]) {
     for(int i=0;i<AMOUNT;i++) {
-        inputToLed(columnReceived[i],array_ont[2*i],array_ont[2*i+1]); //<— invullen column received
+        Led pixel;
+        pixel = inputToLed(array_ont[2*i],array_ont[2*i+1]); //<— invullen column received
+        columnReceived[i] = pixel;
     }
 }
 
@@ -151,11 +164,18 @@ void decompressReceivedPackages(Led columnReceived[], uint8_t array_ont[]) {
 //@param Pixel: an element of the column received to be initialized with the values received from the compressed format
 //@param input1: the first byte received associated with this pixel
 //@param input2: the second byte received associated with this pixel
-void inputToLed(Led pixel, uint8_t input1, uint8_t input2) {
-    pixel.brightness = (input1>>4) & 0b00001111;
+Led inputToLed(uint8_t input1, uint8_t input2) {
+    Led pixel;
+    pixel.brightness = (input1>>4);
+    pixel.brightness &= 0b00001111;
     pixel.blue = input1 & 0b00001111;
-    pixel.green = (input2>>4) & 0b00001111;
+    printf_P(PSTR("blue : %d"),pixel.blue);
+    pixel.green = (input2>>4) ;
+    pixel.green &= 0b00001111;
+    printf_P(PSTR("green : %d"),pixel.green);
     pixel.red = input2 & 0b00001111;
+    printf_P(PSTR("red : %d \n\r"),pixel.red);
+    return pixel;
 }
 
 //const char wou hem ook niet raar genoeg
@@ -174,9 +194,9 @@ void getUserInput() {
         }
         string[i]=userInput[i];
         printf_P(PSTR("nieuwe c %d:%c  %x\n\r"),i,string[i],string[i]);
-        string_red[i]=31;
-        string_blue[i]=0;
-        string_green[i]=0;
+        string_red[i]=15;
+        string_blue[i]=12;
+        string_green[i]=7;
     }
     while(i<MAX_STRING_LEN) {
         string[i]='\0'; //for the remaining lenght of the string , fill up with 0 chars

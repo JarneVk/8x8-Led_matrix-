@@ -29,7 +29,7 @@ void zender_timer_setup(){
 	printf_P(PSTR("init timeout timer \n\r"));
 	
 	TCB1_CCMPL = 0x00;
-	TCB1_CCMPH = 0x04;
+	TCB1_CCMPH = 0x06;
 	TCB1_CTRLA = 0b00000101;
 	TCB1_CTRLB = 0b00000000;		//periodic
 	TCB1_INTCTRL = 0x01;	//enable inetrups
@@ -43,7 +43,7 @@ void uartsetup_zender_uart1(){
 	PORTC_DIRSET = 0x01;
 	USART1_CTRLB = 0b11000000;
 	USART1_CTRLA = 0b10000000;
-	USART1_EVCTRL = 0x01; //disable IrDA
+	USART1_EVCTRL = 0x01; 
 
 	zender_buffer_uart1 = 0;
 	NAck_count = 0;
@@ -52,10 +52,15 @@ void uartsetup_zender_uart1(){
 		
 }
 
+/**
+ * @brief zend data over usart1 
+ * 
+ * @param hexgetal  een 8 bit getal dat verzonden moet worden 
+ */
 void sendData_zender_usart1(uint8_t hexgetal){ 
+	printf_P(PSTR("send %d \n\r"),hexgetal);
 	zender_buffer_uart1 = hexgetal;
     while(!(USART1_STATUS & USART_DREIF_bm));
-	printf_P(PSTR("send %d \n\r"),hexgetal);
     USART1_TXDATAL = hexgetal;
 }
 
@@ -79,6 +84,10 @@ void sendNewColumn(){
 		NACK :	 0000 0010	
 */
 
+/**
+ * @brief interupt functie die wordt opgerepen 
+ * als de zender een packetje ontvangt 
+ */
 void RX_ontvanger_interupt(){
 	//reset de timout counter
 	STOP_TIMER;
@@ -89,17 +98,18 @@ void RX_ontvanger_interupt(){
 	printf_P(PSTR(" %d \n\r"),data);
 	if(data == 1){	//ACK
 		NAck_count = 0;
+		USART1_TXDATAH = 0x00;
 		sendData_zender_usart1(getNextOutputData());
 		START_TIMER;
 	} else if(data == 2){ //NACK
 		NAck_count += 1;
+		USART1_TXDATAH = 0x00;
 		sendData_zender_usart1(zender_buffer_uart1);
 		START_TIMER;
 	} else if(data == 3){
 		//stop met zenden END
 		TCB1_CTRLB = 0x01;
-		//ledsAansturen();
-		driveLeds();
+		//driveLeds();
 	}
 
 }
@@ -127,12 +137,11 @@ ISR(TCB1_INT_vect){
 	zender_count_timeout += 1;
 	if(zender_count_timeout >= 4){		//verbinding verbroken
 		zender_count_timeout = 0;
-		driveLeds();
-		//ledsAansturen();	
+		//driveLeds();	
 		printf_P(PSTR("stop timer \n\r"));
 	}
 	else{
-		sendData_zender_usart1(ontvanger_buffer_uart0);
+		sendData_zender_usart1(zender_buffer_uart1);
 		START_TIMER;
 	}
 }

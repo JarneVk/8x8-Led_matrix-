@@ -10,7 +10,7 @@ int main(void)
     initLedPoorten();
     initGlobalVariables();
     uarts_setup();
-    shiftTimer_setup();
+    //shiftTimer_setup();
     //string in matrix zetten
     //getUserInput();
     

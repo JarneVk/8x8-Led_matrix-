@@ -26,7 +26,7 @@ void uartsetup_ontvanger_uart0(){
 	PORTA_DIRSET = 0x01;
 	USART0_CTRLB = 0b11000000;
 	USART0_CTRLA = 0b10000000;
-	USART0_EVCTRL = 0x01; //disable IrDA
+	USART0_EVCTRL = 0x01; 
 
 	ontvanger_buffer_uart0 = 0;
 
@@ -57,9 +57,11 @@ void RX_inperupt_ontvanger(){
 		sendData_ontvanger_usart0(2);
 	} else{
 		printf_P(PSTR("%d \n\r"),bits[0]);
-		if(bits[1]==0x01){
+		if(bits[1] & USART_DATA8_bm  && bits[0] == 60){
 			printf_P(PSTR("startframe \n\r"));
 			//clear slave variable voor nieuw frame
+			ontvang_i = 0;
+			sendData_ontvanger_usart0(1);
 		}
 		else if(writeOntvangenData(bits[0]) == 0){
 			sendData_ontvanger_usart0(1); //ACK
