@@ -40,7 +40,7 @@ void printLedMatrixToTerminal(Led m[][AMOUNT]);
 void printMatrixToTerminal(uint8_t matrix[][LETTER_WIDTH]);
 void initLedMatrix1d(Led matrix[AMOUNT], uint8_t value);
 void sendColumn();
-void sendNewColumn();
+//void sendNewColumn();
 
 //*****global variables*****:
 

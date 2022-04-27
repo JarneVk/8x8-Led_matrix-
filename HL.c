@@ -37,7 +37,7 @@ uint16_t ledToOutput(Led pixel) {
     red_send = (uint16_t)pixel.red; //take the 4 LSB's from brightness and put in bit 3 until 0 of red_send
     red_send&= 0b0000000000001111; //mask for bit 3 until 0
     output = brightness_send + blue_send + green_send + red_send; //concatenate the 4 pieces of information in a 2 byte unsigned int
-    printf_P(PSTR("output : %d \n\r"),output);
+    // printf_P(PSTR("output : %d \n\r"),output);
     return output;
 }
 
@@ -48,7 +48,7 @@ uint16_t ledToOutput(Led pixel) {
 //@return: the next element to be send to the slave (in 16 bit compressed format BBBBBBBBGGGGRRRR)
 uint8_t getNextOutputData() {
     uint16_t nextElement;
-    printf_P(PSTR("column index :%d \n\r"),columnIndex);
+    // printf_P(PSTR("column index :%d \n\r"),columnIndex);
     if(columnIndex > 7) {
         return 0; // columnIndex out of bounce
     }
@@ -101,7 +101,7 @@ void driveLeds(){
             ledArray[col_led*AMOUNT+row_led] = hwDriver;
         }
     }
-    
+    /*
     printf_P(PSTR("leds\n\r"));
     for(int col=AMOUNT-1; col>=0; col--) {
         for(int row=AMOUNT-1; row>=0; row--) {
@@ -114,7 +114,7 @@ void driveLeds(){
                 printf_P(PSTR("0   "));
         }
         printf_P(PSTR("\n\r"));
-    }
+    }*/
     writeToLed(ledArray);
 }
 
@@ -132,18 +132,17 @@ int writeOntvangenData(uint8_t data){
 }
 
 void endOntvanger(){
-    for(int i=0; i<16;i++){
-        printf_P(PSTR("%d"),array_ont[i]);
-    }
-    printf_P(PSTR("\n\r"));
+    // for(int i=0; i<16;i++){
+        // printf_P(PSTR("%d"),array_ont[i]);
+    // }
+    // printf_P(PSTR("\n\r"));
     Led columnReceived[AMOUNT]; 
     decompressReceivedPackages(columnReceived,array_ont);
-    for(int i=0;i<AMOUNT;i++){
-        printf_P(PSTR("%d"),columnReceived[i].brightness);
-    }
+    // for(int i=0;i<AMOUNT;i++){
+        // printf_P(PSTR("%d"),columnReceived[i].brightness);
+    // }
     
     shiftMatrix(columnReceived);
-    driveLeds();
 }
 
 
@@ -169,12 +168,12 @@ Led inputToLed(uint8_t input1, uint8_t input2) {
     pixel.brightness = (input1>>4);
     pixel.brightness &= 0b00001111;
     pixel.blue = input1 & 0b00001111;
-    printf_P(PSTR("blue : %d"),pixel.blue);
+    //printf_P(PSTR("blue : %d"),pixel.blue);
     pixel.green = (input2>>4) ;
     pixel.green &= 0b00001111;
-    printf_P(PSTR("green : %d"),pixel.green);
+    //printf_P(PSTR("green : %d"),pixel.green);
     pixel.red = input2 & 0b00001111;
-    printf_P(PSTR("red : %d \n\r"),pixel.red);
+    //printf_P(PSTR("red : %d \n\r"),pixel.red);
     return pixel;
 }
 
@@ -183,17 +182,17 @@ char userInput[MAX_STRING_LEN]="Test str";
 //method to get the input string from the user
 void getUserInput() {
     //string niet declareren lokaal?
-    for(int i=0; i<MAX_STRING_LEN; i++ ){
+    /*for(int i=0; i<MAX_STRING_LEN; i++ ){
         printf_P(PSTR("%c,%x"),userInput[i],userInput[i]);
-    }
-    printf_P(PSTR("\n\r\n\r"));
+    }*/
+    // printf_P(PSTR("\n\r\n\r"));
     int i;
     for(i=0; i<MAX_STRING_LEN; i++ ){
         if(userInput[i] == '\0') {
             break; //end of user input
         }
         string[i]=userInput[i];
-        printf_P(PSTR("nieuwe c %d:%c  %x\n\r"),i,string[i],string[i]);
+        // printf_P(PSTR("nieuwe c %d:%c  %x\n\r"),i,string[i],string[i]);
         string_red[i]=15;
         string_blue[i]=12;
         string_green[i]=7;
@@ -202,7 +201,7 @@ void getUserInput() {
         string[i]='\0'; //for the remaining lenght of the string , fill up with 0 chars
         i++;
     } 
-    printf_P(PSTR("nieuwe string:%s\n\r"),string);
+    // printf_P(PSTR("nieuwe string:%s\n\r"),string);
     string_brightness=20;
 }
 
@@ -265,9 +264,9 @@ void shiftMatrix(Led columnReceived[AMOUNT]) {
 void masterShiftMatrix(Led letter[][LETTER_WIDTH]) {
     Led cr[AMOUNT];//column received
 
-    if( columnLetterToShiftIn > 3 ) {
+   /* if( columnLetterToShiftIn > 3 ) {
         printf_P(PSTR("columnLetter out of bounds! Trouble in masterShiftMatrix\n\r"));
-    }
+    }*/
     for(int i=0;i<AMOUNT; i++) {
         cr[i] = letter[i][columnLetterToShiftIn]; //copying a column of the letter to be shifted in
     }
@@ -294,7 +293,7 @@ void masterShiftMatrixFullString() {
     Led letter[AMOUNT][LETTER_WIDTH];
     
     if (letterNr<MAX_STRING_LEN && string[letterNr]!='\0'){
-        printf_P(PSTR("string[letterNr] %d : %c\n\r"),letterNr,string[letterNr]);
+        // printf_P(PSTR("string[letterNr] %d : %c\n\r"),letterNr,string[letterNr]);
         charToLedLetter(string[letterNr],letter, string_brightness, string_red[letterNr], string_green[letterNr], string_blue[letterNr]);
         masterShiftMatrix(letter);
         if(columnLetterToShiftIn ==0) {
@@ -318,9 +317,9 @@ void masterShiftMatrixFullString() {
 //@param green: the amount of red
 //@param blue: the amount of red
 void charToLedLetter(char cha, Led letter[][LETTER_WIDTH], uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue){
-    printf_P(PSTR("karakter: %c\n\r"),cha);
+    // printf_P(PSTR("karakter: %c\n\r"),cha);
     cha = tolower(cha); //only lowercase letters
-    printf_P(PSTR("karakter: %c\n\r"),cha);
+    // printf_P(PSTR("karakter: %c\n\r"),cha);
     switch (cha)
     {
         case 'a': enterLetterInMatrix(letter,matrix_a, brightness, red, green, blue);      break;

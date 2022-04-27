@@ -32,6 +32,7 @@ void uarts_setup();
 void timer_setup();
 uint8_t getNextOutputData();
 uint8_t timerEventToggle;
+void sendNewColumn();
 
 //Led's
 void initLedPoorten();

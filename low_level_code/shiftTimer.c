@@ -14,14 +14,11 @@ timer die interups geeft om de matrix te laten shiften
 void shiftTimer_setup(){
 	 	// clk/64
 	TCB0_CCMPL = 0x00;
-	TCB0_CCMPH = 0x30;
+	TCB0_CCMPH = 0x10;
 	TCB0_CTRLA = 0b00000101; 
 	TCB0_CTRLB = 0x00;		//periotic interupt
 	TCB0_INTCTRL = 0x01;	//enable inetrups
-	//TCB1_CNT = 0x00;		//zet timer op 0
-
-	//TCB1_EVCTRL |= PIN4_bm; 	// om de timer te starten 
-
+	
 	//LED voor te testen 
 	PORTC_DIR |= PIN4_bm;
 	PORTC_DIR |= PIN5_bm;
@@ -36,5 +33,5 @@ ISR(TCB0_INT_vect){
 	stop_antwoorden = 0;
 	masterShiftMatrixFullString();
 	sendColumn();
-	driveLeds();
+	//driveLeds();
 }
