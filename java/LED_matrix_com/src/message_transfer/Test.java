@@ -19,7 +19,7 @@ public class Test {
 		mes.setFgRangeColor(new Led(255,0,255), 0, -1);
 		mes.setBgRangeColor(new Led(0,255,0), 0, -1);
 		mes.setBrightness(10);
-		System.out.println(CNMessageTransfer.bytesToHex(mes.getMessageBytes()));
+//		System.out.println(CNMessageTransfer.bytesToHex(mes.getMessageBytes()));
 		try {
 			CNMessageTransfer cn = new CNMessageTransfer(0);
 			try {

@@ -117,6 +117,7 @@ void sendReceivedData(){
     USART3_sendChar((char)0x03);
     //logo
     USART3_sendChar((char)0x03);
+    USART3_sendChar((char)0x03);
 }
 
 
@@ -185,20 +186,38 @@ ISR(USART3_RXC_vect){
                     }
                 }
             }else{
-                sendReceivedData();
-                // getUserInput();
-                indexIn++;
-                sendPhase = 0;
+                indexIn = 0;
+                sendPhase = 7;
             } break;
         case 7:
             if(inc != 3){
-                if(inc == 0xff){
-                    // USART3_sendChar('k');
-                    // USART3_sendChar((char)0x03);
+                //logo
+            }else{
+                
+                sendReceivedData();
+                
+                indexIn = 0;
+                sendPhase = 8;
+            }break;
+        case 8:
+            // USART3_sendChar(8);
+            // USART3_sendChar(inc);
+            // USART3_sendChar((char)0x03);
+            if(inc != 3){
+                // USART3_sendChar(inc);
+                // USART3_sendChar((char)0x03);
+                if(inc > 0x7E){
+                    USART3_sendChar('k');
+                    USART3_sendChar((char)0x03);
                     getUserInput();
+                }else{
+                    USART3_sendChar('n');
+                    USART3_sendChar((char)0x03);
                 }
             }else{
+                USART3_sendChar(inc);
+                USART3_sendChar((char)0x03);
                 sendPhase = 0;
-            }
+            }break;
     }
 }
