@@ -69,27 +69,47 @@ public class CNMessageTransfer{
 						System.out.println(CNMessageTransfer.bytesToHex(incMessage));
 					}else {
 						
-//						System.out.println(CNMessageTransfer.bytesToHex(new byte[] {-128,3}));
-//						System.out.println(CNMessageTransfer.bytesToHex(incMessage));
-						
+						System.out.println("test1");
 						//dit in thread
+						checkIn = true;
 						boolean ok = true;
-						for(int i = 0; i < incMessage.length; i++) {
-							System.out.println("test");
-							if(incMessage[i] != outMessage.getMessageBytes()[i]) {
-								ok = false;
-								break;
-							}
-						}
+						
 						System.out.print(ok);
-						if(ok){
-							writeBytes(new byte[] {-128,3});
-						}
+						System.out.print(checkIn);
+						
 						//in thread
 						System.out.println("test");
 						
 						setIndex(0);
 					}
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+							while(true) {
+								if(checkIn) {
+									
+									boolean ok = true;
+									for(int i = 0; i < incMessage.length; i++) {
+										System.out.println(CNMessageTransfer.bytesToHex(new byte[] {incMessage[i]}));
+										System.out.println(new byte[] {outMessage.getMessageBytes()[i]});
+										System.out.println(incMessage[i] != outMessage.getMessageBytes()[i]);
+										System.out.println("inc");
+										System.out.println(CNMessageTransfer.bytesToHex(incMessage));
+										System.out.println("out");
+										System.out.println(CNMessageTransfer.bytesToHex(outMessage.getMessageBytes()));
+										
+										if(incMessage[i] != outMessage.getMessageBytes()[i]) {
+											ok = false;
+											break;
+										}
+									}
+									checkIn = false;
+									System.out.println(ok);
+								}
+							
+							}
+						}
+					}).start();;
 				}
 
 				@Override
@@ -147,6 +167,7 @@ public class CNMessageTransfer{
 	 */
 	public void sendMessage(Message mes) {
 		writeBytes(mes.getMessageBytes());
+		outMessage = mes;
 	}
 	
 	private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();

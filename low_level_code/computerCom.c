@@ -112,7 +112,7 @@ void sendReceivedData(){
     USART3_sendChar((char)0x03);
     for(int i = 0; i < lengte; i++){
         USART3_sendChar(string_bgred[i]);
-        USART3_sendChar(string_green[i] << 4 | string_blue[i]);
+        USART3_sendChar(string_bggreen[i] << 4 | string_bgblue[i]);
     }
     USART3_sendChar((char)0x03);
     //logo

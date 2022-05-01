@@ -56,10 +56,10 @@ public class Message {
 			
 		}
 		messageBytes[currentIndex++] = CNMessageTransfer.END_OF_PHASE;
-		System.out.println(CNMessageTransfer.bytesToHex(
-				new byte[] {(byte)(((messageColor.getBrightness() >>> 1) & 0x0f) << 4)}));
-		System.out.println(CNMessageTransfer.bytesToHex(
-				new byte[] {(byte)(((messageColor.getFgColors().get(0).getGreenBlueMerge())))}));
+//		System.out.println(CNMessageTransfer.bytesToHex(
+//				new byte[] {(byte)(((messageColor.getBrightness() >>> 1) & 0x0f) << 4)}));
+//		System.out.println(CNMessageTransfer.bytesToHex(
+//				new byte[] {(byte)(((messageColor.getFgColors().get(0).getGreenBlueMerge())))}));
 		messageBytes[currentIndex] = (byte) ((((messageColor.getBrightness() >>> 1) & 0x0f) << 4) | messageColor.getFgColors().get(0).getCompressedRed());
 		messageBytes[currentIndex + 1] = messageColor.getFgColors().get(0).getGreenBlueMerge();
 		for(int i = 2; i < lenString*2; i+=2) {
