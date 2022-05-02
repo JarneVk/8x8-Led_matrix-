@@ -207,6 +207,18 @@ void getUserInput(char inputString[], uint8_t s_r[], uint8_t s_b[], uint8_t s_g[
     string_brightness=brightness;
 }
 
+//function to receive logo from java gui and store contents
+//@param inputLogo: matrix that is filled with the java logo input
+void getUserLogo(Led inputLogo[][AMOUNT]) {
+    for (int row = 0; row < AMOUNT; row++)
+    {
+        for(int col=0; col<AMOUNT; col++) {
+            logo_matrix[row][col]=inputLogo[row][col];
+        }
+    }
+    
+}
+
 //**********DATA PROCESSING**********
 
 //function to enter a letter into a led matrix that is ready to be loaded into the master

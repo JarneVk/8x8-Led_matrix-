@@ -63,6 +63,7 @@ uint8_t string_green[MAX_STRING_LEN]; //the amount of green for each letter of t
 uint8_t string_blue[MAX_STRING_LEN]; //the amount of blue for each letter of the string
 uint8_t string_brightness=10; //the brightness of the string to be displayed on the leds
 Led main_matrix[AMOUNT][AMOUNT]; //the matrix of this LED BOARD
+Led logo_matrix[AMOUNT][AMOUNT]; //variable to store to logo to display on screen
 
 const uint8_t matrix_a[AMOUNT][LETTER_WIDTH] PROGMEM = {{0,0,0,0},
                                                        {0,1,1,0},
