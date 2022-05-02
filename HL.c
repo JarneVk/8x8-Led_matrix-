@@ -193,7 +193,6 @@ void getUserInput(char inputString[], uint8_t s_r[], uint8_t s_b[], uint8_t s_g[
     int i;
     for(i=0; i<MAX_STRING_LEN; i++ ){
         if(inputString[i] == '\0') {
-            string[i]='\0';
             break; //end of user input
         }
         string[i]=inputString[i];
