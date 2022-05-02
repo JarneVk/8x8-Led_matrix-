@@ -10,9 +10,9 @@
 void initGlobalVariables() {
     fillLedMatrixWithValue(main_matrix,0,0,0,0);//filling the entire matrix with 0's
     for (int i = 0; i < MAX_STRING_LEN; i++) {
-        string_blue[i]=0;
-        string_red[i]=0;
-        string_blue[i]=0;
+        string_blue[i]=12;
+        string_red[i]=15;
+        string_green[i]=7;
     }    
 }
 
@@ -178,9 +178,13 @@ Led inputToLed(uint8_t input1, uint8_t input2) {
 }
 
 //const char wou hem ook niet raar genoeg
-char userInput[MAX_STRING_LEN]="Test str";
-//method to get the input string from the user
-void getUserInput() {
+//char userInput[MAX_STRING_LEN]="Test str";
+//method to get the input string from the user    
+//@param inputString: string to display on led boards from java gui
+//@param s_r: array with the amount of red per letter
+//@param s_b: array with the amount of blue per letter
+//@param s_g: array with the amount of green per letter
+void getUserInput(char inputString[], uint8_t s_r[], uint8_t s_b[], uint8_t s_g[] ,uint8_t brightness) {
     //string niet declareren lokaal?
     /*for(int i=0; i<MAX_STRING_LEN; i++ ){
         printf_P(PSTR("%c,%x"),userInput[i],userInput[i]);
@@ -188,21 +192,20 @@ void getUserInput() {
     // printf_P(PSTR("\n\r\n\r"));
     int i;
     for(i=0; i<MAX_STRING_LEN; i++ ){
-        if(userInput[i] == '\0') {
+        if(inputString[i] == '\0') {
+            string[i]='\0';
             break; //end of user input
         }
-        string[i]=userInput[i];
-        // printf_P(PSTR("nieuwe c %d:%c  %x\n\r"),i,string[i],string[i]);
-        string_red[i]=15;
-        string_blue[i]=12;
-        string_green[i]=7;
+        string[i]=inputString[i];
+        string_red[i]=s_r[i];
+        string_blue[i]=s_b[i];
+        string_green[i]=s_g[i];
     }
     while(i<MAX_STRING_LEN) {
         string[i]='\0'; //for the remaining lenght of the string , fill up with 0 chars
         i++;
     } 
-    // printf_P(PSTR("nieuwe string:%s\n\r"),string);
-    string_brightness=20;
+    string_brightness=brightness;
 }
 
 //**********DATA PROCESSING**********

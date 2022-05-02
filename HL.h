@@ -25,7 +25,7 @@ uint16_t ledToOutput(Led pixel);
 uint32_t ledToHardwareDriver(Led pixel);
 void decompressReceivedPackages(Led columnReceived[], uint8_t array_ont[]);
 Led inputToLed(uint8_t input1, uint8_t input2);
-void getUserInput();
+void getUserInput(char inputString[], uint8_t s_r[], uint8_t s_b[], uint8_t s_g[] ,uint8_t brightness);
 
 //**********DATA PROCESSING**********
 void enterLetterInMatrix(Led m[][LETTER_WIDTH],const uint8_t letterMatrix[][LETTER_WIDTH], uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue);
