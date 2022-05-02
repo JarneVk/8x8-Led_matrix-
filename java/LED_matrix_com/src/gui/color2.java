@@ -180,10 +180,11 @@ class color2 extends JFrame implements ActionListener, ChangeListener   {
 			int sendB = sendC.getBlue();
 			String sendS = jText.getText();
 			
-			Led led = new Led(sendR,sendG,sendB,31);
+			Led led = new Led(sendR,sendG,sendB);
 			Message message = new Message();
+			message.setBrightness(31);
 			message.setMessage(sendS);
-			message.setColor(led,-1);
+			message.setFgColor(led,-1);
 			CNMessageTransfer cnm;
 			
 			System.out.println((led.getGreen()));

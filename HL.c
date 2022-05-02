@@ -188,7 +188,7 @@ void getUserInput() {
     // printf_P(PSTR("\n\r\n\r"));
     int i;
     for(i=0; i<MAX_STRING_LEN; i++ ){
-        if(userInput[i] == '\0') {
+        if(inputString[i] == '\0') {
             break; //end of user input
         }
         string[i]=userInput[i];

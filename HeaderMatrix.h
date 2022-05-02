@@ -17,12 +17,10 @@ typedef struct led{
     uint8_t blue; //amount of blue : value between 0-31
 }Led;
 
-#define MAX_STRING_LEN 30
-#define MAX_MESSAGE_COLORS 5
 
 #define AMOUNT 8
 #define LETTER_WIDTH 4
-#define MAX_STRING_LEN 30
+#define MAX_STRING_LEN 35
 
 //ontvanger
 void uarts_setup();
@@ -46,6 +44,7 @@ void shiftTimer_reset();
 //computer communication
 void USART3_Init();
 void USART3_sendChar(char data);
+void sendReceivedData();
 
 /*
 Define for easy string literal use
@@ -60,10 +59,14 @@ void masterShiftMatrixFullString();
 void initGlobalVariables();
 
 void driveLeds();
+void getUserInput();
 
 uint8_t string_red[MAX_STRING_LEN]; //the amount of red for each letter of the string
 uint8_t string_green[MAX_STRING_LEN]; //the amount of green for each letter of the string
 uint8_t string_blue[MAX_STRING_LEN]; //the amount of blue for each letter of the string
+uint8_t string_bgred[MAX_STRING_LEN]; //the amount of red for each letter of the string
+uint8_t string_bggreen[MAX_STRING_LEN]; //the amount of green for each letter of the string
+uint8_t string_bgblue[MAX_STRING_LEN]; //the amount of blue for each letter of the string
 uint8_t string_brightness; //the brightness of the string to be displayed on the leds
 
 uint8_t zender_buffer_uart1;
@@ -81,9 +84,7 @@ int ontvang_i; //testing
 void ledsAansturen();
 void zender_timer_setup();
 
-char inputString[MAX_STRING_LEN];
-Led stringColor[MAX_MESSAGE_COLORS];
-uint8_t colorIndex[MAX_MESSAGE_COLORS];
+char inputString[MAX_STRING_LEN + 1];
 
 
 void endOntvanger();

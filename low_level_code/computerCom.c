@@ -83,66 +83,141 @@ void USART3_Init(){
     //Enable receive interrupt
     USART3_CTRLA = 0b10000000;
 
+    TCB2_CCMPL = 0x00;
+	TCB2_CCMPH = 0x30;
+	TCB2_CTRLA = 0b00000101; 
+	TCB2_CTRLB = 0x01;		//periotic interupt
+	TCB2_INTCTRL = 0x01;	//enable inetrups
+
     sei();
  
 }
 
-//test
-// char inputString[MAX_STRING_LEN];
-// Led stringColor[MAX_MESSAGE_COLORS];
-// uint8_t colorIndex[MAX_MESSAGE_COLORS];
-// // char* inPointer = NULL;
+
+void sendReceivedData(){
+    USART3_sendChar((char)0x01);
+
+    uint8_t lengte = 0;
+    while(inputString[lengte] != '\0'){
+        USART3_sendChar(inputString[lengte++]);
+    }
+    USART3_sendChar((char)0x03);
+    USART3_sendChar(string_brightness <<4 | string_red[0]);
+    USART3_sendChar(string_green[0] << 4 | string_blue[0]);
+    for(int i = 1; i < lengte; i++){
+        USART3_sendChar(string_red[i]);
+        USART3_sendChar(string_green[i] << 4 | string_blue[i]);
+    }
+
+    USART3_sendChar((char)0x03);
+    for(int i = 0; i < lengte; i++){
+        USART3_sendChar(string_bgred[i]);
+        USART3_sendChar(string_bggreen[i] << 4 | string_bgblue[i]);
+    }
+    USART3_sendChar((char)0x03);
+    //logo
+    USART3_sendChar((char)0x03);
+    USART3_sendChar((char)0x03);
+}
+
+
 uint8_t lengthInputString = 0;
 uint8_t indexIn = 0;
 uint8_t sendPhase = 0;
 
+
 ISR(USART3_RXC_vect){
-     uint8_t inc = USART3_RXDATAL;
-    if(inc == 1){
-        sendPhase = 0;
-        indexIn = 0;
-    }else{
-        switch(sendPhase){
-            case 0:
-                if(inc != 3){
-                    if(indexIn <= MAX_STRING_LEN - 2){ // -2 voor string termination
-                        inputString[indexIn] = inc;
+    uint8_t inc = USART3_RXDATAL;
+    
+
+    switch(sendPhase){
+        case 0:
+            if(inc == 1){
+                sendPhase = 1;
+                indexIn = 0;
+            }break;
+        case 1:
+            if(inc != 3){
+                if(indexIn <= MAX_STRING_LEN){ // geen -1 voor string termination
+                    inputString[indexIn] = inc;
+                    indexIn++;
+                }
+            }else{
+                inputString[indexIn] = '\0';
+                lengthInputString = indexIn;
+                indexIn = 0;
+                sendPhase = 2;
+            } break;
+        case 2:
+            string_brightness = ((inc>>4) & 0x0f);
+            string_red[indexIn] = (inc) & 0x0f;
+            sendPhase = 4;
+            break;
+        case 3:
+        case 4:
+            if(inc != 3){
+                if(indexIn <= MAX_STRING_LEN - 1){
+                    if(sendPhase == 3){
+                        string_red[indexIn] = (inc) & 0x0f;
+                        sendPhase++;
+                    }else{
+                        string_green[indexIn] = (inc>>4) & 0x0f;
+                        string_blue[indexIn] = (inc) & 0x0f;
                         indexIn++;
+                        sendPhase--;
                     }
-                }else{
-                    inputString[indexIn] = '\0';
-                    lengthInputString = indexIn;
-                    indexIn = 0;
-                    sendPhase++;
-                } break;
-            case 1:
-            case 2:
-                if(inc != 3){
-                    if(indexIn <= MAX_MESSAGE_COLORS - 1){
-                        if(sendPhase == 1){
-                            stringColor[indexIn].brightness = ((inc>>4) & 0x0f);
-                            stringColor[indexIn].red = (inc<<4) & 0xf0;
-                            sendPhase++;
-                        }else{
-                            stringColor[indexIn].blue = (inc>>4) & 0x0f;
-                            stringColor[indexIn].green = (inc<<4) & 0xf0;
-                            indexIn++;
-                            sendPhase--;
-                        }
+                }
+            }else{
+                indexIn = 0;
+                sendPhase = 5;
+            } break;
+        case 5:
+        case 6:
+            if(inc != 3){
+                if(indexIn <= MAX_STRING_LEN - 1){
+                    if(sendPhase == 5){
+                        string_bgred[indexIn] = (inc) & 0x0f;
+                        sendPhase++;
+                    }else{
+                        string_bggreen[indexIn] = (inc>>4) & 0x0f;
+                        string_bgblue[indexIn] = (inc) & 0x0f;
+                        indexIn++;
+                        sendPhase--;
                     }
+                }
+            }else{
+                indexIn = 0;
+                sendPhase = 7;
+            } break;
+        case 7:
+            if(inc != 3){
+                //logo
+            }else{
+                
+                sendReceivedData();
+                
+                indexIn = 0;
+                sendPhase = 8;
+            }break;
+        case 8:
+            // USART3_sendChar(8);
+            // USART3_sendChar(inc);
+            // USART3_sendChar((char)0x03);
+            if(inc != 3){
+                // USART3_sendChar(inc);
+                // USART3_sendChar((char)0x03);
+                if(inc > 0x7E){
+                    USART3_sendChar('k');
+                    USART3_sendChar((char)0x03);
+                    getUserInput();
                 }else{
-                    indexIn = 0;
-                    sendPhase += 2;
-                } break;
-            case 3:
-                if(inc != 3){
-                    if(indexIn <= MAX_MESSAGE_COLORS - 1){
-                        colorIndex[indexIn] = inc;
-                    }
-                }else{
-                    indexIn = 0;
-                    sendPhase = 0;
-                } break;
-        }
+                    USART3_sendChar('n');
+                    USART3_sendChar((char)0x03);
+                }
+            }else{
+                USART3_sendChar(inc);
+                USART3_sendChar((char)0x03);
+                sendPhase = 0;
+            }break;
     }
 }

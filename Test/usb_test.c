@@ -15,14 +15,15 @@ int main(void){
 
         //printStringLiteral("test");
         // printf_P(PSTR("%d"),i);
-        SRAM_printBytes((uint8_t*)stringColor, sizeof(stringColor));
-        USART3_sendChar('\n');
-        USART3_sendChar('\r');
-        SRAM_printBytes((uint8_t*)colorIndex, sizeof(colorIndex));
-        USART3_sendChar('\n');
-        USART3_sendChar('\r');
-        USART3_sendChar((char)0x03);
-        _delay_ms(500);
+        // SRAM_printBytes((uint8_t*)stringfgColor, sizeof(stringfgColor));
+        // USART3_sendChar('\n');
+        // USART3_sendChar('\r');
+        // SRAM_printBytes((uint8_t*)stringbgColor, sizeof(stringbgColor));
+        // USART3_sendChar('\n');
+        // USART3_sendChar('\r');
+        // USART3_sendChar((char)0x03);
+        // sendReceivedData();
+        // _delay_ms(2000);
 
         // int i = 0;
         // while(pgm_read_byte(&test[i]) != '\0'){

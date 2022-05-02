@@ -1,6 +1,8 @@
 package message_transfer;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.fazecast.jSerialComm.*;
 
@@ -8,8 +10,13 @@ public class CNMessageTransfer{
 	
 	private SerialPort comPort;
 	private byte[] data;
+	private byte[] incMessage;
+	private Message outMessage;
+	private int index;
+	private boolean checkIn = false;
 	public static final byte START_OF_TRANSMISSION = 1;
 	public static final byte END_OF_PHASE = 3;
+	public static final byte AMOUNT_OF_PHASES = 5;
 	
 	/**
 	 * 
@@ -18,6 +25,8 @@ public class CNMessageTransfer{
 	 */
 	public CNMessageTransfer(int i) throws IOException {
 		boolean win = false;
+		incMessage = new byte[0];
+		//hier thread die blijft checken
 		if(System.getProperty("os.name").toLowerCase().contains("windows"));
 			win = true;
 		SerialPort[] comPorts = SerialPort.getCommPorts();
@@ -45,6 +54,92 @@ public class CNMessageTransfer{
 				@Override
 				public void serialEvent(SerialPortEvent arg0) {
 					data = arg0.getReceivedData();
+					System.out.println(CNMessageTransfer.bytesToHex(data));
+					System.out.println(index);
+					if(index != AMOUNT_OF_PHASES - 1) {
+						byte[] temp = new byte[incMessage.length + data.length];
+						for(int i = 0; i < incMessage.length; i++) {
+							temp[i] = incMessage[i];
+						}
+						for(int i = 0; i < data.length; i++) {
+							temp[incMessage.length + i] = data[i];
+						}
+						incMessage = temp;
+						setIndex(index + 1);
+//						System.out.println(CNMessageTransfer.bytesToHex(incMessage));
+					}else {
+						
+						System.out.println("checkIn");
+						//dit in thread
+						
+//						System.out.print(ok);
+//						System.out.print(checkIn);
+//						
+//						//in thread
+//						System.out.println("test");
+						boolean ok = true;
+						System.out.println("inc");
+						System.out.println(CNMessageTransfer.bytesToHex(incMessage));
+						System.out.println("out");
+						System.out.println(CNMessageTransfer.bytesToHex(outMessage.getMessageBytes()));
+						for(int i = 0; i < incMessage.length; i++) {
+							if(incMessage[i] != outMessage.getMessageBytes()[i]) {
+								ok = false;
+								break;
+							}
+						}
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						if(ok) {
+							byte[] send = new byte[] {CNMessageTransfer.integerToUnsignedByte(0xff),CNMessageTransfer.integerToUnsignedByte(0x03)};
+							System.out.println(CNMessageTransfer.bytesToHex(send));
+							writeBytes(send);
+						}else {
+							byte[] send = new byte[] {CNMessageTransfer.integerToUnsignedByte(0x00),CNMessageTransfer.integerToUnsignedByte(0x03)};
+							System.out.println(CNMessageTransfer.bytesToHex(send));
+							writeBytes(send);
+						}
+						checkIn = false;
+						incMessage = null;
+						System.out.println(ok);
+//						checkIn = true;
+						
+						setIndex(0);
+					}
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+							while(true) {
+								if(checkIn) {
+									
+									boolean ok = true;
+									System.out.println("inc");
+									System.out.println(CNMessageTransfer.bytesToHex(incMessage));
+									System.out.println("out");
+									System.out.println(CNMessageTransfer.bytesToHex(outMessage.getMessageBytes()));
+									for(int i = 0; i < incMessage.length; i++) {
+										if(incMessage[i] != outMessage.getMessageBytes()[i]) {
+											ok = false;
+											break;
+										}
+									}
+									if(ok) {
+										writeBytes(new byte[] {CNMessageTransfer.integerToUnsignedByte(0xff),CNMessageTransfer.integerToUnsignedByte(0x03)});
+									}else {
+										writeBytes(new byte[] {CNMessageTransfer.integerToUnsignedByte(0x00),CNMessageTransfer.integerToUnsignedByte(0x03)});
+									}
+									checkIn = false;
+									incMessage = null;
+									System.out.println(ok);
+								}
+							
+							}
+						}
+					}).start();;
 				}
 
 				@Override
@@ -66,6 +161,9 @@ public class CNMessageTransfer{
 		}
 	}
 	
+	public void setIndex(int in) {
+		index = (in<AMOUNT_OF_PHASES)?in:0;
+	}
 	
 	public String getData() {
 		if(data != null)
@@ -99,6 +197,7 @@ public class CNMessageTransfer{
 	 */
 	public void sendMessage(Message mes) {
 		writeBytes(mes.getMessageBytes());
+		outMessage = mes;
 	}
 	
 	private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();

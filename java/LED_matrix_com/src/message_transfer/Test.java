@@ -15,9 +15,11 @@ public class Test {
 	
 	public static void testMessage() {
 		Message mes = new Message();
-		mes.setMessage("somethinggf");
-//		mes.getMessageColor().setColor(new Led(255,100,50,20), 0);
-		System.out.println(CNMessageTransfer.bytesToHex(mes.getMessageBytes()));
+		mes.setMessage("test");
+		mes.setFgRangeColor(new Led(255,0,255), 0, -1);
+		mes.setBgRangeColor(new Led(0,255,0), 0, -1);
+		mes.setBrightness(10);
+//		System.out.println(CNMessageTransfer.bytesToHex(mes.getMessageBytes()));
 		try {
 			CNMessageTransfer cn = new CNMessageTransfer(0);
 			try {
@@ -32,7 +34,7 @@ public class Test {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				System.out.println(cn.getData());
+//				System.out.println(cn.getData());
 //				System.out.println(cn.getHexString());
 			}
 		} catch (IOException e) {
@@ -45,10 +47,9 @@ public class Test {
 		l.setBlue(128);
 		l.setGreen(255);
 		l.setRed(128);
-		l.setBrightness(3);
 		System.out.println(l);
-		System.out.println(l.getBrightnessRedMerge());
-		System.out.println(CNMessageTransfer.bytesToHex(new byte[] {l.getBrightnessRedMerge()}));
+		System.out.println(l.getCompressedRed());
+		System.out.println(CNMessageTransfer.bytesToHex(new byte[] {l.getCompressedRed()}));
 		System.out.println(CNMessageTransfer.bytesToHex(new byte[] {l.getGreenBlueMerge()}));
 	}
 	
