@@ -102,17 +102,17 @@ void sendReceivedData(){
         USART3_sendChar(inputString[lengte++]);
     }
     USART3_sendChar((char)0x03);
-    USART3_sendChar(string_brightness <<4 | string_red[0]);
-    USART3_sendChar(string_green[0] << 4 | string_blue[0]);
+    USART3_sendChar(input_brightness <<4 | input_red[0]);
+    USART3_sendChar(input_green[0] << 4 | input_blue[0]);
     for(int i = 1; i < lengte; i++){
-        USART3_sendChar(string_red[i]);
-        USART3_sendChar(string_green[i] << 4 | string_blue[i]);
+        USART3_sendChar(input_red[i]);
+        USART3_sendChar(input_green[i] << 4 | input_blue[i]);
     }
 
     USART3_sendChar((char)0x03);
     for(int i = 0; i < lengte; i++){
-        USART3_sendChar(string_bgred[i]);
-        USART3_sendChar(string_bggreen[i] << 4 | string_bgblue[i]);
+        USART3_sendChar(input_bgred[i]);
+        USART3_sendChar(input_bggreen[i] << 4 | input_bgblue[i]);
     }
     USART3_sendChar((char)0x03);
     //logo
@@ -149,8 +149,8 @@ ISR(USART3_RXC_vect){
                 sendPhase = 2;
             } break;
         case 2:
-            string_brightness = ((inc>>4) & 0x0f);
-            string_red[indexIn] = (inc) & 0x0f;
+            input_brightness = ((inc>>4) & 0x0f);
+            input_red[indexIn] = (inc) & 0x0f;
             sendPhase = 4;
             break;
         case 3:
@@ -158,11 +158,11 @@ ISR(USART3_RXC_vect){
             if(inc != 3){
                 if(indexIn <= MAX_STRING_LEN - 1){
                     if(sendPhase == 3){
-                        string_red[indexIn] = (inc) & 0x0f;
+                        input_red[indexIn] = (inc) & 0x0f;
                         sendPhase++;
                     }else{
-                        string_green[indexIn] = (inc>>4) & 0x0f;
-                        string_blue[indexIn] = (inc) & 0x0f;
+                        input_green[indexIn] = (inc>>4) & 0x0f;
+                        input_blue[indexIn] = (inc) & 0x0f;
                         indexIn++;
                         sendPhase--;
                     }
@@ -176,11 +176,11 @@ ISR(USART3_RXC_vect){
             if(inc != 3){
                 if(indexIn <= MAX_STRING_LEN - 1){
                     if(sendPhase == 5){
-                        string_bgred[indexIn] = (inc) & 0x0f;
+                        input_bgred[indexIn] = (inc) & 0x0f;
                         sendPhase++;
                     }else{
-                        string_bggreen[indexIn] = (inc>>4) & 0x0f;
-                        string_bgblue[indexIn] = (inc) & 0x0f;
+                        input_bggreen[indexIn] = (inc>>4) & 0x0f;
+                        input_bgblue[indexIn] = (inc) & 0x0f;
                         indexIn++;
                         sendPhase--;
                     }
@@ -207,16 +207,16 @@ ISR(USART3_RXC_vect){
                 // USART3_sendChar(inc);
                 // USART3_sendChar((char)0x03);
                 if(inc > 0x7E){
-                    USART3_sendChar('k');
-                    USART3_sendChar((char)0x03);
-                    getUserInput();
+                    // USART3_sendChar('k');
+                    // USART3_sendChar((char)0x03);
+                    getUserInput(inputString, input_red, input_blue, input_green, input_brightness);
                 }else{
-                    USART3_sendChar('n');
-                    USART3_sendChar((char)0x03);
+                    // USART3_sendChar('n');
+                    // USART3_sendChar((char)0x03);
                 }
             }else{
-                USART3_sendChar(inc);
-                USART3_sendChar((char)0x03);
+                // USART3_sendChar(inc);
+                // USART3_sendChar((char)0x03);
                 sendPhase = 0;
             }break;
     }

@@ -59,15 +59,16 @@ void masterShiftMatrixFullString();
 void initGlobalVariables();
 
 void driveLeds();
-void getUserInput();
+void getUserInput(char inputString[], uint8_t s_r[], uint8_t s_b[], uint8_t s_g[] ,uint8_t brightness);
 
-uint8_t string_red[MAX_STRING_LEN]; //the amount of red for each letter of the string
-uint8_t string_green[MAX_STRING_LEN]; //the amount of green for each letter of the string
-uint8_t string_blue[MAX_STRING_LEN]; //the amount of blue for each letter of the string
-uint8_t string_bgred[MAX_STRING_LEN]; //the amount of red for each letter of the string
-uint8_t string_bggreen[MAX_STRING_LEN]; //the amount of green for each letter of the string
-uint8_t string_bgblue[MAX_STRING_LEN]; //the amount of blue for each letter of the string
-uint8_t string_brightness; //the brightness of the string to be displayed on the leds
+char inputString[MAX_STRING_LEN + 1];
+uint8_t input_red[MAX_STRING_LEN]; //the amount of red for each letter of the string
+uint8_t input_green[MAX_STRING_LEN]; //the amount of green for each letter of the string
+uint8_t input_blue[MAX_STRING_LEN]; //the amount of blue for each letter of the string
+uint8_t input_bgred[MAX_STRING_LEN]; //the amount of red for each letter of the string
+uint8_t input_bggreen[MAX_STRING_LEN]; //the amount of green for each letter of the string
+uint8_t input_bgblue[MAX_STRING_LEN]; //the amount of blue for each letter of the string
+uint8_t input_brightness; //the brightness of the string to be displayed on the leds
 
 uint8_t zender_buffer_uart1;
 uint8_t ontvanger_buffer_uart0;
@@ -84,7 +85,7 @@ int ontvang_i; //testing
 void ledsAansturen();
 void zender_timer_setup();
 
-char inputString[MAX_STRING_LEN + 1];
+
 
 
 void endOntvanger();

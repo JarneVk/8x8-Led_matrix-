@@ -25,7 +25,7 @@ uint16_t ledToOutput(Led pixel);
 uint32_t ledToHardwareDriver(Led pixel);
 void decompressReceivedPackages(Led columnReceived[], uint8_t array_ont[]);
 Led inputToLed(uint8_t input1, uint8_t input2);
-void getUserInput(char inputString[], uint8_t s_r[], uint8_t s_b[], uint8_t s_g[] ,uint8_t brightness);
+// void getUserInput(char inputString[], uint8_t s_r[], uint8_t s_b[], uint8_t s_g[] ,uint8_t brightness);
 
 //**********DATA PROCESSING**********
 void enterLetterInMatrix(Led m[][LETTER_WIDTH],const uint8_t letterMatrix[][LETTER_WIDTH], uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue);
@@ -58,10 +58,10 @@ uint8_t letterNr; //the counter of the letter in the string
 
 //general use global variables
 char string[MAX_STRING_LEN + 1]="Something"; //the string to be displayed on screen
-// uint8_t string_red[MAX_STRING_LEN]; //the amount of red for each letter of the string
-// uint8_t string_green[MAX_STRING_LEN]; //the amount of green for each letter of the string
-// uint8_t string_blue[MAX_STRING_LEN]; //the amount of blue for each letter of the string
-// uint8_t string_brightness=10; //the brightness of the string to be displayed on the leds
+uint8_t string_red[MAX_STRING_LEN]; //the amount of red for each letter of the string
+uint8_t string_green[MAX_STRING_LEN]; //the amount of green for each letter of the string
+uint8_t string_blue[MAX_STRING_LEN]; //the amount of blue for each letter of the string
+uint8_t string_brightness=10; //the brightness of the string to be displayed on the leds
 Led main_matrix[AMOUNT][AMOUNT]; //the matrix of this LED BOARD
 
 const uint8_t matrix_a[AMOUNT][LETTER_WIDTH] PROGMEM = {{0,0,0,0},
