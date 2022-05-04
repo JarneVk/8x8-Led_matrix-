@@ -1,37 +1,63 @@
 package gui;
-// Java Program to take RGBA value from
-// user and set it as background of panel
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import java.awt.event.*;
+
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 import java.io.IOException;
 import java.text.MessageFormat;
 
+import java.util.*;
 import message_transfer.*;
-
 class color2 extends JFrame implements ActionListener, ChangeListener   {
-	JSlider sR, sG, sB;
-	JLabel lR, lG, lB;
-	JButton bF, bB, bSend;
-	JTextField jText;
+	ArrayList<Integer> sendFR = new ArrayList<Integer>(35);
+	ArrayList<Integer> sendFG = new ArrayList<Integer>(35);
+	ArrayList<Integer> sendFB = new ArrayList<Integer>(35);
+	ArrayList<Integer> sendBR = new ArrayList<Integer>(35);
+	ArrayList<Integer> sendBG = new ArrayList<Integer>(35);
+	ArrayList<Integer> sendBB = new ArrayList<Integer>(35);
 
+	Color cWhite = new Color(255,255,255);
+	Color cBlack = new Color(0,0,0);
+	
+
+	JSlider sR, sG, sB;
+	JLabel lR, lG, lB, lColor;
+	
+	JButton bF, bB, bAddField, bRemoveField, bSend;
+	JTextField jText;
 	
 	//all gridbuttons
 	JButton[] buttons = new JButton[64];
-	
+
 	// panel
-	JPanel p, p2;
-	JLabel lText;
+	JPanel pLeft, pMatrix, pFrontBack;
+	
+	JTextPane txtPane;
+	
 	// constructor
 	color2()
 	{
+
 		super("color");
 		
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		//jText = new JTextField("Sample Text");
+		txtPane = new JTextPane();
 
-		jText = new JTextField("Sample Text");
+		for(int i=0; i<35; i++) {
+			sendFR.add(255);
+			sendFG.add(255);
+			sendFB.add(255);
+			sendBR.add(0);
+			sendBG.add(0);
+			sendBB.add(0);			
+		}
+		
 		// create sliders
 		sR = new JSlider(0, 255, 0);
 		sG = new JSlider(0, 255, 0);
@@ -42,43 +68,73 @@ class color2 extends JFrame implements ActionListener, ChangeListener   {
 		lR = new JLabel("Red = 0");
 		lG = new JLabel("Green = 0");
 		lB = new JLabel("Blue = 0");
-		lText = new JLabel("Sample text!!!");
-		lText.setFont(new Font("Arail", Font.BOLD, 22));
+		lColor = new JLabel();
+		lColor.setOpaque(true);
+		
+	
+		
+		
 		// create a panel
-		p = new JPanel();
-		p2 = new JPanel();
+		pLeft = new JPanel();
+		pMatrix = new JPanel();
+		pFrontBack = new JPanel();
+
 		// create button
 		bF = new JButton("Front");
 		bB  = new JButton("Back");
+		bAddField  = new JButton("Add");
 		bSend = new JButton("Send");
+		bRemoveField = new JButton("Remove");
 		
 		
 		// add ActionListener
 		bF.addActionListener(this);
 		bB.addActionListener(this);
 		bSend.addActionListener(this);
-
+		bAddField.addActionListener(this);
+		bRemoveField.addActionListener(this);
+		
 		// add ChangeListener
 		sR.addChangeListener(this);
 		sG.addChangeListener(this);
 		sB.addChangeListener(this);
 	
 		// add components to panel
-		this.setLayout(new GridLayout(0, 2));
-		p.setLayout(new GridLayout(0, 2));
-		p.add(lR);
-		p.add(sR);
-		p.add(lG);
-		p.add(sG);
-		p.add(lB);
-		p.add(sB);
-		p.add(bF);
-		p.add(bB);
-		p.add(lText);
-		p.add(jText);
-		p.add(bSend);
 		
-		p2.setLayout(new GridLayout(0, 8));
+		this.setLayout(new GridLayout(1,0));
+		pLeft.setLayout(new GridLayout(0,1));
+		
+		
+		lR.setHorizontalAlignment(JLabel.CENTER);
+		lR.setVerticalAlignment(JLabel.BOTTOM);
+		lG.setHorizontalAlignment(JLabel.CENTER);
+		lG.setVerticalAlignment(JLabel.BOTTOM);
+		lB.setHorizontalAlignment(JLabel.CENTER);
+		lB.setVerticalAlignment(JLabel.BOTTOM);
+		
+		pLeft.add(lR);
+		pLeft.add(sR);
+		pLeft.add(lG);
+		pLeft.add(sG);
+		pLeft.add(lB);
+		pLeft.add(sB);
+		pLeft.add(lColor);
+
+		pFrontBack.setLayout(new GridLayout(0,2));
+		pFrontBack.add(bF);
+		pFrontBack.add(bB);
+		
+		txtPane.setFont(new Font("ZCQ Small Regular", Font.PLAIN,18));
+		txtPane.setForeground(cWhite);
+		txtPane.setBackground(cBlack);
+		pLeft.add(txtPane);
+		pLeft.add(pFrontBack);
+		
+		
+		
+		pLeft.add(bSend);
+
+		pMatrix.setLayout(new GridLayout(0, 8));
 		
 		//button grid
 		int r, g, b, a;
@@ -101,7 +157,7 @@ class color2 extends JFrame implements ActionListener, ChangeListener   {
 				buttons[i*8+j2] = new JButton("b"+ Integer.toString(i*8+j2)); 
 				buttons[i*8+j2].addActionListener(this);
 				buttons[i*8+j2].setBackground(c);
-				p2.add(buttons[i*8+j2]);
+				pMatrix.add(buttons[i*8+j2]);
 				
 		    }
 		}
@@ -109,11 +165,12 @@ class color2 extends JFrame implements ActionListener, ChangeListener   {
 		
 		this.setMinimumSize(new Dimension(900, 450));
 
-		this.add(p);
-		this.add(p2);
+		this.add(pLeft);
+		this.add(pMatrix);
 		this.setVisible(true);
 
 	}
+
 
 	public void stateChanged(ChangeEvent ce) {
 		Object s = ce.getSource();
@@ -135,10 +192,8 @@ class color2 extends JFrame implements ActionListener, ChangeListener   {
 		a = 255;
 
 		Color c = new Color(r, g, b, a);
-		bF.setBackground(c);
-		bB.setBackground(c);
 		
-		
+		lColor.setBackground(c);	
 	}
 	
 	
@@ -156,39 +211,53 @@ class color2 extends JFrame implements ActionListener, ChangeListener   {
 		Color c = new Color(r, g, b, a);
 
 		if (s.equals("Front")) {
+			int startIndex = txtPane.getSelectionStart();
+			int endIndex = txtPane.getSelectionEnd();
 			
-
-			// set the color of the sample text
-
-			lText.setForeground(c);
-			jText.setForeground(c);
+			SimpleAttributeSet attributeSetFront = new SimpleAttributeSet();
+			System.out.println("FRONT start = " + startIndex + "\t end = " + endIndex);
+			for(int i=startIndex; i<endIndex; i++){
+				System.out.println(i);
+				sendFR.set(i, r);
+				sendFG.set(i, g);
+				sendFB.set(i, b);
+				StyleConstants.setForeground(attributeSetFront, c);
+				StyleConstants.setBackground(attributeSetFront, new Color(sendBR.get(i), sendBG.get(i), sendBB.get(i)));
+				txtPane.getStyledDocument().setCharacterAttributes(i, 1, attributeSetFront, rootPaneCheckingEnabled);
+			}
 		}
 		else if (s.equals("Back")) {
-
-			// set the color as background of panel
-			p.setBackground(c);
-			sR.setBackground(c);
-			sG.setBackground(c);
-			sB.setBackground(c);
+			int startIndex = txtPane.getSelectionStart();
+			int endIndex = txtPane.getSelectionEnd();
 			
+			SimpleAttributeSet attributeSetBack = new SimpleAttributeSet();
+			System.out.println("FRONT start = " + startIndex + "\t end = " + endIndex);
+			for(int i=startIndex; i<endIndex; i++){
+				sendBR.set(i, r);
+				sendBG.set(i, g);
+				sendBB.set(i, b);
+				StyleConstants.setBackground(attributeSetBack, c);
+				StyleConstants.setForeground(attributeSetBack, new Color(sendFR.get(i), sendFG.get(i),	sendFB.get(i)));
+				txtPane.getStyledDocument().setCharacterAttributes(i, 1, attributeSetBack, rootPaneCheckingEnabled);
+			}	
 		}
 		else if (s.equals("Send")){
-			System.out.print("testing b\n");
-			Color sendC = jText.getForeground();
-			int sendR = sendC.getRed();
-			int sendG = sendC.getGreen();
-			int sendB = sendC.getBlue();
-			String sendS = jText.getText();
+			System.out.println("testing send");
 			
-			Led led = new Led(sendR,sendG,sendB);
+			String sendS = txtPane.getText();
+			System.out.println("String |" + sendS + "| end");
+			int len = sendS.length();
+			for(int i=0; i<len; i++) {	
+				System.out.println(sendFR.get(i) + "," + sendFG.get(i) + "," + sendFB.get(i));
+			}
 			Message message = new Message();
-			message.setBrightness(31);
 			message.setMessage(sendS);
-			message.setFgColor(led,-1);
+			message.setBrightness(10);
+			for(int i=0; i<len; i++) {	
+				message.setFgColor(new Led(sendFR.get(i),sendFG.get(i),sendFB.get(i))  , i);
+			}
+			
 			CNMessageTransfer cnm;
-			
-			System.out.println((led.getGreen()));
-			
 			System.out.println(CNMessageTransfer.bytesToHex(message.getMessageBytes()));
 		}
 		else {
@@ -207,8 +276,8 @@ class color2 extends JFrame implements ActionListener, ChangeListener   {
 	// Main Method
 	public static void main(String args[])
 	{
-
-		color2 c2 = new color2();
+		new color2();
+		
 	}
 }
 
