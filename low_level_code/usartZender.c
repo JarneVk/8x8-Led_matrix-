@@ -28,8 +28,8 @@ werking: 	- 	Er moet een externe functie 'uint8_t getNextOutputData()' worden di
 void zender_timer_setup(){
 	printf_P(PSTR("init timeout timer \n\r"));
 	
-	TCB1_CCMPL = 0xF0;
-	TCB1_CCMPH = 0x00;
+	TCB1_CCMPL = 0x00;
+	TCB1_CCMPH = 0x10;
 	TCB1_CTRLA = 0b00000101;
 	TCB1_CTRLB = 0b00000000;		//periodic
 	TCB1_INTCTRL = 0x01;	//enable inetrups
@@ -40,11 +40,10 @@ void zender_timer_setup(){
 void uartsetup_zender_uart1(){
 	printf_P(PSTR("init zender \n\r"));
 	USART1_BAUD = 0x02B6; //19200
-	USART1_CTRLC = 0b00100111;  //8 bit mode
+	USART1_CTRLC = 0b10100111;  //8 bit mode
 	PORTC_DIRSET = 0x01;
 	USART1_CTRLB = 0b11000000;
-	USART1_CTRLA = 0b10000000;
-	USART1_EVCTRL = 0x01; 
+	USART1_CTRLA = 0b11000000;
 
 	zender_buffer_uart1 = 0;
 	NAck_count = 0;
@@ -59,14 +58,21 @@ void uartsetup_zender_uart1(){
  * @param hexgetal  een 8 bit getal dat verzonden moet worden 
  */
 void sendData_zender_usart1(uint8_t hexgetal){ 
-	// printf_P(PSTR("send %d \n\r"),hexgetal);
+	USART1_CTRLB = 0b01000000;
+	printf_P(PSTR("send %d \n\r"),hexgetal);
 	zender_buffer_uart1 = hexgetal;
     while(!(USART1_STATUS & USART_DREIF_bm));
     USART1_TXDATAL = hexgetal;
 }
 
+ISR(USART1_TXC_vect){
+	USART1_CTRLB = 0b11000000;
+	printf_P(PSTR("tc \n\r"));
+	USART1_STATUS |= USART_TXCIF_bm;
+}
+
 void sendNewColumn(){ 
-	// printf_P(PSTR("senNewColumn"));
+	printf_P(PSTR("senNewColumn"));
 	ontvang_i=0;
 
 	NAck_count = 0;
@@ -97,33 +103,41 @@ void RX_ontvanger_interupt(){
 	TCB1_CNTH = 0x00;	
 	zender_count_timeout = 0;
 	uint8_t data = USART1_RXDATAL;
-	// printf_P(PSTR(" %d \n\r"),data);
-	if(data == 1){	//ACK
-		NAck_count = 0;
-		USART1_TXDATAH = 0x00;
-		sendData_zender_usart1(getNextOutputData());
-		START_TIMER;
-	} else if(data == 2){ //NACK
-		NAck_count += 1;
-		USART1_TXDATAH = 0x00;
-		sendData_zender_usart1(zender_buffer_uart1);
-		START_TIMER;
-	} else if(data == 3){
-		//stop met zenden END
-		TCB1_CTRLB = 0x01;
-		driveLeds();
-	}
+	uint8_t dataH = USART0_RXDATAH;
+	printf_P(PSTR(" %d \n\r"),data);
+	if(dataH & USART_FERR_bm || data & USART_PERR_bm){
+		//NACK
+		printf_P(PSTR("NACK \n\r"));
+		USART1_TXDATAH = 0x01;
+		sendData_ontvanger_usart0(2);
+	} else if(data == 1){	//ACK
+			NAck_count = 0;
+			USART1_TXDATAH = 0x00;
+			sendData_zender_usart1(getNextOutputData());
+			START_TIMER;
+		} else if(data == 2){ //NACK
+			NAck_count += 1;
+			USART1_TXDATAH = 0x00;
+			sendData_zender_usart1(zender_buffer_uart1);
+			START_TIMER;
+		} else if(data == 3){
+			//stop met zenden END
+			TCB1_CTRLB = 0x01;
+			driveLeds();
+		}
 
 }
 
 ISR(USART1_RXC_vect){
-	// printf_P(PSTR("zender interupt : "));
-	if(NAck_count > 4){
+	/*printf_P(PSTR("zender interupt : "));
+	if(NAck_count > 10){
 		//stop met antwoorden
 	} else{
+		printf_P(PSTR(" NACK \n\r"));
 		RX_ontvanger_interupt();
-	}
+	}*/
 	
+	RX_ontvanger_interupt();
 
 }
 
@@ -135,15 +149,16 @@ ISR(TCB1_INT_vect){
 	TCB1_CNTH = 0x00;
 	PORTC_OUT ^= PIN5_bm;
 	TCB1_INTFLAGS = 0x01;
-	// printf_P(PSTR("timeout \n\r"));
+	printf_P(PSTR("timeout \n\r"));
 	zender_count_timeout += 1;
 	if(zender_count_timeout >= 4){		//verbinding verbroken
 		zender_count_timeout = 0;
 		driveLeds();	
-		// printf_P(PSTR("stop timer \n\r"));
+		printf_P(PSTR("stop timer \n\r"));
 	}
 	else{
 		sendData_zender_usart1(zender_buffer_uart1);
 		START_TIMER;
 	}
 }
+

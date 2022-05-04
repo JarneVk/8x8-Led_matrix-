@@ -31,7 +31,6 @@ void uarts_setup();
 //zender
 void timer_setup();
 uint8_t getNextOutputData();
-uint8_t timerEventToggle;
 void sendNewColumn();
 
 //Led's
@@ -68,13 +67,11 @@ uint8_t string_brightness; //the brightness of the string to be displayed on the
 
 uint8_t zender_buffer_uart1;
 uint8_t ontvanger_buffer_uart0;
-uint8_t zender_verbinding;
-uint8_t zender_count_timeout;
-uint8_t NAck_count;
-uint8_t stop_antwoorden;
+volatile uint8_t zender_count_timeout;
+volatile uint8_t NAck_count;
 
-uint8_t columnIndex;
-uint8_t part;
+volatile uint8_t columnIndex;
+volatile uint8_t part;
 
 
 int ontvang_i; //testing
