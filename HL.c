@@ -213,10 +213,15 @@ void getUserLogo(Led inputLogo[][AMOUNT]) {
     for (int row = 0; row < AMOUNT; row++)
     {
         for(int col=0; col<AMOUNT; col++) {
-            logo_matrix[row][col]=inputLogo[row][col];
+            if(col<4) {
+                logo1_matrix[row][col]=inputLogo[row][col];
+            }
+            else {
+                uint8_t col_logo2 = col-4; //goes from 0->3 when col goes from 4->7
+                logo2_matrix[row][col_logo2]=inputLogo[row][col];
+            }
         }
     }
-    
 }
 
 //**********DATA PROCESSING**********
@@ -362,6 +367,22 @@ void charToLedLetter(char cha, Led letter[][LETTER_WIDTH], uint8_t brightness, u
         case 'x': enterLetterInMatrix(letter,matrix_x, brightness, red, green, blue);      break;
         case 'y': enterLetterInMatrix(letter,matrix_y, brightness, red, green, blue);      break;
         case 'z': enterLetterInMatrix(letter,matrix_z, brightness, red, green, blue);      break;
+        case '[': {
+            for(int row=0;row<AMOUNT;row++) {
+                for(int col=0;col<LETTER_WIDTH;col++) {
+                    letter[row][col]=logo1_matrix[row][col]; //copying the first half into the matrix to be shifted on the screen
+                }
+            }
+            break;
+        }
+        case ']': {
+            for(int row=0;row<AMOUNT;row++) {
+                for(int col=0;col<LETTER_WIDTH;col++) {
+                    letter[row][col]=logo2_matrix[row][col]; //copying the second half into the matrix to be shifted on the screen
+                }
+            }
+            break;
+        }
 
         case ' ': enterLetterInMatrix(letter,matrix_space, brightness, red, green, blue);  break;
 
