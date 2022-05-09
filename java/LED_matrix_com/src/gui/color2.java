@@ -245,8 +245,14 @@ class color2 extends JFrame implements ActionListener, ChangeListener   {
 			System.out.println("testing send");
 			
 			String sendS = txtPane.getText();
-			System.out.println("String |" + sendS + "| end");
+			
 			int len = sendS.length();
+			if (len > Message.MAX_STRING_LEN-1) {
+				sendS = sendS.substring(0, Message.MAX_STRING_LEN-1);
+				len = sendS.length();
+			}
+			
+			System.out.println("String |" + sendS + " " + len + "| end");
 			for(int i=0; i<len; i++) {	
 				System.out.println(sendFR.get(i) + "," + sendFG.get(i) + "," + sendFB.get(i));
 			}
@@ -277,7 +283,6 @@ class color2 extends JFrame implements ActionListener, ChangeListener   {
 	public static void main(String args[])
 	{
 		new color2();
-		
 	}
 }
 
