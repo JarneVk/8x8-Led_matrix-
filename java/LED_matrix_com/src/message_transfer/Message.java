@@ -63,16 +63,16 @@ public class Message {
 		messageBytes[currentIndex] = (byte) ((((messageColor.getBrightness() >>> 1) & 0x0f) << 4) | messageColor.getFgColors().get(0).getCompressedRed());
 		messageBytes[currentIndex + 1] = messageColor.getFgColors().get(0).getGreenBlueMerge();
 		for(int i = 2; i < lenString*2; i+=2) {
-			messageBytes[currentIndex + i] = messageColor.getFgColors().get(i).getCompressedRed();
-			messageBytes[currentIndex + i + 1] = messageColor.getFgColors().get(i).getGreenBlueMerge();
+			messageBytes[currentIndex + i] = messageColor.getFgColors().get(i/2).getCompressedRed();
+			messageBytes[currentIndex + i + 1] = messageColor.getFgColors().get(i/2).getGreenBlueMerge();
 			
 		}
 		currentIndex += lenString*2;
 		
 		messageBytes[currentIndex++] = CNMessageTransfer.END_OF_PHASE;
 		for(int i = 0; i < lenString*2; i+=2) {
-			messageBytes[currentIndex + i] = messageColor.getBgColors().get(i).getCompressedRed();
-			messageBytes[currentIndex + i + 1] = messageColor.getBgColors().get(i).getGreenBlueMerge();
+			messageBytes[currentIndex + i] = messageColor.getBgColors().get(i/2).getCompressedRed();
+			messageBytes[currentIndex + i + 1] = messageColor.getBgColors().get(i/2).getGreenBlueMerge();
 			
 		}
 		currentIndex += lenString*2;
