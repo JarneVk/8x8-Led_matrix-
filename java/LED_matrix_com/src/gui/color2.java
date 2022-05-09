@@ -145,19 +145,13 @@ class color2 extends JFrame implements ActionListener, ChangeListener   {
 		a = 255;
 
 		Color c = new Color(r, g, b, a);
-		int j2;
-		for(int j=7;j>=0;j--){
-		    for(int i=7;i>=0;i--){
-		    	if (i%2==1) {
-					j2 = 7-j;
-				}
-				else {
-					j2 = j;
-				}
-				buttons[i*8+j2] = new JButton("b"+ Integer.toString(i*8+j2)); 
-				buttons[i*8+j2].addActionListener(this);
-				buttons[i*8+j2].setBackground(c);
-				pMatrix.add(buttons[i*8+j2]);
+
+		for(int j=0;j<8;j++){
+	     	for(int i=0;i<8;i++){
+				buttons[i+j*8] = new JButton("b"+ Integer.toString(i+j*8)); 
+				buttons[i+j*8].addActionListener(this);
+				buttons[i+j*8].setBackground(c);
+				pMatrix.add(buttons[i+j*8]);
 				
 		    }
 		}
@@ -262,16 +256,27 @@ class color2 extends JFrame implements ActionListener, ChangeListener   {
 			for(int i=0; i<len; i++) {	
 				message.setFgColor(new Led(sendFR.get(i),sendFG.get(i),sendFB.get(i))  , i);
 			}
+
+			//logo
+			Color logoColor;
+			for(int j=0;j<8;j++){
+		     	for(int i=0;i<8;i++){
+		    	 	logoColor = buttons[i+j*8].getBackground();
+		    	 	message.setLogoColors(new Led(logoColor.getRed(), logoColor.getGreen(), logoColor.getBlue()), i+j*8);
+		    	 	System.out.println(logoColor.getRed() +  logoColor.getGreen() + logoColor.getBlue());
+		     	}
+			}
 			
 			CNMessageTransfer cnm;
-			System.out.println(CNMessageTransfer.bytesToHex(message.getMessageBytes()));
+			System.out.println(CNMessageTransfer.bytesToHex(message.getMessageBytes()));			
+			
 		}
 		else {
-			for(int j=7;j>=0;j--){
-		     	for(int i=7;i>=0;i--){
-		    	 	String buttonName = "b"+ Integer.toString(i*8+j); 
+			for(int j=0;j<8;j++){
+		     	for(int i=0;i<8;i++){
+		    	 	String buttonName = "b"+ Integer.toString(i+j*8); 
 		    	 	if (s.equals(buttonName)) {
-		    	 		buttons[i*8+j].setBackground(c);
+		    	 		buttons[i+j*8].setBackground(c);
 		    		}
 		     	}
 			}

@@ -19,14 +19,10 @@ public class Message {
 	private MessageColor messageColor;
 	
 	
-	private Led[][] logo;
+	private Led[] logo;
 	
 	public Message() {
 		messageColor = new MessageColor();
-		logo = new Led[8][8];
-		for(int i = 0; i < 8; i++)
-			for(int j = 0; j < 8; j++)
-				logo[i][j] = new Led(0, 0, 0);
 	}
 	
 	public String getMessage() {
@@ -47,7 +43,7 @@ public class Message {
 		//System.out.println(stringBytes.length + 1 + lenLeds + 1 + messageColor.getColorsIndex().size() + 1 + 1);
 //		System.out.println(stringBytes.length);
 //		System.out.println(lenLeds);
-		int lenMessage = 1 + lenString + 1 + lenString*2 + 1 + lenString*2 + 1 + 1;
+		int lenMessage = 1 + lenString + 1 + lenString*2 + lenString*2 + 64*2;
 		byte[] messageBytes = new byte[lenMessage];
 		int currentIndex = 0;
 		messageBytes[currentIndex++] = CNMessageTransfer.START_OF_TRANSMISSION;
@@ -69,17 +65,22 @@ public class Message {
 		}
 		currentIndex += lenString*2;
 		
-		messageBytes[currentIndex++] = CNMessageTransfer.END_OF_PHASE;
+//		messageBytes[currentIndex++] = CNMessageTransfer.END_OF_PHASE;
 		for(int i = 0; i < lenString*2; i+=2) {
 			messageBytes[currentIndex + i] = messageColor.getBgColors().get(i/2).getCompressedRed();
 			messageBytes[currentIndex + i + 1] = messageColor.getBgColors().get(i/2).getGreenBlueMerge();
-			
 		}
 		currentIndex += lenString*2;
 		
-		messageBytes[currentIndex++] = CNMessageTransfer.END_OF_PHASE;
+//		messageBytes[currentIndex++] = CNMessageTransfer.END_OF_PHASE;
 		//hier dan 8x8 array leds
-		messageBytes[currentIndex++] = CNMessageTransfer.END_OF_PHASE;
+		for(int i = 0; i < 64*2; i+=2) {
+			messageBytes[currentIndex + i] = (messageColor.getLogoColors())[i/2].getCompressedRed();
+			messageBytes[currentIndex + i + 1] = (messageColor.getLogoColors())[i/2].getGreenBlueMerge();
+		}
+		
+		
+//		messageBytes[currentIndex++] = CNMessageTransfer.END_OF_PHASE;
 		
 		return messageBytes;
 	}
@@ -90,6 +91,10 @@ public class Message {
 	
 	public void setBrightness(int brightness){
 		getMessageColor().setBrightness(brightness);
+	}
+	
+	public void setLogoColors(Led led, int i) {
+		getMessageColor().logoColors[i] = led;
 	}
 	
 	public void setFgRangeColor(Led color, int startCharacterIndex, int stopCharacterIndex) {
@@ -103,6 +108,8 @@ public class Message {
 	public void setBgRangeColor(Led color, int startCharacterIndex, int stopCharacterIndex) {
 		getMessageColor().setBgRangeColor(color, startCharacterIndex, stopCharacterIndex);
 	}
+	
+	
 
 	public MessageColor getMessageColor() {
 		return messageColor;
@@ -116,11 +123,16 @@ public class Message {
 	public class MessageColor{
 		private ArrayList<Led> fgColors;
 		private ArrayList<Led> bgColors;
+		private Led[] logoColors;
 		private byte brightness;
 		
 		private MessageColor() {
 			setFgColors(new ArrayList<Led>());
 			setBgColors(new ArrayList<Led>());
+			logoColors=new Led[64];
+			for(int i=0; i<64; i++) {	
+				logoColors[i] = new Led(255,255,255);
+			}
 			setFgRangeColor(new Led(255,255,255), 0, -1); //default foreground white 10 brightness from begin to end of message
 			setBgRangeColor(new Led(0,0,0), 0, -1); //default background black 0 brightness from begin to end of message
 			setBrightness(10);
@@ -138,11 +150,20 @@ public class Message {
 		public ArrayList<Led> getBgColors() {
 			return bgColors;
 		}
+		
+		public void setLogoColors(Led led, int i) {
+			logoColors[i] = led;
+		}
+		
+		public Led[] getLogoColors() {
+			return logoColors;
+		}
 
 		public void setBgColors(ArrayList<Led> bgColors) {
 			this.bgColors = bgColors;
 		}
-
+		
+	
 
 		/**
 		 * Sets the color for the previous index till the chosen index.
