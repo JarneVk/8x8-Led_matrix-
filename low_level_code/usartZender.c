@@ -29,7 +29,7 @@ void zender_timer_setup(){
 	printf_P(PSTR("init timeout timer \n\r"));
 	
 	TCB1_CCMPL = 0x00;
-	TCB1_CCMPH = 0x10;
+	TCB1_CCMPH = 0x01;
 	TCB1_CTRLA = 0b00000101;
 	TCB1_CTRLB = 0b00000000;		//periodic
 	TCB1_INTCTRL = 0x01;	//enable inetrups
@@ -59,7 +59,7 @@ void uartsetup_zender_uart1(){
  */
 void sendData_zender_usart1(uint8_t hexgetal){ 
 	USART1_CTRLB = 0b01000000;
-	printf_P(PSTR("send %d \n\r"),hexgetal);
+	// printf_P(PSTR("send %d \n\r"),hexgetal);
 	zender_buffer_uart1 = hexgetal;
     while(!(USART1_STATUS & USART_DREIF_bm));
     USART1_TXDATAL = hexgetal;
@@ -67,7 +67,7 @@ void sendData_zender_usart1(uint8_t hexgetal){
 
 ISR(USART1_TXC_vect){
 	USART1_CTRLB = 0b11000000;
-	printf_P(PSTR("tc \n\r"));
+	// printf_P(PSTR("tc \n\r"));
 	USART1_STATUS |= USART_TXCIF_bm;
 }
 
@@ -103,13 +103,13 @@ void RX_ontvanger_interupt(){
 	TCB1_CNTH = 0x00;	
 	zender_count_timeout = 0;
 	uint8_t data = USART1_RXDATAL;
-	uint8_t dataH = USART0_RXDATAH;
+	uint8_t dataH = USART1_RXDATAH;
 	printf_P(PSTR(" %d \n\r"),data);
-	if(dataH & USART_FERR_bm || data & USART_PERR_bm){
+	if(dataH & (USART_FERR_bm | USART_PERR_bm)){
 		//NACK
 		printf_P(PSTR("NACK \n\r"));
 		USART1_TXDATAH = 0x01;
-		sendData_ontvanger_usart0(2);
+		sendData_zender_usart1(2);
 	} else if(data == 1){	//ACK
 			NAck_count = 0;
 			USART1_TXDATAH = 0x00;
@@ -124,6 +124,8 @@ void RX_ontvanger_interupt(){
 			//stop met zenden END
 			TCB1_CTRLB = 0x01;
 			driveLeds();
+			printf_P(PSTR("end \n\r"));
+			
 		}
 
 }
@@ -147,7 +149,7 @@ ISR(TCB1_INT_vect){
 	STOP_TIMER;
 	TCB1_CNTL = 0x00;
 	TCB1_CNTH = 0x00;
-	PORTC_OUT ^= PIN5_bm;
+	// PORTC_OUT ^= PIN5_bm;
 	TCB1_INTFLAGS = 0x01;
 	printf_P(PSTR("timeout \n\r"));
 	zender_count_timeout += 1;

@@ -85,6 +85,7 @@ uint32_t ledToHardwareDriver(Led pixel) {
 //Global vars used here:
 //*main_matrix
 void driveLeds(){
+    printf_P(PSTR("dl \n\r"));
     uint32_t ledArray[AMOUNT*AMOUNT];
     for(int col=AMOUNT-1; col>=0; col--) {
         for(int row=AMOUNT-1; row>=0; row--) {
