@@ -15,11 +15,12 @@ public class Test {
 	
 	public static void testMessage() {
 		Message mes = new Message();
-		mes.setMessage("test");
-		mes.setFgRangeColor(new Led(255,0,255), 0, -1);
-		mes.setBgRangeColor(new Led(0,255,0), 0, -1);
-		mes.setBrightness(10);
-//		System.out.println(CNMessageTransfer.bytesToHex(mes.getMessageBytes()));
+		mes.setMessage("a");
+//		mes.setFgRangeColor(new Led(128,0,255), 0, -1);
+		mes.setBgRangeColor(new Led(0,128,0), 0, -1);
+		mes.setFgColor(new Led(128,0,40), 0);
+//		mes.setBrightness(10);
+		System.out.println(CNMessageTransfer.bytesToHex(mes.getMessageBytes()));
 		try {
 			CNMessageTransfer cn = new CNMessageTransfer(0);
 			try {
@@ -27,13 +28,16 @@ public class Test {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			cn.sendMessage(mes);
+			
 			while(true) {
+				System.out.println(cn.sendMessage(mes));
+				System.out.println("test");
 				try {
-					Thread.sleep(100);
+					Thread.sleep(10000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
+				
 //				System.out.println(cn.getData());
 //				System.out.println(cn.getHexString());
 			}

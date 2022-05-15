@@ -12,11 +12,14 @@ public class CNMessageTransfer{
 	private byte[] data;
 	private byte[] incMessage;
 	private Message outMessage;
-	private int index;
 	private boolean checkIn = false;
+	private boolean endTrans = false;
+	private long startTrans;
+	private boolean transCheck;
+	private boolean activeTrans = false;
 	public static final byte START_OF_TRANSMISSION = 1;
 	public static final byte END_OF_PHASE = 3;
-	public static final byte AMOUNT_OF_PHASES = 5;
+	public static final long TRANS_TIMEOUT = 2000;
 	
 	/**
 	 * 
@@ -29,86 +32,46 @@ public class CNMessageTransfer{
 		//hier thread die blijft checken
 		if(System.getProperty("os.name").toLowerCase().contains("windows"));
 			win = true;
-		SerialPort[] comPorts = SerialPort.getCommPorts();
-		ArrayList<SerialPort> curioVComs = new ArrayList<SerialPort>();
-		for(SerialPort sp : comPorts) {
+			SerialPort[] comPorts = SerialPort.getCommPorts();
+			ArrayList<SerialPort> curioVComs = new ArrayList<SerialPort>();
+			for(SerialPort sp : comPorts) {
 			//System.out.println(sp.getPortDescription());
-			if(sp.getPortDescription().equals("Curiosity Virtual COM Port") && win)
+			if(sp.getPortDescription().equals("Curiosity Virtual COM Port") || sp.getPortDescription().equals("nEDBG CMSIS-DAP"))
 				curioVComs.add(sp);
-			else
-				if(sp.getPortDescription().equals("nEDBG CMSIS-DAP"))
-					curioVComs.add(sp);
 		}
 		try {
 			comPort = curioVComs.get(i);
 			if(!comPort.openPort())
 				throw(new IOException("Failed to open port"));
-			//moet uiteindelijk SerialPortMessageListener worden wordt bij zenden niet gebruikt gewoon voor debug
-			comPort.addDataListener(new SerialPortMessageListener() {
+				//moet uiteindelijk SerialPortMessageListener worden wordt bij zenden niet gebruikt gewoon voor debug
+				comPort.addDataListener(new SerialPortDataListener() {
 
 				@Override
 				public int getListeningEvents() {
-					return SerialPort.LISTENING_EVENT_DATA_RECEIVED;
+					return  SerialPort.LISTENING_EVENT_DATA_RECEIVED;
 				}
 
 				@Override
 				public void serialEvent(SerialPortEvent arg0) {
 					data = arg0.getReceivedData();
 					System.out.println(CNMessageTransfer.bytesToHex(data));
-					System.out.println(index);
-					if(index != AMOUNT_OF_PHASES - 1) {
-						byte[] temp = new byte[incMessage.length + data.length];
-						for(int i = 0; i < incMessage.length; i++) {
-							temp[i] = incMessage[i];
-						}
-						for(int i = 0; i < data.length; i++) {
-							temp[incMessage.length + i] = data[i];
-						}
-						incMessage = temp;
-						setIndex(index + 1);
-//						System.out.println(CNMessageTransfer.bytesToHex(incMessage));
+					
+					byte[] temp = new byte[incMessage.length + data.length];
+					for(int i = 0; i < incMessage.length; i++) {
+						temp[i] = incMessage[i];
+					}
+					for(int i = 0; i < data.length; i++) {
+						temp[incMessage.length + i] = data[i];
+					}
+					incMessage = temp;
+//					System.out.println(CNMessageTransfer.bytesToHex(incMessage));
+					if(incMessage.length != outMessage.getMessageBytes().length) {
+						
 					}else {
 						
-						System.out.println("checkIn");
-						//dit in thread
+						checkIn = true;
 						
-//						System.out.print(ok);
-//						System.out.print(checkIn);
-//						
-//						//in thread
-//						System.out.println("test");
-						boolean ok = true;
-						System.out.println("inc");
-						System.out.println(CNMessageTransfer.bytesToHex(incMessage));
-						System.out.println("out");
-						System.out.println(CNMessageTransfer.bytesToHex(outMessage.getMessageBytes()));
-						for(int i = 0; i < incMessage.length; i++) {
-							if(incMessage[i] != outMessage.getMessageBytes()[i]) {
-								ok = false;
-								break;
-							}
-						}
-						try {
-							Thread.sleep(100);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						if(ok) {
-							byte[] send = new byte[] {CNMessageTransfer.integerToUnsignedByte(0xff),CNMessageTransfer.integerToUnsignedByte(0x03)};
-							System.out.println(CNMessageTransfer.bytesToHex(send));
-							writeBytes(send);
-						}else {
-							byte[] send = new byte[] {CNMessageTransfer.integerToUnsignedByte(0x00),CNMessageTransfer.integerToUnsignedByte(0x03)};
-							System.out.println(CNMessageTransfer.bytesToHex(send));
-							writeBytes(send);
-						}
-						checkIn = false;
-						incMessage = null;
-						System.out.println(ok);
-//						checkIn = true;
-						
-						setIndex(0);
+
 					}
 					new Thread(new Runnable() {
 						@Override
@@ -127,30 +90,34 @@ public class CNMessageTransfer{
 											break;
 										}
 									}
+									checkIn = false;
+									incMessage = new byte[0];
 									if(ok) {
 										writeBytes(new byte[] {CNMessageTransfer.integerToUnsignedByte(0xff),CNMessageTransfer.integerToUnsignedByte(0x03)});
+										transCheck = true;
 									}else {
 										writeBytes(new byte[] {CNMessageTransfer.integerToUnsignedByte(0x00),CNMessageTransfer.integerToUnsignedByte(0x03)});
+										transCheck = false;
 									}
-									checkIn = false;
-									incMessage = null;
-									System.out.println(ok);
+									synchronized(CNMessageTransfer.this) {
+										endTrans = true;
+									}
+									
+//									System.out.println(ok);
 								}
-							
+								if(activeTrans) {
+									try {
+										Thread.sleep(500);
+									} catch (InterruptedException e) {
+									}
+									if((System.currentTimeMillis() - CNMessageTransfer.this.startTrans) > CNMessageTransfer.TRANS_TIMEOUT) {
+										transCheck = false;
+										endTrans = true;
+									}
+								}
 							}
 						}
 					}).start();;
-				}
-
-				@Override
-				public boolean delimiterIndicatesEndOfMessage() {
-					return true;
-				}
-
-				@Override
-				public byte[] getMessageDelimiter() {
-					// TODO Auto-generated method stub
-					return new byte[] {3};
 				}
 			});
 			comPort.setComPortParameters(9600, 8, 1, SerialPort.EVEN_PARITY);
@@ -160,10 +127,7 @@ public class CNMessageTransfer{
 			throw(new SerialPortInvalidPortException("Curiosity Virtual COM Port not Found!"));
 		}
 	}
-	
-	public void setIndex(int in) {
-		index = (in<AMOUNT_OF_PHASES)?in:0;
-	}
+
 	
 	public String getData() {
 		if(data != null)
@@ -195,9 +159,27 @@ public class CNMessageTransfer{
 	 * DEZE JORN
 	 * @param mes
 	 */
-	public void sendMessage(Message mes) {
+	public boolean sendMessage(Message mes) {
+		
 		writeBytes(mes.getMessageBytes());
+		startTrans = System.currentTimeMillis();
+		activeTrans = true;
 		outMessage = mes;
+		while(!endTrans) {
+			synchronized(this) {
+				if(endTrans)
+					break;
+//				System.out.println("iets");
+			}
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+
+			}
+		}
+		activeTrans = false;
+		endTrans = false;
+		return transCheck;
 	}
 	
 	private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();

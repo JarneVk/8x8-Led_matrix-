@@ -93,7 +93,8 @@ void USART3_Init(){
  
 }
 
-
+// Led (*inputLogo)[8][8] = NULL;
+volatile Led inputLogo[8][8];
 void sendReceivedData(){
     USART3_sendChar((char)0x01);
 
@@ -102,6 +103,7 @@ void sendReceivedData(){
         USART3_sendChar(inputString[lengte++]);
     }
     USART3_sendChar((char)0x03);
+    //eind ascii
     USART3_sendChar(input_brightness <<4 | input_red[0]);
     USART3_sendChar(input_green[0] << 4 | input_blue[0]);
     for(int i = 1; i < lengte; i++){
@@ -109,32 +111,50 @@ void sendReceivedData(){
         USART3_sendChar(input_green[i] << 4 | input_blue[i]);
     }
 
-    USART3_sendChar((char)0x03);
+    // USART3_sendChar((char)0x03);
     for(int i = 0; i < lengte; i++){
         USART3_sendChar(input_bgred[i]);
         USART3_sendChar(input_bggreen[i] << 4 | input_bgblue[i]);
     }
-    USART3_sendChar((char)0x03);
+    // USART3_sendChar((char)0x03);
     //logo
-    USART3_sendChar((char)0x03);
-    USART3_sendChar((char)0x03);
+    for(int i = 0; i < AMOUNT; i++){
+        for(int j = 0; j < AMOUNT; j++){
+            // USART3_sendChar(inputLogo[i][j]->red);
+            // USART3_sendChar(inputLogo[i][j]->green << 4 | inputLogo[i][j]->blue);
+            USART3_sendChar(inputLogo[i][j].red);
+            USART3_sendChar(inputLogo[i][j].green << 4 | inputLogo[i][j].blue);
+        }
+    }
+    // // USART3_sendChar((char)0x03);
+    // USART3_sendChar((char)0x03);
+    // USART3_sendChar((char)0x03);
 }
 
 
-uint8_t lengthInputString = 0;
-uint8_t indexIn = 0;
-uint8_t sendPhase = 0;
+volatile uint8_t lengthInputString = 0;
+volatile uint8_t indexIn = 0;
+volatile uint8_t indexJn = 0;
+volatile uint8_t sendPhase = 0;
+volatile uint8_t inputLength = 0;
+
 
 
 ISR(USART3_RXC_vect){
     uint8_t inc = USART3_RXDATAL;
-    
+    // USART3_sendChar(sendPhase);
 
     switch(sendPhase){
         case 0:
             if(inc == 1){
+                // USART3_sendChar(8);
+                // USART3_sendChar(inc);
+                // USART3_sendChar((char)0x03);
                 sendPhase = 1;
                 indexIn = 0;
+                indexJn = 0;
+                // if(inputLogo == NULL)
+                //     inputLogo = malloc(sizeof(Led)*AMOUNT*AMOUNT);
             }break;
         case 1:
             if(inc != 3){
@@ -145,9 +165,11 @@ ISR(USART3_RXC_vect){
             }else{
                 inputString[indexIn] = '\0';
                 lengthInputString = indexIn;
+                inputLength = indexIn;
                 indexIn = 0;
                 sendPhase = 2;
             } break;
+            //eind ascii
         case 2:
             input_brightness = ((inc>>4) & 0x0f);
             input_red[indexIn] = (inc) & 0x0f;
@@ -155,69 +177,88 @@ ISR(USART3_RXC_vect){
             break;
         case 3:
         case 4:
-            if(inc != 3){
-                if(indexIn <= MAX_STRING_LEN - 1){
-                    if(sendPhase == 3){
-                        input_red[indexIn] = (inc) & 0x0f;
-                        sendPhase++;
-                    }else{
-                        input_green[indexIn] = (inc>>4) & 0x0f;
-                        input_blue[indexIn] = (inc) & 0x0f;
-                        indexIn++;
-                        sendPhase--;
-                    }
-                }
+            // if(inc != 3){
+            
+            if(sendPhase == 3){
+                input_red[indexIn] = (inc) & 0x0f;
+                sendPhase++;
             }else{
+                input_green[indexIn] = (inc>>4) & 0x0f;
+                input_blue[indexIn] = (inc) & 0x0f;
+                indexIn++;
+                sendPhase--;
+            }
+                // USART3_sendChar(indexIn);
+                // }
+            if(indexIn >= inputLength){
                 indexIn = 0;
                 sendPhase = 5;
             } break;
         case 5:
         case 6:
-            if(inc != 3){
-                if(indexIn <= MAX_STRING_LEN - 1){
-                    if(sendPhase == 5){
-                        input_bgred[indexIn] = (inc) & 0x0f;
-                        sendPhase++;
-                    }else{
-                        input_bggreen[indexIn] = (inc>>4) & 0x0f;
-                        input_bgblue[indexIn] = (inc) & 0x0f;
-                        indexIn++;
-                        sendPhase--;
-                    }
-                }
+            if(sendPhase == 5){
+                input_bgred[indexIn] = (inc) & 0x0f;
+                sendPhase++;
             }else{
+                input_bggreen[indexIn] = (inc>>4) & 0x0f;
+                input_bgblue[indexIn] = (inc) & 0x0f;
+                indexIn++;
+                sendPhase--;
+            }
+                // USART3_sendChar(indexIn);
+            if(indexIn >= inputLength){
                 indexIn = 0;
                 sendPhase = 7;
             } break;
         case 7:
-            if(inc != 3){
-                //logo
+        case 8:
+            
+            if(sendPhase == 7){
+                // inputLogo[indexIn][indexJn]->red = inc & 0x0f;
+                inputLogo[indexIn][indexJn].red = inc & 0x0f;
+                // USART3_sendChar(indexIn);
+                // USART3_sendChar(indexJn);
+                // USART3_sendChar(0xFF);
+                sendPhase++;
             }else{
+                // inputLogo[indexIn][indexJn]->green = (inc>>4) & 0x0f;
+                // inputLogo[indexIn][indexJn]->blue = inc & 0x0f;
+                inputLogo[indexIn][indexJn].green = (inc>>4) & 0x0f;
+                inputLogo[indexIn][indexJn].blue = inc & 0x0f;
+                // USART3_sendChar(indexJn);
+                indexJn++;
+                if(indexJn == 8){
+                    indexJn = 0;
+                    indexIn++;
+                }
                 
+                sendPhase--;
+            }
+            //logo
+            if(indexIn == 8){
                 sendReceivedData();
                 
                 indexIn = 0;
-                sendPhase = 8;
+                indexJn = 0;
+                sendPhase = 9;
             }break;
-        case 8:
+        case 9:
             // USART3_sendChar(8);
             // USART3_sendChar(inc);
             // USART3_sendChar((char)0x03);
-            if(inc != 3){
+
                 // USART3_sendChar(inc);
                 // USART3_sendChar((char)0x03);
                 if(inc > 0x7E){
                     // USART3_sendChar('k');
                     // USART3_sendChar((char)0x03);
                     getUserInput(inputString, input_red, input_blue, input_green, input_brightness);
-                }else{
-                    // USART3_sendChar('n');
-                    // USART3_sendChar((char)0x03);
                 }
-            }else{
-                // USART3_sendChar(inc);
-                // USART3_sendChar((char)0x03);
-                sendPhase = 0;
-            }break;
+            
+            // free(inputLogo);
+            // inputLogo = NULL;
+            sendPhase = 0;
+            break;
     }
+    
 }
