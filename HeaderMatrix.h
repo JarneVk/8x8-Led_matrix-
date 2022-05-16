@@ -85,7 +85,9 @@ int ontvang_i; //testing
 void ledsAansturen();
 void zender_timer_setup();
 
-
+//eeprom
+void writeToEeprom(char message[], uint8_t s_r[], uint8_t s_g[], uint8_t s_b[], Led logo[][AMOUNT], uint8_t brightness);
+uint8_t readFromEeprom(char message[], uint8_t s_r[], uint8_t s_g[], uint8_t s_b[], Led logo[][AMOUNT], uint8_t *brightness);
 
 
 void endOntvanger();

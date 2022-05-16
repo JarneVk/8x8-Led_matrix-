@@ -94,7 +94,7 @@ void USART3_Init(){
 }
 
 // Led (*inputLogo)[8][8] = NULL;
-volatile Led inputLogo[8][8];
+Led inputLogo[8][8];
 void sendReceivedData(){
     USART3_sendChar((char)0x01);
 
@@ -132,11 +132,11 @@ void sendReceivedData(){
 }
 
 
-volatile uint8_t lengthInputString = 0;
-volatile uint8_t indexIn = 0;
-volatile uint8_t indexJn = 0;
-volatile uint8_t sendPhase = 0;
-volatile uint8_t inputLength = 0;
+uint8_t lengthInputString = 0;
+uint8_t indexIn = 0;
+uint8_t indexJn = 0;
+uint8_t sendPhase = 0;
+uint8_t inputLength = 0;
 
 
 
@@ -253,6 +253,7 @@ ISR(USART3_RXC_vect){
                     // USART3_sendChar('k');
                     // USART3_sendChar((char)0x03);
                     getUserInput(inputString, input_red, input_blue, input_green, input_brightness);
+                    writeToEeprom(inputString, input_red, input_green, input_blue, inputLogo, input_brightness);
                 }
             
             // free(inputLogo);

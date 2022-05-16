@@ -93,10 +93,10 @@ public class CNMessageTransfer{
 									checkIn = false;
 									incMessage = new byte[0];
 									if(ok) {
-										writeBytes(new byte[] {CNMessageTransfer.integerToUnsignedByte(0xff),CNMessageTransfer.integerToUnsignedByte(0x03)});
+										writeBytes(new byte[] {CNMessageTransfer.integerToUnsignedByte(0xff)});
 										transCheck = true;
 									}else {
-										writeBytes(new byte[] {CNMessageTransfer.integerToUnsignedByte(0x00),CNMessageTransfer.integerToUnsignedByte(0x03)});
+										writeBytes(new byte[] {CNMessageTransfer.integerToUnsignedByte(0x00)});
 										transCheck = false;
 									}
 									synchronized(CNMessageTransfer.this) {

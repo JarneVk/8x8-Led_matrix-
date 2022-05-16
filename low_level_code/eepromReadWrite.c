@@ -1,8 +1,8 @@
-#include "HeaderMatrix.h"
+#include "../HeaderMatrix.h"
 #include <avr/eeprom.h>
 
 
-void writeToEeprom(char message[], uint8_t s_r[], uint8_t s_g[], uint8_t s_b[], Led logo[], uint8_t brightness){
+void writeToEeprom(char message[], uint8_t s_r[], uint8_t s_g[], uint8_t s_b[], Led logo[][AMOUNT], uint8_t brightness){
     uint8_t messageLength = 0;
     uint8_t currentAddres = 0;
     //length of message
@@ -41,16 +41,16 @@ void writeToEeprom(char message[], uint8_t s_r[], uint8_t s_g[], uint8_t s_b[], 
     }
 
     //logo to eeprom
-    for(int i = 0; i < AMOUNT; i+=2){
+    for(int i = 0; i < AMOUNT; i++){
         for(int j = 0; j < AMOUNT; j+=2){
-            eeprom_update_byte(currentAddres++, ((logo[i].red << 4) & 0xf0) | logo[i].blue);
-            eeprom_update_byte(currentAddres++, ((logo[i].green << 4) & 0xf0) | logo[i+1].red);
-            eeprom_update_byte(currentAddres++, ((logo[i+1].blue << 4) & 0xf0) | logo[i+1].green);
+            eeprom_update_byte(currentAddres++, ((logo[i][j].red << 4) & 0xf0) | logo[i][j].blue);
+            eeprom_update_byte(currentAddres++, ((logo[i][j].green << 4) & 0xf0) | logo[i][j+1].red);
+            eeprom_update_byte(currentAddres++, ((logo[i][j+1].blue << 4) & 0xf0) | logo[i][j+1].green);
         }
     }
 }
 
-int64_t readFromEeprom(char message[], uint8_t s_r[], uint8_t s_g[], uint8_t s_b[], Led logo[], uint8_t *brightness){
+uint8_t readFromEeprom(char message[], uint8_t s_r[], uint8_t s_g[], uint8_t s_b[], Led logo[][AMOUNT], uint8_t *brightness){
     uint8_t currentAddres = 0;
     if(eeprom_read_byte(currentAddres++) != 1){
         return 0;
@@ -95,20 +95,21 @@ int64_t readFromEeprom(char message[], uint8_t s_r[], uint8_t s_g[], uint8_t s_b
         }
     }
 
-    for(int i = 0; i < AMOUNT; i+=2){
+    for(int i = 0; i < AMOUNT; i++){
         for(int j = 0; j < AMOUNT; j+=2){
             uint8_t data;
             data = eeprom_read_byte(currentAddres++);
-            logo[i].red = (data >> 4) & 0x0f;
-            logo[i].blue = data & 0x0f;
+            logo[i][j].red = (data >> 4) & 0x0f;
+            logo[i][j].blue = data & 0x0f;
 
             data = eeprom_read_byte(currentAddres++);
-            logo[i].green = (data >> 4) & 0x0f;
-            logo[i+1].red = data & 0x0f;
+            logo[i][j].green = (data >> 4) & 0x0f;
+            logo[i][j+1].red = data & 0x0f;
 
             data = eeprom_read_byte(currentAddres++);
-            logo[i+1].blue = (data >> 4) & 0x0f;
-            logo[i+1].green = data & 0x0f;
+            logo[i][j+1].blue = (data >> 4) & 0x0f;
+            logo[i][j+1].green = data & 0x0f;
         }
     }
+    return 1;
 }
