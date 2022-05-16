@@ -29,7 +29,6 @@ void uarts_setup();
 //zender
 void timer_setup();
 uint8_t getNextOutputData();
-uint8_t timerEventToggle;
 void sendNewColumn();
 
 //Led's
@@ -40,6 +39,7 @@ void writeToLed(uint32_t bits[]);
 //shiftTimer
 void shiftTimer_reset();
 
+int writeOntvangenData(uint8_t data);
 
 //computer communication
 void USART3_Init();
@@ -60,6 +60,7 @@ void initGlobalVariables();
 
 void driveLeds();
 void getUserInput(char inputString[], uint8_t s_r[], uint8_t s_b[], uint8_t s_g[] ,uint8_t brightness);
+void getUserLogo(Led inputLogo[][AMOUNT]);
 
 char inputString[MAX_STRING_LEN + 1];
 uint8_t input_red[MAX_STRING_LEN]; //the amount of red for each letter of the string
@@ -72,13 +73,11 @@ uint8_t input_brightness; //the brightness of the string to be displayed on the 
 
 uint8_t zender_buffer_uart1;
 uint8_t ontvanger_buffer_uart0;
-uint8_t zender_verbinding;
-uint8_t zender_count_timeout;
-uint8_t NAck_count;
-uint8_t stop_antwoorden;
+volatile uint8_t zender_count_timeout;
+volatile uint8_t NAck_count;
 
-uint8_t columnIndex;
-uint8_t part;
+volatile uint8_t columnIndex;
+volatile uint8_t part;
 
 
 int ontvang_i; //testing
@@ -91,3 +90,7 @@ uint8_t readFromEeprom(char message[], uint8_t s_r[], uint8_t s_g[], uint8_t s_b
 
 
 void endOntvanger();
+
+
+volatile uint8_t ontvangerEnd;
+volatile uint8_t zenderEnd;

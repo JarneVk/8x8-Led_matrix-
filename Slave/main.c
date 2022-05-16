@@ -12,7 +12,7 @@ int main(void)
     uarts_setup();
     //shiftTimer_setup();
     //string in matrix zetten
-    //getUserInput();
+    // getUserInput();
     
     while (1) 
     {
