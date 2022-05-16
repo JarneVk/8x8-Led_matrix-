@@ -41,6 +41,7 @@ void writeToLed(uint32_t bits[]);
 //shiftTimer
 void shiftTimer_reset();
 
+int writeOntvangenData(uint8_t data);
 
 //computer communication
 void USART3_Init();
@@ -84,3 +85,7 @@ uint8_t colorIndex[MAX_MESSAGE_COLORS];
 
 
 void endOntvanger();
+
+
+volatile uint8_t ontvangerEnd;
+volatile uint8_t zenderEnd;

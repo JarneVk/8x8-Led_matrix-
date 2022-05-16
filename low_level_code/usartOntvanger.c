@@ -20,7 +20,7 @@ werking :	- 	Er moet een externe functie 'int writeUartData(uint8_t data)' worde
 
 
 void uartsetup_ontvanger_uart0(){
-	// printf_P(PSTR("init ontvanger \n\r"));
+	//// printf_P(PSTR("init ontvanger \n\r"));
 	USART0_BAUD = 0x02B6; //19200
 	USART0_CTRLC = 0b10100111;  //8 bit mode
 	PORTA_DIRSET = 0x01;
@@ -43,7 +43,7 @@ void uartsetup_ontvanger_uart0(){
 
 
 void sendData_ontvanger_usart0(uint8_t hexgetal){
-	// printf_P(PSTR("send %d \n\r"),hexgetal);
+	//// printf_P(PSTR("send %d \n\r"),hexgetal);
 	USART0_CTRLB = 0b01000000;
 	ontvanger_buffer_uart0 = hexgetal;
     while(!(USART0_STATUS & USART_DREIF_bm));
@@ -52,7 +52,7 @@ void sendData_ontvanger_usart0(uint8_t hexgetal){
 
 ISR(USART0_TXC_vect){
 	USART0_CTRLB = 0b11000000;
-	// printf_P(PSTR("tc \n\r"));
+	//// printf_P(PSTR("tc \n\r"));
 	USART0_STATUS |= USART_TXCIF_bm;
 }
 
@@ -62,11 +62,11 @@ void RX_inperupt_ontvanger(){
 	bits[1] = USART0_RXDATAH;
 	bits[0] = USART0_RXDATAL;
 
-	// printf_P(PSTR("%d \n\r"),bits[0]);
+	//printf_P(PSTR("ont:%d \n\r"),bits[0]);
 
 	if(bits[1] & USART_FERR_bm || bits[1] & USART_PERR_bm){
 		//NACK
-		// printf_P(PSTR("NACK \n\r"));
+		//// printf_P(PSTR("NACK \n\r"));
 		sendData_ontvanger_usart0(2);
 	} else{
 		if(bits[1] & USART_DATA8_bm && bits[0] == 2){
@@ -74,7 +74,7 @@ void RX_inperupt_ontvanger(){
 			sendData_ontvanger_usart0(ontvanger_buffer_uart0);
 		}
 		else if(bits[1] & USART_DATA8_bm  && bits[0] == 60){
-			// printf_P(PSTR("startframe \n\r"));
+			//// printf_P(PSTR("startframe \n\r"));
 			//clear slave variable voor nieuw frame
 			ontvang_i = 0;
 			sendNewColumn();
@@ -84,10 +84,15 @@ void RX_inperupt_ontvanger(){
 			sendData_ontvanger_usart0(1); //ACK
 		} else {
 			// END
+			ontvangerEnd = 1;
 			endOntvanger();
 			ontvang_i=0;
 			sendData_ontvanger_usart0(3);
-			// printf_P(PSTR("end_o \n\r"));
+			//printf_P(PSTR("end_o \n\r"));
+			if(zenderEnd){
+				driveLeds();
+			}
+			zenderEnd = 0;
 		}
 	}
 
@@ -96,10 +101,10 @@ void RX_inperupt_ontvanger(){
 
 ISR(USART0_RXC_vect){
 	PORTC_OUT |= PIN7_bm;
-	// printf_P(PSTR("ontvanger interupt : "));
+	//// printf_P(PSTR("ontvanger interupt : "));
 	RX_inperupt_ontvanger();
 	PORTC_OUT &= ~PIN7_bm;
-	// printf_P(PSTR("frame: %d \n\r"),USART0_RXDATAL);
+	//// printf_P(PSTR("frame: %d \n\r"),USART0_RXDATAL);
 }
 
 

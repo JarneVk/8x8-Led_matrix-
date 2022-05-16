@@ -49,7 +49,7 @@ int main(void)
 
     while (1) 
     {
-        printf_P(PSTR("ontvanger \n\r"));
-        _delay_ms(10000);
+        // printf_P(PSTR("ontvanger \n\r"));
+        // _delay_ms(10000);
     }
 }
