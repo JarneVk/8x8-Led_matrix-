@@ -261,7 +261,7 @@ void enterLetterInMatrix(Led m[][LETTER_WIDTH], const uint8_t letterMatrix[][LET
 void shiftMatrix(Led columnReceived[AMOUNT]) {
 
     for(int j=0; j<AMOUNT; j++) {
-        if(j==0) {
+        if(j==(master+1)%2) {
             for(int i=0; i<AMOUNT; i++) {
                 columnSend[i]=main_matrix[i][j]; //copying the first column to send to the next matrix
             }
