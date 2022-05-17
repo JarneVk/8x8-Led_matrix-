@@ -216,6 +216,7 @@ ISR(USART3_RXC_vect){
             if(sendPhase == 7){
                 // inputLogo[indexIn][indexJn]->red = inc & 0x0f;
                 inputLogo[indexIn][indexJn].red = inc & 0x0f;
+                inputLogo[indexIn][indexJn].brightness = input_brightness;
                 // USART3_sendChar(indexIn);
                 // USART3_sendChar(indexJn);
                 // USART3_sendChar(0xFF);
