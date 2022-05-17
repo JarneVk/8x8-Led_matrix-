@@ -155,7 +155,7 @@ ISR(TCB1_INT_vect){
 		if(zender_count_timeout >= 4){		//verbinding verbroken
 			zender_count_timeout = 0;
 			zenderEnd = 1;
-			if(ontvangerEnd){
+			if(ontvangerEnd || master){
 				driveLeds();
 			}
 			ontvangerEnd = 0;

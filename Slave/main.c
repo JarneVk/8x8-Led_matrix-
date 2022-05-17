@@ -5,6 +5,7 @@
 
 int main(void)
 {
+    master = 0;
     //initialisatie 
     USART3_Init();
     initLedPoorten();

@@ -1,10 +1,9 @@
 #include "../HeaderMatrix.h"
 #include <avr/io.h>
 
-
-
 int main(void)
 {
+    master = 1;
     //initialisatie 
     USART3_Init();
     initLedPoorten();

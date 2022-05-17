@@ -94,3 +94,5 @@ void endOntvanger();
 
 volatile uint8_t ontvangerEnd;
 volatile uint8_t zenderEnd;
+
+uint8_t master;
