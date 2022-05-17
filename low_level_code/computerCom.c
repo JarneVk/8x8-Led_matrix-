@@ -72,6 +72,7 @@ void USART3_Init(){
     #ifdef PRINTFP
     stdout = &USART3_stream;
     #endif
+    CPUINT_LVL1VEC = USART3_RXC_vect_num;//tesster tesst test test test
     //9600
     USART3_BAUD = 0x056D;
     //Asynchronous even parity 1 stop bit 8 bit size
