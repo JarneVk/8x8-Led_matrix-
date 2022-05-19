@@ -40,9 +40,6 @@ public class Message {
 	public byte[] getMessageBytes() {
 		byte[] stringBytes = message.getBytes(StandardCharsets.UTF_8);
 		int lenString = stringBytes.length;
-		//System.out.println(stringBytes.length + 1 + lenLeds + 1 + messageColor.getColorsIndex().size() + 1 + 1);
-//		System.out.println(stringBytes.length);
-//		System.out.println(lenLeds);
 		int lenMessage = 1 + lenString + 1 + lenString*2 + lenString*2 + 64*2;
 		byte[] messageBytes = new byte[lenMessage];
 		int currentIndex = 0;
@@ -52,10 +49,6 @@ public class Message {
 			
 		}
 		messageBytes[currentIndex++] = CNMessageTransfer.END_OF_PHASE;
-//		System.out.println(CNMessageTransfer.bytesToHex(
-//				new byte[] {(byte)(((messageColor.getBrightness() >>> 1) & 0x0f) << 4)}));
-//		System.out.println(CNMessageTransfer.bytesToHex(
-//				new byte[] {(byte)(((messageColor.getFgColors().get(0).getGreenBlueMerge())))}));
 		messageBytes[currentIndex] = (byte) ((((messageColor.getBrightness() >>> 1) & 0x0f) << 4) | messageColor.getFgColors().get(0).getCompressedRed());
 		messageBytes[currentIndex + 1] = messageColor.getFgColors().get(0).getGreenBlueMerge();
 		for(int i = 2; i < lenString*2; i+=2) {
@@ -65,22 +58,16 @@ public class Message {
 		}
 		currentIndex += lenString*2;
 		
-//		messageBytes[currentIndex++] = CNMessageTransfer.END_OF_PHASE;
 		for(int i = 0; i < lenString*2; i+=2) {
 			messageBytes[currentIndex + i] = messageColor.getBgColors().get(i/2).getCompressedRed();
 			messageBytes[currentIndex + i + 1] = messageColor.getBgColors().get(i/2).getGreenBlueMerge();
 		}
 		currentIndex += lenString*2;
 		
-//		messageBytes[currentIndex++] = CNMessageTransfer.END_OF_PHASE;
-		//hier dan 8x8 array leds
 		for(int i = 0; i < 64*2; i+=2) {
 			messageBytes[currentIndex + i] = (messageColor.getLogoColors())[i/2].getCompressedRed();
 			messageBytes[currentIndex + i + 1] = (messageColor.getLogoColors())[i/2].getGreenBlueMerge();
 		}
-		
-		
-//		messageBytes[currentIndex++] = CNMessageTransfer.END_OF_PHASE;
 		
 		return messageBytes;
 	}
@@ -216,7 +203,5 @@ public class Message {
 		public byte getBrightness() {
 			return brightness;
 		}
-
-		
 	}
 }

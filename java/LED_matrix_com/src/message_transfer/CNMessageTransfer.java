@@ -63,60 +63,9 @@ public class CNMessageTransfer{
 						temp[incMessage.length + i] = data[i];
 					}
 					incMessage = temp;
-//					System.out.println(CNMessageTransfer.bytesToHex(incMessage));
-					if(incMessage.length != outMessage.getMessageBytes().length) {
-						
-					}else {
-						
+					if(incMessage.length == outMessage.getMessageBytes().length) {
 						checkIn = true;
-						
-
 					}
-//					new Thread(new Runnable() {
-//						@Override
-//						public void run() {
-//							while(true) {
-//								if(checkIn) {
-//									
-//									boolean ok = true;
-//									System.out.println("inc");
-//									System.out.println(CNMessageTransfer.bytesToHex(incMessage));
-//									System.out.println("out");
-//									System.out.println(CNMessageTransfer.bytesToHex(outMessage.getMessageBytes()));
-//									for(int i = 0; i < incMessage.length; i++) {
-//										if(incMessage[i] != outMessage.getMessageBytes()[i]) {
-//											ok = false;
-//											break;
-//										}
-//									}
-//									checkIn = false;
-//									incMessage = new byte[0];
-//									if(ok) {
-//										writeBytes(new byte[] {CNMessageTransfer.integerToUnsignedByte(0xff)});
-//										transCheck = true;
-//									}else {
-//										writeBytes(new byte[] {CNMessageTransfer.integerToUnsignedByte(0x00)});
-//										transCheck = false;
-//									}
-//									synchronized(CNMessageTransfer.this) {
-//										endTrans = true;
-//									}
-//									
-////									System.out.println(ok);
-//								}
-//								if(activeTrans) {
-//									try {
-//										Thread.sleep(500);
-//									} catch (InterruptedException e) {
-//									}
-//									if((System.currentTimeMillis() - CNMessageTransfer.this.startTrans) > CNMessageTransfer.TRANS_TIMEOUT) {
-//										transCheck = false;
-//										endTrans = true;
-//									}
-//								}
-//							}
-//						}
-//					}).start();;
 				}
 			});
 			comPort.setComPortParameters(9600, 8, 1, SerialPort.EVEN_PARITY);
@@ -135,10 +84,6 @@ public class CNMessageTransfer{
 				if(checkIn) {
 					
 					boolean ok = true;
-					System.out.println("inc");
-					System.out.println(CNMessageTransfer.bytesToHex(incMessage));
-					System.out.println("out");
-					System.out.println(CNMessageTransfer.bytesToHex(outMessage.getMessageBytes()));
 					for(int i = 0; i < incMessage.length; i++) {
 						if(incMessage[i] != outMessage.getMessageBytes()[i]) {
 							ok = false;
@@ -157,8 +102,6 @@ public class CNMessageTransfer{
 					synchronized(CNMessageTransfer.this) {
 						endTrans = true;
 					}
-					
-//						System.out.println(ok);
 				}
 				if(activeTrans) {
 					try {
@@ -195,7 +138,6 @@ public class CNMessageTransfer{
 			message[i] = data[i];
 		}
 		message[data.length] = 3;
-//		System.out.println(bytesToHex(message));
 		writeBytes(message);
 	}
 	
@@ -214,7 +156,6 @@ public class CNMessageTransfer{
 			synchronized(this) {
 				if(endTrans)
 					break;
-//				System.out.println("iets");
 			}
 			try {
 				Thread.sleep(500);
