@@ -7,7 +7,7 @@ void writeToEeprom(char message[], uint8_t s_r[], uint8_t s_g[], uint8_t s_b[], 
     uint8_t currentAddres = 0;
     //length of message
     for(; message[messageLength] != '\0'; messageLength++);
-    
+    messageLength++;
     uint8_t uneven = messageLength%2;
 
     eeprom_update_byte(currentAddres++, 1); //data is in eeprom
@@ -59,7 +59,7 @@ uint8_t readFromEeprom(char message[], uint8_t s_r[], uint8_t s_g[], uint8_t s_b
     uint8_t messageLength = 0;
     while(1){
         message[messageLength] = eeprom_read_byte(currentAddres++);
-        if(message[messageLength++]){
+        if(message[messageLength++] == '\0'){
             break;
         }
     }

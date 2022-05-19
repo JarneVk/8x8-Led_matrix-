@@ -47,6 +47,13 @@ void writeToLed(uint32_t bits[]){
             }
         }
     }
+    for(int i=0; i<32; i++){    //32x0
+        //_delay_ms(1);
+        PORTB_OUT |= PIN4_bm;
+        //_delay_ms(1);
+        PORTB_OUT &= ~PIN4_bm;
+        //_delay_ms(1);
+    }
     /*
     for(int i=0; i<32; i++){    //32x1
         PORTB_OUT |= PIN5_bm;

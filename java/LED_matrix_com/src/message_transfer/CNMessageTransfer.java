@@ -30,11 +30,10 @@ public class CNMessageTransfer{
 		boolean win = false;
 		incMessage = new byte[0];
 		//hier thread die blijft checken
-		if(System.getProperty("os.name").toLowerCase().contains("windows"));
-			win = true;
-			SerialPort[] comPorts = SerialPort.getCommPorts();
-			ArrayList<SerialPort> curioVComs = new ArrayList<SerialPort>();
-			for(SerialPort sp : comPorts) {
+
+		SerialPort[] comPorts = SerialPort.getCommPorts();
+		ArrayList<SerialPort> curioVComs = new ArrayList<SerialPort>();
+		for(SerialPort sp : comPorts) {
 			//System.out.println(sp.getPortDescription());
 			if(sp.getPortDescription().equals("Curiosity Virtual COM Port") || sp.getPortDescription().equals("nEDBG CMSIS-DAP"))
 				curioVComs.add(sp);
@@ -73,51 +72,51 @@ public class CNMessageTransfer{
 						
 
 					}
-					new Thread(new Runnable() {
-						@Override
-						public void run() {
-							while(true) {
-								if(checkIn) {
-									
-									boolean ok = true;
-									System.out.println("inc");
-									System.out.println(CNMessageTransfer.bytesToHex(incMessage));
-									System.out.println("out");
-									System.out.println(CNMessageTransfer.bytesToHex(outMessage.getMessageBytes()));
-									for(int i = 0; i < incMessage.length; i++) {
-										if(incMessage[i] != outMessage.getMessageBytes()[i]) {
-											ok = false;
-											break;
-										}
-									}
-									checkIn = false;
-									incMessage = new byte[0];
-									if(ok) {
-										writeBytes(new byte[] {CNMessageTransfer.integerToUnsignedByte(0xff)});
-										transCheck = true;
-									}else {
-										writeBytes(new byte[] {CNMessageTransfer.integerToUnsignedByte(0x00)});
-										transCheck = false;
-									}
-									synchronized(CNMessageTransfer.this) {
-										endTrans = true;
-									}
-									
-//									System.out.println(ok);
-								}
-								if(activeTrans) {
-									try {
-										Thread.sleep(500);
-									} catch (InterruptedException e) {
-									}
-									if((System.currentTimeMillis() - CNMessageTransfer.this.startTrans) > CNMessageTransfer.TRANS_TIMEOUT) {
-										transCheck = false;
-										endTrans = true;
-									}
-								}
-							}
-						}
-					}).start();;
+//					new Thread(new Runnable() {
+//						@Override
+//						public void run() {
+//							while(true) {
+//								if(checkIn) {
+//									
+//									boolean ok = true;
+//									System.out.println("inc");
+//									System.out.println(CNMessageTransfer.bytesToHex(incMessage));
+//									System.out.println("out");
+//									System.out.println(CNMessageTransfer.bytesToHex(outMessage.getMessageBytes()));
+//									for(int i = 0; i < incMessage.length; i++) {
+//										if(incMessage[i] != outMessage.getMessageBytes()[i]) {
+//											ok = false;
+//											break;
+//										}
+//									}
+//									checkIn = false;
+//									incMessage = new byte[0];
+//									if(ok) {
+//										writeBytes(new byte[] {CNMessageTransfer.integerToUnsignedByte(0xff)});
+//										transCheck = true;
+//									}else {
+//										writeBytes(new byte[] {CNMessageTransfer.integerToUnsignedByte(0x00)});
+//										transCheck = false;
+//									}
+//									synchronized(CNMessageTransfer.this) {
+//										endTrans = true;
+//									}
+//									
+////									System.out.println(ok);
+//								}
+//								if(activeTrans) {
+//									try {
+//										Thread.sleep(500);
+//									} catch (InterruptedException e) {
+//									}
+//									if((System.currentTimeMillis() - CNMessageTransfer.this.startTrans) > CNMessageTransfer.TRANS_TIMEOUT) {
+//										transCheck = false;
+//										endTrans = true;
+//									}
+//								}
+//							}
+//						}
+//					}).start();;
 				}
 			});
 			comPort.setComPortParameters(9600, 8, 1, SerialPort.EVEN_PARITY);
@@ -128,7 +127,52 @@ public class CNMessageTransfer{
 		}
 	}
 
-	
+	private class InputCheck implements Runnable{
+		public boolean stop = false;
+		@Override
+		public void run() {
+			while(!stop) {
+				if(checkIn) {
+					
+					boolean ok = true;
+					System.out.println("inc");
+					System.out.println(CNMessageTransfer.bytesToHex(incMessage));
+					System.out.println("out");
+					System.out.println(CNMessageTransfer.bytesToHex(outMessage.getMessageBytes()));
+					for(int i = 0; i < incMessage.length; i++) {
+						if(incMessage[i] != outMessage.getMessageBytes()[i]) {
+							ok = false;
+							break;
+						}
+					}
+					checkIn = false;
+					incMessage = new byte[0];
+					if(ok) {
+						writeBytes(new byte[] {CNMessageTransfer.integerToUnsignedByte(0xff)});
+						transCheck = true;
+					}else {
+						writeBytes(new byte[] {CNMessageTransfer.integerToUnsignedByte(0x00)});
+						transCheck = false;
+					}
+					synchronized(CNMessageTransfer.this) {
+						endTrans = true;
+					}
+					
+//						System.out.println(ok);
+				}
+				if(activeTrans) {
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+					}
+					if((System.currentTimeMillis() - CNMessageTransfer.this.startTrans) > CNMessageTransfer.TRANS_TIMEOUT) {
+						transCheck = false;
+						endTrans = true;
+					}
+				}
+			}
+		}
+	}
 	public String getData() {
 		if(data != null)
 			return new String(data);
@@ -160,7 +204,8 @@ public class CNMessageTransfer{
 	 * @param mes
 	 */
 	public boolean sendMessage(Message mes) {
-		
+		InputCheck ic = new InputCheck();
+		new Thread(ic).start();
 		writeBytes(mes.getMessageBytes());
 		startTrans = System.currentTimeMillis();
 		activeTrans = true;
@@ -177,6 +222,7 @@ public class CNMessageTransfer{
 
 			}
 		}
+		ic.stop = true;
 		activeTrans = false;
 		endTrans = false;
 		return transCheck;

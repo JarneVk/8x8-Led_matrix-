@@ -123,7 +123,7 @@ void driveLeds(){
 
 static uint8_t array_ont[16];
 int writeOntvangenData(uint8_t data){
-    if(ontvang_i>14){
+    if(ontvang_i>15){
         return 1;
     } else  {
         array_ont[ontvang_i] = data;
@@ -266,6 +266,7 @@ void shiftMatrix(Led columnReceived[AMOUNT]) {
                 columnSend[i]=main_matrix[i][j]; //copying the first column to send to the next matrix
             }
         }
+
         if(j<AMOUNT-1){
             for(int i=0; i<AMOUNT; i++) {
                 main_matrix[i][j]=main_matrix[i][j+1];//shiting columns to the left

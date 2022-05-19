@@ -254,9 +254,11 @@ ISR(USART3_RXC_vect){
                 if(inc > 0x7E){
                     // USART3_sendChar('k');
                     // USART3_sendChar((char)0x03);
+                    cli();
+                    writeToEeprom(inputString, input_red, input_green, input_blue, inputLogo, input_brightness);
+                    sei();
                     getUserInput(inputString, input_red, input_blue, input_green, input_brightness);
                     getUserLogo(inputLogo);
-                    writeToEeprom(inputString, input_red, input_green, input_blue, inputLogo, input_brightness);
                 }
             
             // free(inputLogo);
