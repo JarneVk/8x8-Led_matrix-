@@ -43,7 +43,7 @@ void zender_timer_setup(){
 void uartsetup_zender_uart1(){
 	//printf_P(PSTR("init zender \n\r"));
 	USART1_BAUD = 0x02B6; //19200
-	USART1_CTRLC = 0b10100111;  //8 bit mode
+	USART1_CTRLC = 0b10100111;  //9 bit mode
 	PORTC_DIRSET = 0x01;
 	USART1_CTRLB = 0b11000000;
 	USART1_CTRLA = 0b11000000;
@@ -53,7 +53,6 @@ void uartsetup_zender_uart1(){
 	timer_var = 0;
 
 	zender_timer_setup();
-		
 }
 
 /**

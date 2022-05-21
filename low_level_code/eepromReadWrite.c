@@ -6,7 +6,7 @@ void writeToEeprom(char message[], uint8_t s_r[], uint8_t s_g[], uint8_t s_b[], 
     uint8_t messageLength = 0;
     uint8_t currentAddres = 0;
     //length of message
-    for(; message[messageLength] != '\0'; messageLength++);
+    for(; message[messageLength] != '\0'; messageLength++);//lol xd
     messageLength++;
     uint8_t uneven = messageLength%2;
 
