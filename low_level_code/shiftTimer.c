@@ -14,7 +14,7 @@ timer die interups geeft om de matrix te laten shiften
 void shiftTimer_setup(){
 	 	// clk/64
 	TCB0_CCMPL = 0x00;
-	TCB0_CCMPH = 0x0A;
+	TCB0_CCMPH = 0x08;
 	TCB0_CTRLA = 0b00000101; 
 	TCB0_CTRLB = 0x00;		//periotic interupt
 	TCB0_INTCTRL = 0x01;	//enable inetrups

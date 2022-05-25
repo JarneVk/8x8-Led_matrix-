@@ -10,6 +10,10 @@
 #include <stdio.h>
 #endif
 
+#define AMOUNT 8
+#define LETTER_WIDTH 4
+#define MAX_STRING_LEN 35
+
 typedef struct led{
     uint8_t brightness; // amount of brightness : value between 0-31
     uint8_t red; //amount of red : value between 0-31
@@ -18,13 +22,8 @@ typedef struct led{
 }Led;
 
 
-#define AMOUNT 8
-#define LETTER_WIDTH 4
-#define MAX_STRING_LEN 35
-
 //ontvanger
 void uarts_setup();
-
 
 //zender
 void timer_setup();
@@ -33,7 +32,6 @@ void sendNewColumn();
 
 //Led's
 void initLedPoorten();
-
 void writeToLed(uint32_t bits[]);
 
 //shiftTimer
@@ -43,25 +41,6 @@ int writeOntvangenData(uint8_t data);
 
 //computer communication
 void USART3_Init();
-void USART3_sendChar(char data);
-void sendReceivedData();
-
-/*
-Define for easy string literal use
-*/
-#define printStringLiteral(ARG) PROG_printString(PSTR(ARG))
-void PROG_printString(const char data[]);
-void SRAM_printBytes(uint8_t *data, uint8_t amount);
-
-
-void masterShiftMatrixFullString();
-
-void initGlobalVariables();
-
-void driveLeds();
-void getUserInput(char inputString[], uint8_t s_r[], uint8_t s_b[], uint8_t s_g[] ,uint8_t brightness);
-void getUserLogo(Led inputLogo[][AMOUNT]);
-
 char inputString[MAX_STRING_LEN + 1];
 uint8_t input_red[MAX_STRING_LEN]; //the amount of red for each letter of the string
 uint8_t input_green[MAX_STRING_LEN]; //the amount of green for each letter of the string
@@ -70,6 +49,14 @@ uint8_t input_bgred[MAX_STRING_LEN]; //the amount of red for each letter of the 
 uint8_t input_bggreen[MAX_STRING_LEN]; //the amount of green for each letter of the string
 uint8_t input_bgblue[MAX_STRING_LEN]; //the amount of blue for each letter of the string
 uint8_t input_brightness; //the brightness of the string to be displayed on the leds
+
+//andere belangrijke dingen
+void masterShiftMatrixFullString();
+void initGlobalVariables();
+void driveLeds();
+void getUserInput(char inputString[], uint8_t s_r[], uint8_t s_b[], uint8_t s_g[] ,uint8_t brightness);
+void getUserLogo(Led inputLogo[][AMOUNT]);
+
 
 uint8_t zender_buffer_uart1;
 uint8_t ontvanger_buffer_uart0;
@@ -95,4 +82,5 @@ void endOntvanger();
 volatile uint8_t ontvangerEnd;
 volatile uint8_t zenderEnd;
 
+//differentatie tussen master en slave
 uint8_t master;

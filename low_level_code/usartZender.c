@@ -50,7 +50,6 @@ void uartsetup_zender_uart1(){
 	timer_var = 0;
 
 	zender_timer_setup();
-		
 }
 
 /**

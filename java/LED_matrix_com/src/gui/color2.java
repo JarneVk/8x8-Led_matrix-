@@ -273,6 +273,7 @@ class color2 extends JFrame implements ActionListener, ChangeListener   {
 				cnm = new CNMessageTransfer(0);
 				cnm.sendMessage(message);
 				cnm.closePort();
+				System.out.println("eind");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
