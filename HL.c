@@ -102,20 +102,6 @@ void driveLeds(){
             ledArray[col_led*AMOUNT+row_led] = hwDriver;
         }
     }
-    /*
-    //printf_P(PSTR("leds\n\r"));
-    for(int col=AMOUNT-1; col>=0; col--) {
-        for(int row=AMOUNT-1; row>=0; row--) {
-            if(col%2) {
-                row=AMOUNT-1-row; //uneven rows in reverse order
-            }
-            if(ledArray[row+col*AMOUNT]&(uint32_t)0b00000000000000000000000011111111)
-                //printf_P(PSTR("1   "));
-            else
-                //printf_P(PSTR("0   "));
-        }
-        //printf_P(PSTR("\n\r"));
-    }*/
     writeToLed(ledArray);
 }
 
@@ -455,87 +441,3 @@ void initLedMatrix1d(Led matrix[AMOUNT], uint8_t value){
 void sendColumn() {
     sendNewColumn(); //function in uartZender
 }
-
-/*
-    main for master
-    initGlobalVariables()
-    initHardware()
-    getUserInput()
-    masterShiftMatrixFullString() <---- potentially with gui
-    sendColumn()
-    driveLeds()
-*/
-
-/*
-    main for slave
-    Led columnReceived[AMOUNT];
-    initHardware()
-    receiveData() -> fill in column received with inputToLed, return 1 -> expect something, return 0 -> expect nothing :)
-    shiftmatrix(columnReceived)
-    sendColumn()
-    driveLeds()
-
-*/
-/*
-int main(void)
-{   
-    USART3_Init();
-    
-    initLedPoorten();
-    initGlobalVariables();
-    string_brightness = 1;
-    for(int i = 0; i < MAX_STRING_LEN; i++){
-        string_red[i] = 0xFF;
-    }
-    //uarts_setup();
-    //leds testing 
-    
-    while(1){
-
-        //fillLedMatrixWithValue(main_matrix,20,31,0,0);
-        for(int i=0;i<40;i++){
-            masterShiftMatrixFullString();
-            driveLeds();
-        }
-        
-        
-        
-    }
-}
-*/
-/*int main(int argc, char *argv[]) {
-
-    Led matrix0[AMOUNT][AMOUNT];
-
-    USART3_Init();
-    //printf_P(PSTR("test\n\r\n\r\n\r"));
-    //printf_P(PSTR("%s\n\r"),string);
-    //printf_P(PSTR("%c\n\r"),string[0]);
-    fillLedMatrixWithValue(matrix0, 31, 31, 0, 0);
-    //printf_P(PSTR("Testing a matrix filled with 31 everywhere: \n\r"));
-    printLedMatrixToTerminal(matrix0);
-
-    //printf_P(PSTR("Testing letter matrix 'a': \n\r"));
-    printMatrixToTerminal_P(matrix_a); //test to see if global variables are available here
-
-    //testing master matrix shifting a full string  
-    initGlobalVariables();
-    getUserInput();
-    //printf_P(PSTR("Testing masterShiftMatrixFullString:\n\r\n\r"));
-    for(int i=0; i<40; i++) {
-        masterShiftMatrixFullString();
-    }
-
-}*/
-
-
-//na discord meeting op 4 april:
-//bericht aan Jarne : voor het ontvangen van de data wordt eerst uint_8 array_ont[16] opgevult met de 16 ontvangen pakketjes
-//daarna wordt deze gebruikt om columnreceived in te vullen met volgende code:
-/*
-Led columnReceived[AMOUNT]; //<- ontvangen kolom
-for(int i=0;i<AMOUNT;i++) {
-    inputToLed(columnReceived[I],array_ont[2i],array_ont[2i+1]); //<— invullen column received
-}
-shiftMatrix(columnReceived);
-*/
