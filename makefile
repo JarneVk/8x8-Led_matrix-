@@ -67,9 +67,9 @@ INCLUDE := $(foreach dir, $(EXT), -I$(dir))
 CFLAGS    = -DF_CPU=$(CLK) -x c -funsigned-char -funsigned-bitfields -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax\
  -Wall -mmcu=atmega4809 -B "./atmega4809" -c -std=gnu99 #-MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"
 LINKERFLAGS =  -Wl,--start-group -Wl,-lm  -Wl,--end-group -Wl,--gc-sections -mrelax -mmcu=atmega4809 -Wl,-u,vfprintf -lprintf_min -B "./atmega4809"  
-
+######################################################################################################### ^ link naar printf functie niet nodig kan weg voor zonder debug
 # executables
-AVRDUDE = avrdude -c $(PRG) -p $(MCU)
+AVRDUDE = avrdude -c $(PRG) -p $(MCU) #avrdude never used
 OBJCOPY = avr-objcopy
 OBJDUMP = avr-objdump
 SIZE	= avr-objdump -Pmem-usage
